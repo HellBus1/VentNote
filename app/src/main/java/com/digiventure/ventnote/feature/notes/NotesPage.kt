@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -17,11 +18,17 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.components.FAB
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesPage(navHostController: NavHostController) {
+fun NotesPage(
+    navHostController: NavHostController,
+    viewmodel: NotesPageViewModel = hiltViewModel()
+) {
+    val noteListState = viewmodel.noteList.observeAsState()
+
     Scaffold(
         topBar = {
             NotesAppBar()
@@ -39,7 +46,8 @@ fun NotesPage(navHostController: NavHostController) {
         },
         content = { contentPadding ->
             Box(modifier = Modifier.padding(contentPadding)) {
-                LazyColumn(modifier = Modifier.semantics { testTag = "notes-rv" }
+                LazyColumn(modifier = Modifier
+                    .semantics { testTag = "notes-rv" }
                     .fillMaxSize()) {
                     items(10) {}
                 }
