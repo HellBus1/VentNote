@@ -1,6 +1,8 @@
 package com.digiventure.ventnote.feature.notes.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -19,5 +21,17 @@ class NotesPageViewModel @Inject constructor(
         emitSource(repository.getNoteList()
             .onEach {}
             .asLiveData())
+    }
+
+    // Toggle search field
+    val isSearching = mutableStateOf(false)
+    fun toggleIsSearching() {
+        isSearching.value = !isSearching.value
+    }
+
+    // Searchfield value
+    val searchedTitleText = mutableStateOf("")
+    fun setSearchedTitleText(title: String) {
+        searchedTitleText.value = title
     }
 }

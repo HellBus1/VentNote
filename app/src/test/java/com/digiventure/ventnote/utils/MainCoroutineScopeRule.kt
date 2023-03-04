@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.digiventure.ventnote.common
+package com.digiventure.ventnote.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

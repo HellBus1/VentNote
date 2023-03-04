@@ -1,7 +1,7 @@
 package com.digiventure.ventnote.notes
 
-import com.digiventure.ventnote.common.BaseUnitTest
-import com.digiventure.ventnote.common.getValueForTest
+import com.digiventure.ventnote.utils.BaseUnitTest
+import com.digiventure.ventnote.utils.getValueForTest
 import com.digiventure.ventnote.data.NoteModel
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel

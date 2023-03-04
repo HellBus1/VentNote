@@ -1,6 +1,6 @@
 package com.digiventure.ventnote.notes
 
-import com.digiventure.ventnote.common.BaseUnitTest
+import com.digiventure.ventnote.utils.BaseUnitTest
 import com.digiventure.ventnote.data.NoteModel
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteLocalService

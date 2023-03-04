@@ -4,7 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.digiventure.common.BaseAcceptanceTest
+import com.digiventure.utils.BaseAcceptanceTest
 import com.digiventure.ventnote.feature.notes.NotesPage
 import com.digiventure.ventnote.ui.theme.VentNoteTheme
 import org.junit.Before

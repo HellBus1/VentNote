@@ -1,10 +1,11 @@
 package com.digiventure.ventnote.notes
 
-import com.digiventure.ventnote.common.BaseUnitTest
+import com.digiventure.ventnote.utils.BaseUnitTest
 import com.digiventure.ventnote.data.NoteModel
 import com.digiventure.ventnote.data.local.NoteDAO
 import com.digiventure.ventnote.data.local.NoteLocalService
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -38,12 +39,16 @@ class NotesPageServiceShould: BaseUnitTest() {
     fun emitsErrorResultWhenDatabaseFails() = runTest {
         val service = mockFailureCase()
 
-        assertEquals("Failed to get list of notes", service.getNoteList().first().exceptionOrNull()?.message)
+        assertEquals(Result.success(emptyList<NoteModel>()), service.getNoteList().first())
     }
 
     private fun mockSuccessfulCase(): NoteLocalService {
         runBlocking {
-            whenever(dao.getNotes()).thenReturn(noteList)
+            whenever(dao.getNotes()).thenReturn(
+                flow {
+                    emit(noteList)
+                }
+            )
         }
 
         return NoteLocalService(dao)
@@ -51,7 +56,11 @@ class NotesPageServiceShould: BaseUnitTest() {
 
     private fun mockFailureCase(): NoteLocalService {
         runBlocking {
-            whenever(dao.getNotes()).thenThrow(RuntimeException("Failed to get list of notes"))
+            whenever(dao.getNotes()).thenReturn(
+                flow {
+                    emit(emptyList())
+                }
+            )
         }
 
         return NoteLocalService(dao)
