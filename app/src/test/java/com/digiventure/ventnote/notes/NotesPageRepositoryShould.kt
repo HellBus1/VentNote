@@ -1,7 +1,7 @@
 package com.digiventure.ventnote.notes
 
 import com.digiventure.ventnote.utils.BaseUnitTest
-import com.digiventure.ventnote.data.NoteModel
+import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteLocalService
 import kotlinx.coroutines.flow.first
@@ -10,9 +10,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
+import org.mockito.Mockito.*
 import org.mockito.kotlin.whenever
 
 class NotesPageRepositoryShould: BaseUnitTest() {

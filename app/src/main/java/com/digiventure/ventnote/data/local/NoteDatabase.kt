@@ -4,7 +4,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.digiventure.ventnote.data.NoteModel
 import java.util.*
 
 object DateConverters {

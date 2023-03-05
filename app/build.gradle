@@ -16,7 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
         vectorDrawables {
             useSupportLibrary true
         }
@@ -49,6 +49,7 @@ android {
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += 'META-INF/*'
         }
     }
 }
@@ -90,13 +91,18 @@ dependencies {
     kapt 'com.google.dagger:hilt-android-compiler:2.44'
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0-alpha01'
 
-    // Integration test
+    // Hilt instrumented test
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.44"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.44"
+
+    // Instrumented test
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
-    // For mocking purposes
+    // For mocking purposes & make it visible in instrumented test
+    androidTestImplementation "io.mockk:mockk-android:1.13.4"
     testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
     testImplementation 'org.mockito:mockito-inline:5.1.1'
 

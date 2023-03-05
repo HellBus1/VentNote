@@ -2,13 +2,14 @@ package com.digiventure.ventnote.notes
 
 import com.digiventure.ventnote.utils.BaseUnitTest
 import com.digiventure.ventnote.utils.getValueForTest
-import com.digiventure.ventnote.data.NoteModel
+import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.times
@@ -22,9 +23,16 @@ class NotesPageViewModelShould: BaseUnitTest() {
     private val expected = Result.success(notes)
     private val exception = RuntimeException("Failed to get list of notes")
 
+    private lateinit var viewModel: NotesPageViewModel
+
+    @Before
+    fun setup() {
+        viewModel = NotesPageViewModel(repository)
+    }
+
     @Test
     fun getNotesFromRepository() = runTest {
-        val viewModel = mockSuccessfulCase()
+        mockSuccessfulCase()
 
         viewModel.noteList.getValueForTest()
 
@@ -33,19 +41,32 @@ class NotesPageViewModelShould: BaseUnitTest() {
 
     @Test
     fun emitsNotesFromRepository() = runTest {
-        val viewModel = mockSuccessfulCase()
+        mockSuccessfulCase()
 
         assertEquals(expected, viewModel.noteList.getValueForTest())
     }
 
     @Test
     fun emitsErrorWhenReceiveError() = runTest {
-        val viewModel = mockErrorCase()
+        mockErrorCase()
 
         assertEquals(exception, viewModel.noteList.getValueForTest()?.exceptionOrNull())
     }
 
-    private fun mockSuccessfulCase(): NotesPageViewModel {
+    @Test
+    fun isSearchingIsSameAsInput() {
+        viewModel.isSearching.value = true
+        assertEquals(true, viewModel.isSearching.value)
+    }
+
+    @Test
+    fun searchedTitleTextIsSameAsInput() {
+        val inputTitle = "Test Title"
+        viewModel.searchedTitleText.value = inputTitle
+        assertEquals(inputTitle, viewModel.searchedTitleText.value)
+    }
+
+    private fun mockSuccessfulCase() {
         runBlocking {
             whenever(repository.getNoteList()).thenReturn(
                 flow {
@@ -53,11 +74,9 @@ class NotesPageViewModelShould: BaseUnitTest() {
                 }
             )
         }
-
-        return NotesPageViewModel(repository)
     }
 
-    private fun mockErrorCase(): NotesPageViewModel {
+    private fun mockErrorCase() {
         runBlocking {
             whenever(repository.getNoteList()).thenReturn(
                 flow {
@@ -65,7 +84,5 @@ class NotesPageViewModelShould: BaseUnitTest() {
                 }
             )
         }
-
-        return NotesPageViewModel(repository)
     }
 }

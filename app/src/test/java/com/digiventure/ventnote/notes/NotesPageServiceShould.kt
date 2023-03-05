@@ -1,7 +1,7 @@
 package com.digiventure.ventnote.notes
 
 import com.digiventure.ventnote.utils.BaseUnitTest
-import com.digiventure.ventnote.data.NoteModel
+import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.data.local.NoteDAO
 import com.digiventure.ventnote.data.local.NoteLocalService
 import kotlinx.coroutines.flow.first

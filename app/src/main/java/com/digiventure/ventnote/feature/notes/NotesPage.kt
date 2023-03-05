@@ -1,5 +1,7 @@
 package com.digiventure.ventnote.feature.notes
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,17 +25,16 @@ import com.digiventure.ventnote.R
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.digiventure.ventnote.commons.DateUtil
-import com.digiventure.ventnote.data.NoteModel
+import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.components.NotesAppBar
 import com.digiventure.ventnote.feature.notes.components.NavDrawer
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesPage(
     navHostController: NavHostController,
+    viewModel: NotesPageViewModel = hiltViewModel()
 ) {
-    val viewModel: NotesPageViewModel = hiltViewModel()
     val noteListState = viewModel.noteList.observeAsState()
 
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
@@ -62,7 +63,7 @@ fun NotesPage(
                     FloatingActionButton(
                         onClick = {  },
                         modifier = Modifier.semantics {
-                            testTag = "add-note"
+                            testTag = "add-note-fab"
                         }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -85,7 +86,7 @@ fun NotesPage(
                         ) {
                             items(items = filteredNoteListState.value) {
                                 NotesItem(data = it) {
-                                    navHostController.navigate(route = "play_list_detail_page/${it.id}")
+                                    navHostController.navigate(route = "")
                                 }
                             }
                         }
@@ -96,10 +97,15 @@ fun NotesPage(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NotesItem(data: NoteModel, callback: () -> Unit) {
-    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Box(modifier = Modifier.padding(horizontal = 16.dp)
+        .combinedClickable(
+            onClick = {},
+            onLongClick = {}
+        )
+    ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.White),
             shape = RoundedCornerShape(10.dp),

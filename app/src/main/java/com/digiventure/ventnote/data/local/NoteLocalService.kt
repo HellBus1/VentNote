@@ -1,9 +1,7 @@
 package com.digiventure.ventnote.data.local
 
-import com.digiventure.ventnote.data.NoteModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
