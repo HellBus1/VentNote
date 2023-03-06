@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -23,34 +24,32 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
-@HiltAndroidTest
 class NotesFeature: BaseAcceptanceTest() {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
     private lateinit var navHostController: NavHostController
 
-    @BindValue @MockK
-    lateinit var viewModel: NotesPageViewModel
-
     @Before
     fun setUp() {
         hiltRule.inject()
-        MockKAnnotations.init(this, relaxUnitFun = true)
 
         composeTestRule.setContent {
             navHostController = rememberNavController()
 
             VentNoteTheme {
-                NotesPage(navHostController, viewModel)
+                NotesPage(navHostController)
             }
         }
     }

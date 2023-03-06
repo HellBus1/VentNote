@@ -3,7 +3,6 @@ package com.digiventure.ventnote.data.local
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import java.util.*
 
 @Entity(tableName = "note_table")

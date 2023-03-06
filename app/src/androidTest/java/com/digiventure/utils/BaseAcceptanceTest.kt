@@ -10,8 +10,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-abstract class BaseAcceptanceTest {
+abstract class BaseAcceptanceTest() {
     @get:Rule(order = 1)
     val composeTestRule = createComposeRule()
 

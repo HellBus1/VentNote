@@ -33,8 +33,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotesPage(
     navHostController: NavHostController,
-    viewModel: NotesPageViewModel = hiltViewModel()
 ) {
+    val viewModel: NotesPageViewModel = hiltViewModel()
     val noteListState = viewModel.noteList.observeAsState()
 
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }

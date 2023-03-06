@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.notes.components
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
