@@ -102,7 +102,6 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     // For mocking purposes & make it visible in instrumented test
-    androidTestImplementation "io.mockk:mockk-android:1.13.4"
     testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
     testImplementation 'org.mockito:mockito-inline:5.1.1'
 

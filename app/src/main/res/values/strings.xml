@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">VentNote</string>
+
     <string name="fab">fab</string>
+
+    <string name="nav_title">VentNote</string>
+
+    <!--  Top Appbar Components  -->
+    <string name="close_nav_icon">close nav icon</string>
+    <string name="drawer_nav_icon">drawer nav icon</string>
+    <string name="search_nav_icon">search nav icon</string>
+    <string name="delete_nav_icon">delete nav icon</string>
+    <string name="dropdown_nav_icon">dropdown nav icon</string>
 </resources>

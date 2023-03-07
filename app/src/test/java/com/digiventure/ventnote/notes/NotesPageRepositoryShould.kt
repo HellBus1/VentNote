@@ -16,7 +16,10 @@ import org.mockito.kotlin.whenever
 class NotesPageRepositoryShould: BaseUnitTest() {
     private val service: NoteLocalService = mock()
     private val noteList = mock<List<NoteModel>>()
+    private val note = mock<NoteModel>()
+
     private val exception = RuntimeException("Failed to get list of notes")
+    private val deletionException = RuntimeException("Failed to delete list of notes")
 
     @Test
     fun getNoteListFromService() = runTest {
@@ -39,6 +42,53 @@ class NotesPageRepositoryShould: BaseUnitTest() {
         val repository = mockFailureCase()
 
         assertEquals(exception, repository.getNoteList().first().exceptionOrNull())
+    }
+
+    @Test
+    fun deleteNoteListFromService() = runTest {
+        val repository = NoteRepository(service)
+
+        repository.deleteNoteList(note)
+
+        verify(service, times(1)).deleteNoteList(note)
+    }
+
+    @Test
+    fun emitBooleanAfterDeleteFromService() = runTest {
+        val repository = mockSuccessfulDeletionCase()
+
+        assertEquals(true, repository.deleteNoteList(note).first().getOrNull())
+    }
+
+    @Test
+    fun propagateErrorWhenDeletionError() = runTest {
+        val repository = mockFailureDeletionCase()
+
+        assertEquals(deletionException, repository.deleteNoteList(note).first().exceptionOrNull())
+    }
+
+    private fun mockSuccessfulDeletionCase(): NoteRepository {
+        runBlocking {
+            whenever(service.deleteNoteList(note)).thenReturn(
+                flow {
+                    emit(Result.success(true))
+                }
+            )
+        }
+
+        return NoteRepository(service)
+    }
+
+    private fun mockFailureDeletionCase(): NoteRepository {
+        runBlocking {
+            whenever(service.deleteNoteList(note)).thenReturn(
+                flow {
+                    emit(Result.failure(deletionException))
+                }
+            )
+        }
+
+        return NoteRepository(service)
     }
 
     private fun mockSuccessfulCase(): NoteRepository {

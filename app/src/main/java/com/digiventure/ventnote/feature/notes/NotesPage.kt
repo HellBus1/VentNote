@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -85,9 +86,28 @@ fun NotesPage(
                             )
                         ) {
                             items(items = filteredNoteListState.value) {
-                                NotesItem(data = it) {
-                                    navHostController.navigate(route = "")
-                                }
+                                NotesItem(
+                                    isMarking = viewModel.isMarking.value,
+                                    isMarked = it in viewModel.markedNoteList,
+                                    data = it,
+                                    onClick = {
+                                        if (viewModel.isMarking.value) {
+                                            viewModel.addToMarkedNoteList(it)
+                                        } else {
+                                            navHostController.navigate(route = "")
+                                        }
+                                    },
+                                    onLongClick = {
+                                        Log.d("NotesPage", "long clicked")
+                                        if (!viewModel.isMarking.value) {
+                                            viewModel.isMarking.value = true
+                                        }
+                                        viewModel.addToMarkedNoteList(it)
+                                    },
+                                    onCheckClick = {
+                                        viewModel.addToMarkedNoteList(it)
+                                    }
+                                )
                             }
                         }
                     }
@@ -99,23 +119,25 @@ fun NotesPage(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NotesItem(data: NoteModel, callback: () -> Unit) {
-    Box(modifier = Modifier.padding(horizontal = 16.dp)
-        .combinedClickable(
-            onClick = {},
-            onLongClick = {}
-        )
-    ) {
+fun NotesItem(isMarking: Boolean, isMarked: Boolean, data: NoteModel, onClick: () -> Unit, onLongClick: () -> Unit, onCheckClick: () -> Unit) {
+    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            shape = RoundedCornerShape(10.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
+            elevation = CardDefaults.cardElevation(4.dp),
+            modifier = Modifier.combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() }
+            )
         ) {
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                if (isMarking) {
+                    Checkbox(checked = isMarked, onCheckedChange = { onCheckClick() })
+                }
+                
                 Column(modifier = Modifier.weight(2f)) {
                     ItemText(text = data.title)
                 }

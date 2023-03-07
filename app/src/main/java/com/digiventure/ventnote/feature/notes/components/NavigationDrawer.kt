@@ -23,17 +23,16 @@ fun NavDrawer(drawerState: DrawerState, content: @Composable () -> Unit) {
                     .width(300.dp)
                     .padding(0.dp)
             ) {
-                NavigationDrawerItem(
-                    icon = { Icon(Icons.Filled.Delete, contentDescription = null) },
-                    label = { Text("Deleted") },
-                    selected = false,
-                    onClick = {
-
-                    },
-                    shape = RectangleShape,
-                    modifier = Modifier.padding(0.dp),
-                )
-
+//                NavigationDrawerItem(
+//                    icon = { Icon(Icons.Filled.Delete, contentDescription = null) },
+//                    label = { Text("Deleted") },
+//                    selected = false,
+//                    onClick = {
+//
+//                    },
+//                    shape = RectangleShape,
+//                    modifier = Modifier.padding(0.dp),
+//                )
             }
         },
         content = { content() }
