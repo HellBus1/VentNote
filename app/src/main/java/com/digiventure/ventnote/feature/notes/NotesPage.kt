@@ -6,7 +6,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -21,14 +20,14 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.feature.notes.components.NotesAppBar
 import com.digiventure.ventnote.feature.notes.components.NavDrawer
+import com.digiventure.ventnote.feature.notes.components.NotesAppBar
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 import kotlinx.coroutines.launch
 
 @Composable

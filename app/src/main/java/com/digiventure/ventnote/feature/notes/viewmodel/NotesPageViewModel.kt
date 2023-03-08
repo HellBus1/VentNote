@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,6 +34,10 @@ class NotesPageViewModel @Inject constructor(
     val isMarking = mutableStateOf(false)
     val markedNoteList = mutableStateListOf<NoteModel>()
 
+    fun markAllNote(notes: List<NoteModel>) {
+        markedNoteList.addAll(notes.minus((markedNoteList).toSet()))
+    }
+
     /**
      * Add data to markedNoteList, if exist remove instead
      * */
@@ -46,20 +49,8 @@ class NotesPageViewModel @Inject constructor(
         }
     }
 
-    fun markAllNote() {
-        noteList.value?.getOrNull()?.forEach {
-            if (it !in markedNoteList) {
-                markedNoteList.add(it)
-            }
-        }
-    }
-
     fun unMarkAllNote() {
-        noteList.value?.getOrNull()?.forEach {
-            if (it in markedNoteList) {
-                markedNoteList.remove(it)
-            }
-        }
+        markedNoteList.clear()
     }
 
     /**

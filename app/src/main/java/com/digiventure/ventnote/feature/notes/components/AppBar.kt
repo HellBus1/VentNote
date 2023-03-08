@@ -1,12 +1,10 @@
 package com.digiventure.ventnote.feature.notes.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
-import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +54,9 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit)
                             modifier = Modifier.semantics {  })
                         },
                         onClick = {
-                            viewModel.markAllNote()
+                            viewModel.noteList.value?.getOrNull().let {
+                                if (it != null) viewModel.markAllNote(it)
+                            }
                             expanded.value = false
                         },
                     )

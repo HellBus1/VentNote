@@ -1,15 +1,16 @@
 package com.digiventure.ventnote.notes
 
+import com.digiventure.ventnote.data.NoteRepository
+import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 import com.digiventure.ventnote.utils.BaseUnitTest
 import com.digiventure.ventnote.utils.getValueForTest
-import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -123,6 +124,41 @@ class NotesPageViewModelShould: BaseUnitTest() {
         }
 
         assertEquals(Result.failure<Boolean>(exceptionDeletion), result)
+    }
+
+    @Test
+    fun verifyAddToMarkedNoteListAddsNoteToList() {
+        viewModel.addToMarkedNoteList(note)
+        assertTrue(note in viewModel.markedNoteList)
+    }
+
+    @Test
+    fun verifyAddToMarkedNoteListRemovesNoteFromListIfAlreadyExists() {
+        viewModel.addToMarkedNoteList(note)
+        viewModel.addToMarkedNoteList(note)
+        assertTrue(note !in viewModel.markedNoteList)
+    }
+
+    @Test
+    fun verifyMarkAllNoteAddsAllUniqueNotesToMarkedList() = runTest {
+        val notes = listOf(note, note)
+
+        viewModel.markedNoteList.addAll(notes)
+
+        viewModel.markAllNote(notes)
+
+        assertTrue(viewModel.markedNoteList.size == 2)
+    }
+
+    @Test
+    fun verifyUnMarkAllNoteRemovesAllNotesFromMarkedList() {
+        val noteList = listOf(note, note)
+
+        viewModel.markedNoteList.addAll(noteList)
+
+        viewModel.unMarkAllNote()
+
+        assertTrue(viewModel.markedNoteList.isEmpty())
     }
 
     private fun mockSuccessfulDeletionCase() {
