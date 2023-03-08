@@ -131,7 +131,9 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit)
                     focusManager.clearFocus()
                 },
                 deleteCallback = {
-                    viewModel.deleteNoteList()
+                    viewModel.deleteNoteList() {
+
+                    }
                 })
         },
         modifier = Modifier.semantics {

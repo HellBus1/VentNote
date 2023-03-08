@@ -96,25 +96,47 @@ class NotesPageViewModelShould: BaseUnitTest() {
     fun deleteNoteListFromRepository() = runTest {
         mockSuccessfulDeletionCase()
 
-        viewModel.deleteNoteList(note)
+        viewModel.deleteNoteList(note) { }
 
         verify(repository, times(1)).deleteNoteList(note)
     }
 
     @Test
-    fun emitsBooleanFromRepository() {
-        // TODO (implement boolean checking flow)
+    fun emitsBooleanFromRepository() = runTest {
+        mockSuccessfulDeletionCase()
+
+        var result: Result<Boolean>? = null
+        viewModel.deleteNoteList(note) {
+            result = it
+        }
+
+        assertEquals(expectedDeletion, result)
     }
 
     @Test
     fun emitsErrorWhenDeletionError() {
-        // TODO (implement error checking flow)
+        mockErrorDeletionCase()
+
+        var result: Result<Boolean>? = null
+        viewModel.deleteNoteList(note) {
+            result = it
+        }
+
+        assertEquals(Result.failure<Boolean>(exceptionDeletion), result)
     }
 
     private fun mockSuccessfulDeletionCase() {
         runBlocking {
             whenever(repository.deleteNoteList(note)).thenReturn(
                 flowOf(expectedDeletion)
+            )
+        }
+    }
+
+    private fun mockErrorDeletionCase() {
+        runBlocking {
+            whenever(repository.deleteNoteList(note)).thenReturn(
+                flowOf(Result.failure(exceptionDeletion))
             )
         }
     }

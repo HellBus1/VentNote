@@ -65,10 +65,15 @@ class NotesPageViewModel @Inject constructor(
     /**
      * Delete notes action
      */
-    fun deleteNoteList(vararg notes: NoteModel) {
+    fun deleteNoteList(
+        vararg notes: NoteModel,
+        resultCallback: (Result<Boolean>) -> Unit
+    ) {
         viewModelScope.launch {
             val items: List<NoteModel> = if (notes.isEmpty()) { markedNoteList } else { notes.toList() }
-            repository.deleteNoteList(*items.toTypedArray()).collect { }
+            repository.deleteNoteList(*items.toTypedArray()).collect {
+                resultCallback(it)
+            }
         }
     }
 }
