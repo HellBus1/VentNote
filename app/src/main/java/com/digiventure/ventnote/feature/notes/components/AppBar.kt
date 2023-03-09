@@ -28,6 +28,7 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
+    val openDialog = remember { mutableStateOf(false) }
 
     TopAppBar(
         title = {
@@ -130,15 +131,22 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit)
                     focusManager.clearFocus()
                 },
                 deleteCallback = {
-                    viewModel.deleteNoteList() {
-
-                    }
+                    openDialog.value = true
                 })
         },
         modifier = Modifier.semantics {
             testTag = "top-appBar"
         }
     )
+    
+    CustomAlertDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
+        viewModel.deleteNoteList {
+            if (it.getOrDefault(false)) {
+                viewModel.unMarkAllNote()
+                openDialog.value = false
+            }
+        }
+    })
 }
 
 @Composable

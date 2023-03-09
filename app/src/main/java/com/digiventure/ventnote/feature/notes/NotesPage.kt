@@ -97,7 +97,6 @@ fun NotesPage(
                                         }
                                     },
                                     onLongClick = {
-                                        Log.d("NotesPage", "long clicked")
                                         if (!viewModel.isMarking.value) {
                                             viewModel.isMarking.value = true
                                         }
