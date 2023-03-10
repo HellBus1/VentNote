@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.notes
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -9,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -47,6 +47,7 @@ fun NotesPage(
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     NavDrawer(
         drawerState = drawerState,
@@ -57,8 +58,16 @@ fun NotesPage(
                         scope.launch {
                             drawerState.open()
                         }
+                    }, showSnackbar = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = it,
+                                withDismissAction = true
+                            )
+                        }
                     })
                 },
+                snackbarHost = { SnackbarHost(snackbarHostState) },
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {  },

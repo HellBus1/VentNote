@@ -3,8 +3,8 @@ package com.digiventure.ventnote.notes
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
-import com.digiventure.ventnote.utils.BaseUnitTest
-import com.digiventure.ventnote.utils.getValueForTest
+import com.digiventure.utils.BaseUnitTest
+import com.digiventure.utils.getValueForTest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -97,7 +97,7 @@ class NotesPageViewModelShould: BaseUnitTest() {
     fun deleteNoteListFromRepository() = runTest {
         mockSuccessfulDeletionCase()
 
-        viewModel.deleteNoteList(note) { }
+        viewModel.deleteNoteList(note, onResultCallback = {})
 
         verify(repository, times(1)).deleteNoteList(note)
     }
@@ -106,24 +106,20 @@ class NotesPageViewModelShould: BaseUnitTest() {
     fun emitsBooleanFromRepository() = runTest {
         mockSuccessfulDeletionCase()
 
-        var result: Result<Boolean>? = null
-        viewModel.deleteNoteList(note) {
-            result = it
-        }
-
-        assertEquals(expectedDeletion, result)
+        viewModel.deleteNoteList(note, onResultCallback = {
+            assertEquals(expectedDeletion, it)
+        })
     }
 
     @Test
     fun emitsErrorWhenDeletionError() {
         mockErrorDeletionCase()
 
-        var result: Result<Boolean>? = null
-        viewModel.deleteNoteList(note) {
-            result = it
-        }
-
-        assertEquals(Result.failure<Boolean>(exceptionDeletion), result)
+        viewModel.deleteNoteList(note, onResultCallback = {
+            it.getOrElse { error ->
+                assertEquals(exceptionDeletion.message, error)
+            }
+        })
     }
 
     @Test

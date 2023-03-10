@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.digiventure.ventnote.utils
+package com.digiventure.utils
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer

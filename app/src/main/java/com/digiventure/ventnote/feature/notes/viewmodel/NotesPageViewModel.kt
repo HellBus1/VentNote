@@ -8,6 +8,7 @@ import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -60,12 +61,12 @@ class NotesPageViewModel @Inject constructor(
      */
     fun deleteNoteList(
         vararg notes: NoteModel,
-        resultCallback: (Result<Boolean>) -> Unit
+        onResultCallback: (Result<Boolean>) -> Unit,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val items: List<NoteModel> = if (notes.isEmpty()) { markedNoteList } else { notes.toList() }
             repository.deleteNoteList(*items.toTypedArray()).collect {
-                resultCallback(it)
+                onResultCallback(it)
             }
         }
     }

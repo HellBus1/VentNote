@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.notes.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -26,7 +27,7 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit) {
+fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit, showSnackbar: (message: String) -> Unit) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
@@ -142,12 +143,19 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit)
     )
     
     CustomAlertDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
-        viewModel.deleteNoteList {
-            if (it.getOrDefault(false)) {
-                viewModel.unMarkAllNote()
+        viewModel.deleteNoteList(
+            onResultCallback = {
                 openDialog.value = false
-            }
-        }
+                if (it.isSuccess) {
+                    viewModel.unMarkAllNote()
+                } else {
+                    it.getOrElse { error ->
+                        openDialog.value = false
+                        showSnackbar(error.message ?: "")
+                    }
+                }
+            },
+        )
     })
 }
 
