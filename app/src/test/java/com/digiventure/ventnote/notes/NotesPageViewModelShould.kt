@@ -5,10 +5,12 @@ import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.getValueForTest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.*
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -31,9 +33,18 @@ class NotesPageViewModelShould: BaseUnitTest() {
 
     private lateinit var viewModel: NotesPageViewModel
 
+    private val testDispatcher = TestCoroutineDispatcher()
+
     @Before
     fun setup() {
         viewModel = NotesPageViewModel(repository)
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @After
+    fun cleanup() {
+        Dispatchers.resetMain()
+        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test
@@ -60,7 +71,7 @@ class NotesPageViewModelShould: BaseUnitTest() {
     }
 
     @Test
-    fun verifyIsSearchingIsSameAsInput() {
+    fun verifyIsSearchingIsSameAsInput() = runTest {
         viewModel.isSearching.value = true
         assertEquals(true, viewModel.isSearching.value)
 
@@ -69,14 +80,14 @@ class NotesPageViewModelShould: BaseUnitTest() {
     }
 
     @Test
-    fun verifySearchedTitleTextIsSameAsInput() {
+    fun verifySearchedTitleTextIsSameAsInput() = runTest {
         val inputTitle = "Test Title"
         viewModel.searchedTitleText.value = inputTitle
         assertEquals(inputTitle, viewModel.searchedTitleText.value)
     }
 
     @Test
-    fun verifyIsMarkingIsSameAsInput() {
+    fun verifyIsMarkingIsSameAsInput() = runTest {
         viewModel.isMarking.value = true
         assertEquals(true, viewModel.isMarking.value)
 
@@ -85,7 +96,7 @@ class NotesPageViewModelShould: BaseUnitTest() {
     }
 
     @Test
-    fun verifyMarkedNoteListCanBeAddedOrRemoved() {
+    fun verifyMarkedNoteListCanBeAddedOrRemoved() = runTest {
         viewModel.markedNoteList.add(note)
         assertEquals(1, viewModel.markedNoteList.size)
 
@@ -93,33 +104,31 @@ class NotesPageViewModelShould: BaseUnitTest() {
         assertEquals(0, viewModel.markedNoteList.size)
     }
 
-    @Test
+    @Test // TODO: testing function with callback
     fun deleteNoteListFromRepository() = runTest {
         mockSuccessfulDeletionCase()
 
-        viewModel.deleteNoteList(note, onResultCallback = {})
+        viewModel.deleteNoteList(note)
 
         verify(repository, times(1)).deleteNoteList(note)
     }
 
-    @Test
+    @Test // TODO: testing function with callback
     fun emitsBooleanFromRepository() = runTest {
         mockSuccessfulDeletionCase()
 
-        viewModel.deleteNoteList(note, onResultCallback = {
-            assertEquals(expectedDeletion, it)
-        })
+        val result = viewModel.deleteNoteList(note)
+
+        assertEquals(expectedDeletion, result)
     }
 
-    @Test
-    fun emitsErrorWhenDeletionError() {
+    @Test // TODO: testing function with callback
+    fun emitsErrorWhenDeletionError() = runTest {
         mockErrorDeletionCase()
 
-        viewModel.deleteNoteList(note, onResultCallback = {
-            it.getOrElse { error ->
-                assertEquals(exceptionDeletion.message, error)
-            }
-        })
+        val result = viewModel.deleteNoteList(note)
+
+        assertEquals(Result.failure<Boolean>(exceptionDeletion), result)
     }
 
     @Test

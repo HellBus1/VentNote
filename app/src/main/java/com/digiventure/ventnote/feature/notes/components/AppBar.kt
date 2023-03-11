@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.components.CustomAlertDialog
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +33,8 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit,
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     TopAppBar(
         title = {
@@ -143,19 +147,19 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit,
     )
     
     CustomAlertDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
-        viewModel.deleteNoteList(
-            onResultCallback = {
-                openDialog.value = false
-                if (it.isSuccess) {
-                    viewModel.unMarkAllNote()
-                } else {
-                    it.getOrElse { error ->
-                        openDialog.value = false
-                        showSnackbar(error.message ?: "")
-                    }
+        scope.launch {
+            val result = viewModel.deleteNoteList()
+
+            openDialog.value = false
+            if (result.isSuccess) {
+                viewModel.unMarkAllNote()
+            } else {
+                result.getOrElse { error ->
+                    openDialog.value = false
+                    showSnackbar(error.message ?: "")
                 }
-            },
-        )
+            }
+        }
     })
 }
 
