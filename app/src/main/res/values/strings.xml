@@ -11,4 +11,9 @@
     <string name="search_nav_icon">search nav icon</string>
     <string name="delete_nav_icon">delete nav icon</string>
     <string name="dropdown_nav_icon">dropdown nav icon</string>
+
+    <!--  Errors  -->
+    <string name="note_list_error">Failed to get list of notes</string>
+    <string name="delete_note_error">Failed to delete list of notes</string>
+    <string name="note_detail_error">Failed to get note detail</string>
 </resources>
