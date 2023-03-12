@@ -33,18 +33,9 @@ class NotesPageViewModelShould: BaseUnitTest() {
 
     private lateinit var viewModel: NotesPageViewModel
 
-    private val testDispatcher = TestCoroutineDispatcher()
-
     @Before
     fun setup() {
         viewModel = NotesPageViewModel(repository)
-        Dispatchers.setMain(testDispatcher)
-    }
-
-    @After
-    fun cleanup() {
-        Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test

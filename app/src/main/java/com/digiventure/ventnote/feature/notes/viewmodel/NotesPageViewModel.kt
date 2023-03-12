@@ -20,9 +20,13 @@ class NotesPageViewModel @Inject constructor(
     private val repository: NoteRepository
 ): ViewModel() {
     val noteList: LiveData<Result<List<NoteModel>>> = liveData {
-        emitSource(repository.getNoteList()
-            .onEach {}
-            .asLiveData())
+        try {
+            emitSource(repository.getNoteList()
+                .onEach {}
+                .asLiveData())
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
     }
 
     /**

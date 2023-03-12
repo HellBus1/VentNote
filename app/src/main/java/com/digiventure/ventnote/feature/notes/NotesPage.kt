@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -37,17 +38,28 @@ fun NotesPage(
     val viewModel: NotesPageViewModel = hiltViewModel()
     val noteListState = viewModel.noteList.observeAsState()
 
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
+
+    noteListState.value?.getOrElse {
+        if (it.message != null) {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = it.message ?: "",
+                    withDismissAction = true
+                )
+            }
+        }
+    }
 
     LaunchedEffect(noteListState.value, viewModel.searchedTitleText.value) {
         filteredNoteListState.value = noteListState.value?.getOrNull()?.filter { note ->
             note.title.contains(viewModel.searchedTitleText.value, true)
         } ?: listOf()
     }
-
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     NavDrawer(
         drawerState = drawerState,
