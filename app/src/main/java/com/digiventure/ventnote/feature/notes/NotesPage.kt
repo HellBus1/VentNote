@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.notes
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -9,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -25,22 +23,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
+import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.components.NavDrawer
 import com.digiventure.ventnote.feature.notes.components.NotesAppBar
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
 @Composable
-fun NotesPage(
-    navHostController: NavHostController,
-) {
+fun NotesPage(navHostController: NavHostController) {
     val viewModel: NotesPageViewModel = hiltViewModel()
     val noteListState = viewModel.noteList.observeAsState()
+    val loadingState = viewModel.loader.observeAsState()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val openDialog = remember { mutableStateOf(false) }
 
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
 
@@ -61,7 +62,12 @@ fun NotesPage(
         } ?: listOf()
     }
 
+    LaunchedEffect(key1 = loadingState.value) {
+        openDialog.value = loadingState.value == true
+    }
+
     NavDrawer(
+        navHostController = navHostController,
         drawerState = drawerState,
         content = {
             Scaffold(
@@ -82,15 +88,13 @@ fun NotesPage(
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 floatingActionButton = {
                     FloatingActionButton(
-                        onClick = {  },
+                        onClick = { navHostController.navigate(Route.NoteCreationPage.routeName) },
                         modifier = Modifier.semantics {
                             testTag = "add-note-fab"
                         }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.fab),
-
-                            )
+                            contentDescription = stringResource(R.string.fab),)
                     }
                 },
                 content = { contentPadding ->
@@ -114,7 +118,7 @@ fun NotesPage(
                                         if (viewModel.isMarking.value) {
                                             viewModel.addToMarkedNoteList(it)
                                         } else {
-                                            navHostController.navigate(route = "")
+                                            navHostController.navigate("${Route.NoteDetailPage.routeName}/${it.id}")
                                         }
                                     },
                                     onLongClick = {
@@ -130,6 +134,8 @@ fun NotesPage(
                             }
                         }
                     }
+
+                    LoadingDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false })
                 },
             )
         }

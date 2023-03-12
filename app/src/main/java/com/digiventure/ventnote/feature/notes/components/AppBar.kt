@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.notes.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -23,7 +22,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.components.CustomAlertDialog
+import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
 import kotlinx.coroutines.launch
 
@@ -145,8 +144,8 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit,
             testTag = "top-appBar"
         }
     )
-    
-    CustomAlertDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
+
+    TextDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
         scope.launch {
             val result = viewModel.deleteNoteList()
 

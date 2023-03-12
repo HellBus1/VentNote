@@ -1,7 +1,7 @@
 package com.digiventure.ventnote.comons
 
-import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.utils.BaseUnitTest
+import com.digiventure.ventnote.commons.DateUtil
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
