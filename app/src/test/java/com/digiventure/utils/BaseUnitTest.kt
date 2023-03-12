@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.utils
+package com.digiventure.utils
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import org.junit.Rule

@@ -1,10 +1,11 @@
 package com.digiventure.ventnote.notes
 
+import com.digiventure.utils.BaseUnitTest
+import com.digiventure.utils.captureValues
+import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
-import com.digiventure.ventnote.utils.BaseUnitTest
-import com.digiventure.ventnote.utils.getValueForTest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -60,7 +61,40 @@ class NotesPageViewModelShould: BaseUnitTest() {
     }
 
     @Test
-    fun verifyIsSearchingIsSameAsInput() {
+    fun showLoaderWhileLoadingNoteList() = runTest {
+        mockSuccessfulCase()
+
+        viewModel.loader.captureValues {
+            viewModel.noteList.getValueForTest()
+
+            assertEquals(true, values.first())
+        }
+    }
+
+    @Test
+    fun closeLoaderAfterNoteListLoaded() = runTest {
+        mockSuccessfulCase()
+
+        viewModel.loader.captureValues {
+            viewModel.noteList.getValueForTest()
+
+            assertEquals(false, values.last())
+        }
+    }
+
+    @Test
+    fun closeLoaderAfterGetNotelistError() = runTest {
+        mockErrorCase()
+
+        viewModel.loader.captureValues {
+            viewModel.noteList.getValueForTest()
+
+            assertEquals(false, values.last())
+        }
+    }
+
+    @Test
+    fun verifyIsSearchingIsSameAsInput() = runTest {
         viewModel.isSearching.value = true
         assertEquals(true, viewModel.isSearching.value)
 
@@ -69,14 +103,14 @@ class NotesPageViewModelShould: BaseUnitTest() {
     }
 
     @Test
-    fun verifySearchedTitleTextIsSameAsInput() {
+    fun verifySearchedTitleTextIsSameAsInput() = runTest {
         val inputTitle = "Test Title"
         viewModel.searchedTitleText.value = inputTitle
         assertEquals(inputTitle, viewModel.searchedTitleText.value)
     }
 
     @Test
-    fun verifyIsMarkingIsSameAsInput() {
+    fun verifyIsMarkingIsSameAsInput() = runTest {
         viewModel.isMarking.value = true
         assertEquals(true, viewModel.isMarking.value)
 
@@ -85,7 +119,7 @@ class NotesPageViewModelShould: BaseUnitTest() {
     }
 
     @Test
-    fun verifyMarkedNoteListCanBeAddedOrRemoved() {
+    fun verifyMarkedNoteListCanBeAddedOrRemoved() = runTest {
         viewModel.markedNoteList.add(note)
         assertEquals(1, viewModel.markedNoteList.size)
 
@@ -97,7 +131,7 @@ class NotesPageViewModelShould: BaseUnitTest() {
     fun deleteNoteListFromRepository() = runTest {
         mockSuccessfulDeletionCase()
 
-        viewModel.deleteNoteList(note) { }
+        viewModel.deleteNoteList(note)
 
         verify(repository, times(1)).deleteNoteList(note)
     }
@@ -106,24 +140,51 @@ class NotesPageViewModelShould: BaseUnitTest() {
     fun emitsBooleanFromRepository() = runTest {
         mockSuccessfulDeletionCase()
 
-        var result: Result<Boolean>? = null
-        viewModel.deleteNoteList(note) {
-            result = it
-        }
+        val result = viewModel.deleteNoteList(note)
 
         assertEquals(expectedDeletion, result)
     }
 
     @Test
-    fun emitsErrorWhenDeletionError() {
+    fun emitsErrorWhenDeletionError() = runTest {
         mockErrorDeletionCase()
 
-        var result: Result<Boolean>? = null
-        viewModel.deleteNoteList(note) {
-            result = it
-        }
+        val result = viewModel.deleteNoteList(note)
 
         assertEquals(Result.failure<Boolean>(exceptionDeletion), result)
+    }
+
+    @Test
+    fun showLoaderWhileDeletingNote() = runTest {
+        mockSuccessfulDeletionCase()
+
+        viewModel.loader.captureValues {
+            viewModel.deleteNoteList(note)
+
+            assertEquals(true, values.first())
+        }
+    }
+
+    @Test
+    fun closeLoaderAfterDeleteNoteSuccess() = runTest {
+        mockSuccessfulDeletionCase()
+
+        viewModel.loader.captureValues {
+            viewModel.deleteNoteList(note)
+
+            assertEquals(false, values.last())
+        }
+    }
+
+    @Test
+    fun closeLoaderAfterDeleteNoteError() = runTest {
+        mockErrorDeletionCase()
+
+        viewModel.loader.captureValues {
+            viewModel.deleteNoteList(note)
+
+            assertEquals(false, values.last())
+        }
     }
 
     @Test

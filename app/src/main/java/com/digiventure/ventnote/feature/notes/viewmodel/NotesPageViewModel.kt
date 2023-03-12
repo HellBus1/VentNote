@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.notes.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
@@ -8,18 +7,32 @@ import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class NotesPageViewModel @Inject constructor(
     private val repository: NoteRepository
 ): ViewModel() {
+    /**
+     * Handle loading state
+     * */
+    val loader = MutableLiveData<Boolean>()
+
     val noteList: LiveData<Result<List<NoteModel>>> = liveData {
-        emitSource(repository.getNoteList()
-            .onEach {}
-            .asLiveData())
+        loader.postValue(true)
+        try {
+            emitSource(repository.getNoteList()
+                .onEach {
+                    loader.postValue(false)
+                }
+                .asLiveData())
+        } catch (e: Exception) {
+            loader.postValue(false)
+            emit(Result.failure(e))
+        }
     }
 
     /**
@@ -58,15 +71,16 @@ class NotesPageViewModel @Inject constructor(
     /**
      * Delete notes action
      */
-    fun deleteNoteList(
-        vararg notes: NoteModel,
-        resultCallback: (Result<Boolean>) -> Unit
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = withContext(Dispatchers.IO) {
+        loader.postValue(true)
+        try {
             val items: List<NoteModel> = if (notes.isEmpty()) { markedNoteList } else { notes.toList() }
-            repository.deleteNoteList(*items.toTypedArray()).collect {
-                resultCallback(it)
-            }
+            repository.deleteNoteList(*items.toTypedArray()).onEach {
+                loader.postValue(false)
+            }.last()
+        } catch (e: Exception) {
+            loader.postValue(false)
+            Result.failure(e)
         }
     }
 }

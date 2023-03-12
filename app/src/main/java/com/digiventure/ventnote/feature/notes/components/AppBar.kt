@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,14 +22,18 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit) {
+fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit, showSnackbar: (message: String) -> Unit) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     TopAppBar(
         title = {
@@ -124,6 +129,7 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit)
         actions = {
             TrailingMenuIcons(
                 isMarking = viewModel.isMarking.value,
+                markedItemsCount = viewModel.markedNoteList.size,
                 isSearching = viewModel.isSearching.value,
                 searchCallback = {
                     viewModel.isSearching.value = !viewModel.isSearching.value
@@ -138,12 +144,19 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit)
             testTag = "top-appBar"
         }
     )
-    
-    CustomAlertDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
-        viewModel.deleteNoteList {
-            if (it.getOrDefault(false)) {
+
+    TextDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
+        scope.launch {
+            val result = viewModel.deleteNoteList()
+
+            openDialog.value = false
+            if (result.isSuccess) {
                 viewModel.unMarkAllNote()
-                openDialog.value = false
+            } else {
+                result.getOrElse { error ->
+                    openDialog.value = false
+                    showSnackbar(error.message ?: "")
+                }
             }
         }
     })
@@ -163,10 +176,11 @@ fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDraw
 }
 
 @Composable
-fun TrailingMenuIcons(isMarking: Boolean, isSearching: Boolean, searchCallback: () -> Unit, deleteCallback: () -> Unit) {
+fun TrailingMenuIcons(isMarking: Boolean, markedItemsCount: Int, isSearching: Boolean, searchCallback: () -> Unit, deleteCallback: () -> Unit) {
     if (isMarking) {
-        TopNavBarIcon(Icons.Filled.Delete, stringResource(R.string.delete_nav_icon), Modifier.semantics {  }) {
-            deleteCallback()
+        TopNavBarIcon(Icons.Filled.Delete, stringResource(R.string.delete_nav_icon), Modifier.semantics {  },
+            tint = if (markedItemsCount > 0) MaterialTheme.colorScheme.onPrimary else Color.Gray) {
+            if (markedItemsCount > 0) deleteCallback()
         }
     } else if (isSearching) {
         TopNavBarIcon(Icons.Filled.Close, stringResource(R.string.delete_nav_icon), Modifier.semantics {  }) {
@@ -180,12 +194,18 @@ fun TrailingMenuIcons(isMarking: Boolean, isSearching: Boolean, searchCallback: 
 }
 
 @Composable
-fun TopNavBarIcon(image: ImageVector, description: String, modifier: Modifier, onClick: () -> Unit) {
+fun TopNavBarIcon(
+    image: ImageVector,
+    description: String,
+    modifier: Modifier,
+    tint: Color = MaterialTheme.colorScheme.onPrimary,
+    onClick: () -> Unit,
+) {
     IconButton(onClick = { onClick() }, modifier = modifier) {
         Icon(
             imageVector = image,
             contentDescription = description,
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = tint,
         )
     }
 }
