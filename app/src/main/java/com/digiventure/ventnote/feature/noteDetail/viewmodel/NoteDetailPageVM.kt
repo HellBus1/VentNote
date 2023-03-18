@@ -1,24 +1,28 @@
 package com.digiventure.ventnote.feature.noteDetail.viewmodel
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class NoteDetailPageViewModel @Inject constructor(
+class NoteDetailPageVM @Inject constructor(
     private val repository: NoteRepository
-): ViewModel() {
-    var noteDetail: MutableLiveData<Result<NoteModel>> = MutableLiveData()
+): ViewModel(), NoteDetailPageBaseVM {
+    override var noteDetail: MutableLiveData<Result<NoteModel>> = MutableLiveData()
 
-    suspend fun getNoteDetail(id: Int) = withContext(Dispatchers.IO) {
+    override var titleText: MutableState<String> = mutableStateOf("")
+    override var descriptionText: MutableState<String> = mutableStateOf("")
+
+    override var isEditing: MutableState<Boolean> = mutableStateOf(false)
+
+    override suspend fun getNoteDetail(id: Int) = withContext(Dispatchers.IO) {
         repository.getNoteDetail(id).collect {
             noteDetail.postValue(it)
         }

@@ -3,7 +3,6 @@ package com.digiventure.ventnote.data
 import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -32,6 +31,15 @@ class NoteRepository @Inject constructor(
         service.getNoteDetail(id).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: NoteModel(1, "", ""))
+            } else {
+                Result.failure(it.exceptionOrNull()!!)
+            }
+        }
+
+    suspend fun updateNote(vararg notes: NoteModel): Flow<Result<Boolean>> =
+        service.updateNote(*notes).map {
+            if (it.isSuccess) {
+                Result.success(it.getOrNull() ?: false)
             } else {
                 Result.failure(it.exceptionOrNull()!!)
             }

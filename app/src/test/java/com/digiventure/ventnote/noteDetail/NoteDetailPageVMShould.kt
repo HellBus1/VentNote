@@ -4,7 +4,7 @@ import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageViewModel
+import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageVM
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -17,7 +17,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class NoteDetailPageViewModelShould: BaseUnitTest() {
+class NoteDetailPageVMShould: BaseUnitTest() {
     private val repository: NoteRepository = mock()
     private val note = Mockito.mock<NoteModel>()
     private val id = 1
@@ -25,11 +25,11 @@ class NoteDetailPageViewModelShould: BaseUnitTest() {
     private val expected = Result.success(note)
     private val exception = RuntimeException("Failed to get note detail")
 
-    private lateinit var viewModel: NoteDetailPageViewModel
+    private lateinit var viewModel: NoteDetailPageVM
 
     @Before
     fun setup() {
-        viewModel = NoteDetailPageViewModel(repository)
+        viewModel = NoteDetailPageVM(repository)
     }
 
     @Test
