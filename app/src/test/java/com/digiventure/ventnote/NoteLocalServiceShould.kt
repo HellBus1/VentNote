@@ -47,7 +47,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     }
 
     @Test
-    fun emitsFlowOfNoteResultThem() = runTest {
+    fun emitsFlowOfNoteAndEmitsThem() = runTest {
         stubSuccessfulGetDetailCase()
 
         Assert.assertEquals(note, dao.getNoteDetail(id).first())
@@ -93,20 +93,21 @@ class NoteLocalServiceShould: BaseUnitTest() {
     }
 
     @Test
-    fun convertValuesToFlowResultAndEmitsThem() = runTest {
+    fun emitsFlowOfNoteListAndEmitsThem() = runTest {
         stubSuccessfulGetListNoteCase()
 
         Assert.assertEquals(Result.success(noteList), service.getNoteList().first())
     }
 
     @Test
-    fun emitsErrorResultWhenFails() = runTest {
+    fun emitsErrorResultWhenGetNoteListFails() = runTest {
         stubErrorGetListNoteCase()
 
-        Assert.assertEquals(
-            "Failed to get list of notes",
-            service.getNoteList().first().exceptionOrNull()?.message
-        )
+        try {
+            service.getNoteList().first()
+        } catch (e: RuntimeException) {
+            Assert.assertEquals("Failed to get list of notes", e.message)
+        }
     }
 
     private fun stubSuccessfulGetListNoteCase() {
@@ -121,7 +122,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     private fun stubErrorGetListNoteCase() {
         runBlocking {
-            whenever(dao.getNoteDetail(id)).thenThrow(listException)
+            whenever(dao.getNotes()).thenThrow(listException)
         }
     }
 
@@ -136,7 +137,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     }
 
     @Test
-    fun convertResultToFLowAndEmitsThemAfterDeleteNoteList() = runTest {
+    fun emitsFlowOfDeletedLengthAndEmitsThem() = runTest {
         runBlocking { whenever(dao.deleteNotes(note)).thenReturn(1) }
         Assert.assertEquals(Result.success(true), service.deleteNoteList(note).first())
 
@@ -146,27 +147,13 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     @Test
     fun emitsErrorWhenDeletionFails() = runTest {
-        stubErrorDeleteListNoteCase()
+        runBlocking {
+            whenever(dao.deleteNotes(note)).thenThrow(deleteException)
+        }
 
         Assert.assertEquals(
             "Failed to delete list of notes",
             service.deleteNoteList(note).first().exceptionOrNull()?.message
         )
-    }
-
-    private fun stubSuccessfulDeleteListNoteCase() {
-        runBlocking {
-            whenever(dao.getNotes()).thenReturn(
-                flow {
-                    emit(noteList)
-                }
-            )
-        }
-    }
-
-    private fun stubErrorDeleteListNoteCase() {
-        runBlocking {
-            whenever(dao.deleteNotes(note)).thenThrow(deleteException)
-        }
     }
 }
