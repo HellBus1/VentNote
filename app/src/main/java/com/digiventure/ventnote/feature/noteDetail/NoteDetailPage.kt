@@ -41,12 +41,12 @@ fun NoteDetailPage(
     id: String
 ) {
     val noteDetailState = viewModel.noteDetail.observeAsState()
+    val data = noteDetailState.value?.getOrNull()
     LaunchedEffect(key1 = Unit) {
         viewModel.getNoteDetail(id.toInt())
     }
 
     LaunchedEffect(key1 = noteDetailState.value) {
-        val data = noteDetailState.value?.getOrNull()
         viewModel.titleText.value = data?.title ?: ""
         viewModel.descriptionText.value = data?.note ?: ""
     }
@@ -66,6 +66,51 @@ fun NoteDetailPage(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    fun deleteNote() {
+        if (data != null) {
+            scope.launch {
+                viewModel.deleteNoteList(data)
+                    .onSuccess {
+                        deleteDialogState.value = false
+                        navHostController.popBackStack()
+                    }
+                    .onFailure {
+                        deleteDialogState.value = false
+                        snackbarHostState.showSnackbar(
+                            message = it.message ?: "",
+                            withDismissAction = true
+                        )
+                    }
+            }
+        }
+    }
+
+    fun updateNote() {
+        if (viewModel.titleText.value.isEmpty() || viewModel.descriptionText.value.isEmpty()) {
+            requiredDialogState.value = true
+        } else {
+            if (data != null) {
+                scope.launch {
+                    val updatedNote = data.copy(title = viewModel.titleText.value, note = viewModel.descriptionText.value)
+                    viewModel.updateNote(updatedNote)
+                        .onSuccess {
+                            viewModel.isEditing.value = false
+                            snackbarHostState.showSnackbar(
+                                message = "Note successfully updated",
+                                withDismissAction = true
+                            )
+                        }
+                        .onFailure {
+                            snackbarHostState.showSnackbar(
+                                message = it.message ?: "",
+                                withDismissAction = true
+                            )
+                        }
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             NoteDetailAppBar(
@@ -79,9 +124,16 @@ fun NoteDetailPage(
                     deleteDialogState.value = true
                 })
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.isEditing.value = true },
+                onClick = {
+                    if(isEditingState) {
+                        updateNote()
+                    } else {
+                        viewModel.isEditing.value = true
+                    }
+                },
                 modifier = Modifier.semantics {
                     testTag = "edit-note-fab"
                 }) {
@@ -161,28 +213,7 @@ fun NoteDetailPage(
     TextDialog(
         isOpened = deleteDialogState.value,
         onDismissCallback = { deleteDialogState.value = false },
-        onConfirmCallback = {
-            val value = noteDetailState.value?.getOrNull()
-            if (value != null) {
-                scope.launch {
-                    val result = viewModel.deleteNoteList(value)
-                    deleteDialogState.value = false
-
-                    if (result.isSuccess) {
-                        navHostController.popBackStack()
-                    } else {
-                        result.getOrElse { error ->
-                            snackbarHostState.showSnackbar(
-                                message = error.message ?: "",
-                                withDismissAction = true
-                            )
-
-                            deleteDialogState.value = false
-                        }
-                    }
-                }
-            }
-        })
+        onConfirmCallback = { deleteNote() })
 
     LoadingDialog(isOpened = openLoadingDialog.value, onDismissCallback = { openLoadingDialog.value = false })
 
