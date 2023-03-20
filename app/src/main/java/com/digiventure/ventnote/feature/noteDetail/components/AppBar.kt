@@ -7,18 +7,23 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageBaseVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDetailAppBar(isEditing: Boolean, descriptionTextLength: Int, onBackPressed: () -> Unit, onClosePressed: () -> Unit, onDeletePressed: () -> Unit) {
+    val expanded = remember { mutableStateOf(false) }
+
     TopAppBar(
         title = {
             Text(
@@ -43,7 +48,23 @@ fun NoteDetailAppBar(isEditing: Boolean, descriptionTextLength: Int, onBackPress
         },
         actions = {
             TopNavBarIcon(Icons.Filled.MoreVert, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
-
+                expanded.value = true
+            }
+            DropdownMenu(
+                offset = DpOffset((10).dp, 0.dp),
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false }) {
+                DropdownMenuItem(
+                    text = { Text(
+                        text = "Delete Note",
+                        fontSize = 16.sp,
+                        modifier = Modifier.semantics {  })
+                    },
+                    onClick = {
+                        onDeletePressed()
+                        expanded.value = false
+                    },
+                )
             }
         },
         modifier = Modifier.semantics {  },

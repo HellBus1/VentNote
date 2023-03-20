@@ -6,6 +6,11 @@ import com.digiventure.ventnote.data.local.NoteModel
 
 interface NoteDetailPageBaseVM {
     /**
+     * Handling loading state
+     * */
+    val loader: MutableLiveData<Boolean>
+
+    /**
      * Contain note detail
      * */
     var noteDetail: MutableLiveData<Result<NoteModel>>
@@ -22,8 +27,20 @@ interface NoteDetailPageBaseVM {
     var isEditing: MutableState<Boolean>
 
     /**
-     * @param id is a note id passed from notelist,
      * retrieve responsible note by it's id
+     * @param id is a note id passed from notelist,
      * */
     suspend fun getNoteDetail(id: Int)
+
+    /**
+     * update single note
+     * @param note is a note model
+     * */
+    suspend fun updateNote(note: NoteModel): Result<Boolean>
+
+    /**
+     * delete notelist
+     * @param notes is a list of note
+     */
+    suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean>
 }

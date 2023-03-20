@@ -7,11 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -27,12 +24,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.noteDetail.components.NoteDetailAppBar
 import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageBaseVM
 import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageMockVM
 import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageVM
 import com.digiventure.ventnote.ui.theme.PurpleGrey80
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +56,15 @@ fun NoteDetailPage(
     val requiredDialogState = remember { mutableStateOf(false) }
     val deleteDialogState = remember { mutableStateOf(false) }
     val cancelDialogState = remember { mutableStateOf(false) }
+    val openLoadingDialog = remember { mutableStateOf(false) }
+
+    val loadingState = viewModel.loader.observeAsState()
+    LaunchedEffect(key1 = loadingState.value) {
+        openLoadingDialog.value = loadingState.value == true
+    }
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         topBar = {
@@ -68,7 +76,7 @@ fun NoteDetailPage(
                 }, onClosePressed = {
                     cancelDialogState.value = true
                 }, onDeletePressed = {
-
+                    deleteDialogState.value = true
                 })
         },
         floatingActionButton = {
@@ -154,8 +162,29 @@ fun NoteDetailPage(
         isOpened = deleteDialogState.value,
         onDismissCallback = { deleteDialogState.value = false },
         onConfirmCallback = {
+            val value = noteDetailState.value?.getOrNull()
+            if (value != null) {
+                scope.launch {
+                    val result = viewModel.deleteNoteList(value)
+                    deleteDialogState.value = false
 
+                    if (result.isSuccess) {
+                        navHostController.popBackStack()
+                    } else {
+                        result.getOrElse { error ->
+                            snackbarHostState.showSnackbar(
+                                message = error.message ?: "",
+                                withDismissAction = true
+                            )
+
+                            deleteDialogState.value = false
+                        }
+                    }
+                }
+            }
         })
+
+    LoadingDialog(isOpened = openLoadingDialog.value, onDismissCallback = { openLoadingDialog.value = false })
 
     BackHandler {
         if (viewModel.isEditing.value) {

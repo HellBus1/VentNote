@@ -1,7 +1,5 @@
 package com.digiventure.ventnote.data.local
 
-import com.digiventure.ventnote.R
-import com.digiventure.ventnote.commons.StringUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow

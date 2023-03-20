@@ -8,6 +8,7 @@ import com.digiventure.ventnote.data.local.NoteModel
 
 
 class NoteDetailPageMockVM: ViewModel(), NoteDetailPageBaseVM {
+    override val loader: MutableLiveData<Boolean> = MutableLiveData()
     override var noteDetail: MutableLiveData<Result<NoteModel>> = MutableLiveData()
 
     override var titleText: MutableState<String> = mutableStateOf("This is sample title text")
@@ -15,4 +16,6 @@ class NoteDetailPageMockVM: ViewModel(), NoteDetailPageBaseVM {
     override var isEditing: MutableState<Boolean> = mutableStateOf(false)
 
     override suspend fun getNoteDetail(id: Int) {}
+    override suspend fun updateNote(note: NoteModel): Result<Boolean> = Result.success(true)
+    override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = Result.success(true)
 }
