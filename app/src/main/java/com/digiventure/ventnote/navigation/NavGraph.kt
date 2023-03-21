@@ -28,7 +28,8 @@ fun NavGraph(navHostController: NavHostController) {
                 defaultValue = ""
             })
         ) {
-            NoteDetailPage(navHostController = navHostController)
+            NoteDetailPage(navHostController = navHostController,
+                id = it.arguments?.getString("noteId") ?: "0")
         }
         composable(Route.NoteCreationPage.routeName) {
             NoteCreationPage(navHostController = navHostController)

@@ -26,4 +26,22 @@ class NoteRepository @Inject constructor(
                 Result.failure(it.exceptionOrNull()!!)
             }
         }
+
+    suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> =
+        service.getNoteDetail(id).map {
+            if (it.isSuccess) {
+                Result.success(it.getOrNull() ?: NoteModel(1, "", ""))
+            } else {
+                Result.failure(it.exceptionOrNull()!!)
+            }
+        }
+
+    suspend fun updateNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
+        service.updateNoteList(*notes).map {
+            if (it.isSuccess) {
+                Result.success(it.getOrNull() ?: false)
+            } else {
+                Result.failure(it.exceptionOrNull()!!)
+            }
+        }
 }

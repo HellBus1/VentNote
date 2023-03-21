@@ -5,17 +5,19 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.digiventure.ventnote.R
 
 @Composable
 fun TextDialog(
     isOpened: Boolean,
     onDismissCallback: () -> Unit,
     onConfirmCallback: () -> Unit,
-    title: String = "Warning",
-    description: String = "Are you sure want to delete these items (it cannot be recovered)?",
+    title: String = stringResource(R.string.warning_title),
+    description: String = stringResource(R.string.delete_confirmation_text),
 ) {
     if (isOpened) {
         AlertDialog(
@@ -31,7 +33,7 @@ fun TextDialog(
                     onClick = { onConfirmCallback() },
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Confirm", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.confirm), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
@@ -39,7 +41,7 @@ fun TextDialog(
                     onClick = { onDismissCallback() },
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Dismiss", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.dismiss), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
             },
             shape = RoundedCornerShape(8.dp)
