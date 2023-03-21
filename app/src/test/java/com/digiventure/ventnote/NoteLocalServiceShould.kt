@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -26,6 +27,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     private val detailException = RuntimeException("Failed to get note detail")
     private val listException = RuntimeException("Failed to get list of notes")
     private val deleteException = RuntimeException("Failed to delete list of notes")
+    private val updateException = RuntimeException("Failed to update list of notes")
 
     private lateinit var service: NoteLocalService
 
@@ -50,7 +52,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     fun emitsFlowOfNoteAndEmitsThem() = runTest {
         stubSuccessfulGetDetailCase()
 
-        Assert.assertEquals(note, dao.getNoteDetail(id).first())
+        assertEquals(note, dao.getNoteDetail(id).first())
     }
 
     @Test
@@ -60,7 +62,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
         try {
             dao.getNoteDetail(id).first()
         } catch (e: RuntimeException) {
-            Assert.assertEquals("Failed to get note detail", e.message)
+            assertEquals(detailException.message, e.message)
         }
     }
 
@@ -96,7 +98,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     fun emitsFlowOfNoteListAndEmitsThem() = runTest {
         stubSuccessfulGetListNoteCase()
 
-        Assert.assertEquals(Result.success(noteList), service.getNoteList().first())
+        assertEquals(Result.success(noteList), service.getNoteList().first())
     }
 
     @Test
@@ -106,7 +108,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
         try {
             service.getNoteList().first()
         } catch (e: RuntimeException) {
-            Assert.assertEquals("Failed to get list of notes", e.message)
+            assertEquals(listException.message, e.message)
         }
     }
 
@@ -139,10 +141,10 @@ class NoteLocalServiceShould: BaseUnitTest() {
     @Test
     fun emitsFlowOfDeletedLengthAndEmitsThem() = runTest {
         runBlocking { whenever(dao.deleteNotes(note)).thenReturn(1) }
-        Assert.assertEquals(Result.success(true), service.deleteNoteList(note).first())
+        assertEquals(Result.success(true), service.deleteNoteList(note).first())
 
         runBlocking { whenever(dao.deleteNotes(note)).thenReturn(0) }
-        Assert.assertEquals(Result.success(false), service.deleteNoteList(note).first())
+        assertEquals(Result.success(false), service.deleteNoteList(note).first())
     }
 
     @Test
@@ -151,9 +153,40 @@ class NoteLocalServiceShould: BaseUnitTest() {
             whenever(dao.deleteNotes(note)).thenThrow(deleteException)
         }
 
-        Assert.assertEquals(
-            "Failed to delete list of notes",
+        assertEquals(
+            deleteException.message,
             service.deleteNoteList(note).first().exceptionOrNull()?.message
+        )
+    }
+
+    /**
+     * Test suite for updateNote from dao
+     * */
+    @Test
+    fun updateNoteFromDAO() = runTest {
+        service.updateNoteList(note).first()
+
+        verify(dao, times(1)).updateNote(note)
+    }
+
+    @Test
+    fun emitsFlowOfUpdateLengthAndEmitsThem() = runTest {
+        runBlocking { whenever(dao.updateNote(note)).thenReturn(1) }
+        assertEquals(Result.success(true), service.updateNoteList(note).first())
+
+        runBlocking { whenever(dao.updateNote(note)).thenReturn(0) }
+        assertEquals(Result.success(false), service.updateNoteList(note).first())
+    }
+
+    @Test
+    fun emitsErrorWhenUpdateFails() = runTest {
+        runBlocking {
+            whenever(dao.updateNote(note)).thenThrow(updateException)
+        }
+
+        assertEquals(
+            updateException.message,
+            service.updateNoteList(note).first().exceptionOrNull()?.message
         )
     }
 }

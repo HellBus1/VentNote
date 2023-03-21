@@ -34,10 +34,10 @@ class NoteDetailPageVM @Inject constructor(
             }
     }
 
-    override suspend fun updateNote(note: NoteModel): Result<Boolean> = withContext(Dispatchers.IO) {
+    override suspend fun updateNoteList(vararg notes: NoteModel): Result<Boolean> = withContext(Dispatchers.IO) {
         loader.postValue(true)
         try {
-            repository.updateNote(note).onEach {
+            repository.updateNoteList(*notes).onEach {
                 loader.postValue(false)
             }.last()
         } catch (e: Exception) {

@@ -16,6 +16,6 @@ class NoteDetailPageMockVM: ViewModel(), NoteDetailPageBaseVM {
     override var isEditing: MutableState<Boolean> = mutableStateOf(false)
 
     override suspend fun getNoteDetail(id: Int) {}
-    override suspend fun updateNote(note: NoteModel): Result<Boolean> = Result.success(true)
+    override suspend fun updateNoteList(vararg notes: NoteModel): Result<Boolean> = Result.success(true)
     override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = Result.success(true)
 }

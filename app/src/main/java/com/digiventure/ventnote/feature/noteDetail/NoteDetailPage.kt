@@ -92,7 +92,7 @@ fun NoteDetailPage(
             if (data != null) {
                 scope.launch {
                     val updatedNote = data.copy(title = viewModel.titleText.value, note = viewModel.descriptionText.value)
-                    viewModel.updateNote(updatedNote)
+                    viewModel.updateNoteList(updatedNote)
                         .onSuccess {
                             viewModel.isEditing.value = false
                             snackbarHostState.showSnackbar(

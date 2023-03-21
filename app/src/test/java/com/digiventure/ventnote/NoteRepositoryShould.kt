@@ -9,23 +9,26 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class NoteRepositoryShould: BaseUnitTest() {
-    private val service: NoteLocalService = Mockito.mock()
-    private val noteList = Mockito.mock<List<NoteModel>>()
-    private val note = Mockito.mock<NoteModel>()
+    private val service: NoteLocalService = mock()
+    private val noteList = mock<List<NoteModel>>()
+    private val note = mock<NoteModel>()
 
     private val id = 1
 
     private val exception = RuntimeException("Failed to get list of notes")
     private val deletionException = RuntimeException("Failed to delete list of notes")
     private val noteDetailException = RuntimeException("Failed to get note detail")
+    private val updateException = RuntimeException("Failed to update list of notes")
 
     private lateinit var repository: NoteRepository
 
@@ -50,19 +53,14 @@ class NoteRepositoryShould: BaseUnitTest() {
     fun emitsNoteDetailFromService() = runTest {
         mockSuccessfulGetNoteCase()
 
-        Assert.assertEquals(Result.success(note), repository.getNoteDetail(id).first())
+        assertEquals(Result.success(note), repository.getNoteDetail(id).first())
     }
 
     @Test
-    fun propagateError() = runTest {
+    fun propagateWhenGetNoteDetailError() = runTest {
         mockErrorGetNoteCase()
 
-        repository.getNoteDetail(id).first()
-
-        Assert.assertEquals(
-            Result.failure<NoteModel>(noteDetailException),
-            repository.getNoteDetail(id).first()
-        )
+        assertEquals(noteDetailException, repository.getNoteDetail(id).first().exceptionOrNull())
     }
 
     private fun mockSuccessfulGetNoteCase() {
@@ -90,23 +88,25 @@ class NoteRepositoryShould: BaseUnitTest() {
      * */
     @Test
     fun getNoteListFromService() = runTest {
+        mockSuccessfulGetNoteListCase()
+
         repository.getNoteList()
 
-        Mockito.verify(service, Mockito.times(1)).getNoteList()
+        verify(service, times(1)).getNoteList()
     }
 
     @Test
     fun emitsFlowOfNoteListFromService() = runTest {
         mockSuccessfulGetNoteListCase()
 
-        Assert.assertEquals(noteList, repository.getNoteList().first().getOrNull())
+        assertEquals(Result.success(noteList), repository.getNoteList().first())
     }
 
     @Test
     fun propagateWhenGetNoteListError() = runTest {
         mockFailureGetNoteListCase()
 
-        Assert.assertEquals(exception, repository.getNoteList().first().exceptionOrNull())
+        assertEquals(exception, repository.getNoteList().first().exceptionOrNull())
     }
 
     private fun mockSuccessfulGetNoteListCase() {
@@ -134,23 +134,25 @@ class NoteRepositoryShould: BaseUnitTest() {
      * */
     @Test
     fun deleteNoteListFromService() = runTest {
-        repository.deleteNoteList(note)
-
-        Mockito.verify(service, Mockito.times(1)).deleteNoteList(note)
-    }
-
-    @Test
-    fun emitBooleanAfterDeleteFromService() = runTest {
         mockSuccessfulDeletionCase()
 
-        Assert.assertEquals(true, repository.deleteNoteList(note).first().getOrNull())
+        repository.deleteNoteList(note)
+
+        verify(service, times(1)).deleteNoteList(note)
     }
 
     @Test
-    fun propagateErrorWhenDeletionError() = runTest {
+    fun emitBooleanAfterDeleteNoteListFromService() = runTest {
+        mockSuccessfulDeletionCase()
+
+        assertEquals(true, repository.deleteNoteList(note).first().getOrNull())
+    }
+
+    @Test
+    fun propagateErrorWhenDeleteNoteListError() = runTest {
         mockFailureDeletionCase()
 
-        Assert.assertEquals(deletionException, repository.deleteNoteList(note).first().exceptionOrNull())
+        assertEquals(deletionException, repository.deleteNoteList(note).first().exceptionOrNull())
     }
 
     private fun mockSuccessfulDeletionCase() {
@@ -168,6 +170,52 @@ class NoteRepositoryShould: BaseUnitTest() {
             whenever(service.deleteNoteList(note)).thenReturn(
                 flow {
                     emit(Result.failure(deletionException))
+                }
+            )
+        }
+    }
+
+    /**
+     * Test suite for update notelist from service
+     * */
+    @Test
+    fun updateNoteListFromService() = runTest {
+        mockSuccessfulUpdateCase()
+
+        repository.updateNoteList(note)
+
+        verify(service, times(1)).updateNoteList(note)
+    }
+
+    @Test
+    fun emitBooleanAfterUpdateNoteListFromService() = runTest {
+        mockSuccessfulUpdateCase()
+
+        assertEquals(true, repository.updateNoteList(note).first().getOrNull())
+    }
+
+    @Test
+    fun propagateErrorWhenUpdateNoteListError() = runTest {
+        mockFailureUpdateCase()
+
+        assertEquals(updateException, repository.updateNoteList(note).first().exceptionOrNull())
+    }
+
+    private fun mockSuccessfulUpdateCase() {
+        runBlocking {
+            whenever(service.updateNoteList(note)).thenReturn(
+                flow {
+                    emit(Result.success(true))
+                }
+            )
+        }
+    }
+
+    private fun mockFailureUpdateCase() {
+        runBlocking {
+            whenever(service.updateNoteList(note)).thenReturn(
+                flow {
+                    emit(Result.failure(updateException))
                 }
             )
         }

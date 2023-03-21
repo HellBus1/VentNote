@@ -31,7 +31,7 @@ class NoteLocalService @Inject constructor(
             emit(Result.failure(RuntimeException("Failed to get note detail")))
         }
 
-    suspend fun updateNote(vararg notes: NoteModel): Flow<Result<Boolean>> =
+    suspend fun updateNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
         flow {
             val result = (dao.updateNote(*notes) == notes.size)
             emit(Result.success(result))
