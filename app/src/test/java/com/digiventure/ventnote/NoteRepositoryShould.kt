@@ -6,6 +6,7 @@ import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -27,6 +28,7 @@ class NoteRepositoryShould: BaseUnitTest() {
     private val deletionException = RuntimeException("Failed to delete list of notes")
     private val noteDetailException = RuntimeException("Failed to get note detail")
     private val updateException = RuntimeException("Failed to update list of notes")
+    private val insertException = RuntimeException("Failed to insert list of notes")
 
     private lateinit var repository: NoteRepository
 
@@ -56,7 +58,7 @@ class NoteRepositoryShould: BaseUnitTest() {
 
     @Test
     fun propagateWhenGetNoteDetailError() = runTest {
-        mockErrorGetNoteCase()
+        mockFailureGetNoteCase()
 
         assertEquals(noteDetailException, repository.getNoteDetail(id).first().exceptionOrNull())
     }
@@ -71,7 +73,7 @@ class NoteRepositoryShould: BaseUnitTest() {
         }
     }
 
-    private fun mockErrorGetNoteCase() {
+    private fun mockFailureGetNoteCase() {
         runBlocking {
             whenever(service.getNoteDetail(id)).thenReturn(
                 flow {
@@ -215,6 +217,48 @@ class NoteRepositoryShould: BaseUnitTest() {
                 flow {
                     emit(Result.failure(updateException))
                 }
+            )
+        }
+    }
+
+    /**
+     * Test suite for insert note from service
+     * */
+    @Test
+    fun insertNoteFromService() = runTest {
+        mockSuccessfulInsertCase()
+
+        repository.insertNote(note)
+
+        verify(service, times(1)).insertNote(note)
+    }
+
+    @Test
+    fun emitBooleanAfterInsertNoteFromService() = runTest {
+        mockSuccessfulInsertCase()
+
+        assertEquals(true, service.insertNote(note).first().getOrNull())
+    }
+
+    @Test
+    fun propagateErrorWhenInsertNoteError() = runTest {
+        mockFailureInsertCase()
+
+        assertEquals(insertException, repository.insertNote(note).first().exceptionOrNull())
+    }
+
+    private fun mockSuccessfulInsertCase() {
+        runBlocking {
+            whenever(service.insertNote(note)).thenReturn(
+                flowOf(Result.success(true))
+            )
+        }
+    }
+
+    private fun mockFailureInsertCase() {
+        runBlocking {
+            whenever(service.insertNote(note)).thenReturn(
+                flowOf(Result.failure(insertException))
             )
         }
     }
