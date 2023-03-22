@@ -1,9 +1,6 @@
 package com.digiventure.ventnote.data.local
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,4 +16,7 @@ interface NoteDAO {
 
     @Delete
     fun deleteNotes(vararg notes: NoteModel): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertNote(note: NoteModel): Long
 }

@@ -1,0 +1,24 @@
+package com.digiventure.ventnote.feature.noteCreation.viewmodel
+
+import androidx.compose.runtime.MutableState
+import androidx.lifecycle.MutableLiveData
+import com.digiventure.ventnote.data.local.NoteModel
+
+interface NoteCreationPageBaseVM {
+    /**
+     * Handling loading state
+     * */
+    val loader: MutableLiveData<Boolean>
+
+    /**
+     * State for handling title & description textfield
+     * */
+    val titleText: MutableState<String>
+    val descriptionText: MutableState<String>
+
+    /**
+     * create note
+     * @param note is a note model
+     * */
+    suspend fun addNote(note: NoteModel): Result<Boolean>
+}

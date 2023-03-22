@@ -44,4 +44,13 @@ class NoteRepository @Inject constructor(
                 Result.failure(it.exceptionOrNull()!!)
             }
         }
+
+    suspend fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
+        service.insertNote(note).map {
+            if (it.isSuccess) {
+                Result.success(it.getOrNull() ?: false)
+            } else {
+                Result.failure(it.exceptionOrNull()!!)
+            }
+        }
 }
