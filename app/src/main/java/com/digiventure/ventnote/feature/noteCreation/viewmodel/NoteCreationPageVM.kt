@@ -17,7 +17,7 @@ import javax.inject.Inject
 class NoteCreationPageVM @Inject constructor(
     private val repository: NoteRepository
 ): ViewModel(), NoteCreationPageBaseVM {
-    override val loader: MutableLiveData<Boolean> = MutableLiveData(false)
+    override val loader: MutableLiveData<Boolean> = MutableLiveData()
     override val titleText: MutableState<String> = mutableStateOf("")
     override val descriptionText: MutableState<String> = mutableStateOf("")
 
