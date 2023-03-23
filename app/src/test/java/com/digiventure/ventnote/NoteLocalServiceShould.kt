@@ -6,9 +6,9 @@ import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +28,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     private val listException = RuntimeException("Failed to get list of notes")
     private val deleteException = RuntimeException("Failed to delete list of notes")
     private val updateException = RuntimeException("Failed to update list of notes")
+    private val insertException = RuntimeException("Failed to insert list of notes")
 
     private lateinit var service: NoteLocalService
 
@@ -139,7 +140,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     }
 
     @Test
-    fun emitsFlowOfDeletedLengthAndEmitsThem() = runTest {
+    fun emitsFlowOfBooleanThatDeletedCountSameAsRequestedCount() = runTest {
         runBlocking { whenever(dao.deleteNotes(note)).thenReturn(1) }
         assertEquals(Result.success(true), service.deleteNoteList(note).first())
 
@@ -170,7 +171,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     }
 
     @Test
-    fun emitsFlowOfUpdateLengthAndEmitsThem() = runTest {
+    fun emitsFlowOfBooleanThatUpdatedCountSameAsRequestedCount() = runTest {
         runBlocking { whenever(dao.updateNote(note)).thenReturn(1) }
         assertEquals(Result.success(true), service.updateNoteList(note).first())
 
@@ -187,6 +188,35 @@ class NoteLocalServiceShould: BaseUnitTest() {
         assertEquals(
             updateException.message,
             service.updateNoteList(note).first().exceptionOrNull()?.message
+        )
+    }
+
+    /**
+     * Test suite for insertNote from dao
+     * */
+    @Test
+    fun insertNoteFromDAO() = runTest {
+        service.insertNote(note).first()
+
+        verify(dao, times(1)).insertNote(note)
+    }
+
+    @Test
+    fun emitsFlowOfBooleanThatReturnedIdIsNegativeOrNot() = runTest {
+        runBlocking { whenever(dao.insertNote(note)).thenReturn(1) }
+        assertEquals(Result.success(true), service.insertNote(note).first())
+
+        runBlocking { whenever(dao.insertNote(note)).thenReturn(-1) }
+        assertEquals(Result.success(false), service.insertNote(note).first())
+    }
+
+    @Test
+    fun emitsErrorWhenInsertionFails() = runTest {
+        runBlocking { whenever(dao.insertNote(note)).thenThrow(insertException) }
+
+        assertEquals(
+            insertException.message,
+            service.insertNote(note).first().exceptionOrNull()?.message
         )
     }
 }

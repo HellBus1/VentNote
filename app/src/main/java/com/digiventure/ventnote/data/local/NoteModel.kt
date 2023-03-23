@@ -12,4 +12,6 @@ data class NoteModel(
     @ColumnInfo(name = "note") val note: String,
     @ColumnInfo(name = "created_at") val createdAt: Date = Date(System.currentTimeMillis()),
     @ColumnInfo(name = "updated_at") val updatedAt: Date = Date(System.currentTimeMillis()),
-)
+) {
+    constructor(title: String, note: String) : this(0, title, note)
+}
