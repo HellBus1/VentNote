@@ -5,7 +5,6 @@ import com.digiventure.utils.captureValues
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.noteCreation.viewmodel.NoteCreationPageVM
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
