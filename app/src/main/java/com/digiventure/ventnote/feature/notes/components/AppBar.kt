@@ -147,17 +147,16 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit,
 
     TextDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
         scope.launch {
-            val result = viewModel.deleteNoteList()
-
-            openDialog.value = false
-            if (result.isSuccess) {
-                viewModel.unMarkAllNote()
-            } else {
-                result.getOrElse { error ->
+            viewModel.deleteNoteList()
+                .onSuccess {
                     openDialog.value = false
-                    showSnackbar(error.message ?: "")
+                    viewModel.unMarkAllNote()
                 }
-            }
+                .onFailure {
+                    openDialog.value = false
+                    openDialog.value = false
+                    showSnackbar(it.message ?: "")
+                }
         }
     })
 }
