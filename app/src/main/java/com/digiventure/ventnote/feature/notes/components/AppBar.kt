@@ -21,14 +21,16 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit, showSnackbar: (message: String) -> Unit) {
+fun NotesAppBar(viewModel: NotesPageBaseVM, toggleDrawerCallback: () -> Unit, showSnackbar: (message: String) -> Unit) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }

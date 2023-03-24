@@ -13,15 +13,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class NotesPageViewModel @Inject constructor(
+class NotesPageVM @Inject constructor(
     private val repository: NoteRepository
-): ViewModel() {
-    /**
-     * Handle loading state
-     * */
-    val loader = MutableLiveData<Boolean>()
+): ViewModel(), NotesPageBaseVM {
+    override val loader = MutableLiveData<Boolean>()
 
-    val noteList: LiveData<Result<List<NoteModel>>> = liveData {
+    override val noteList: LiveData<Result<List<NoteModel>>> = liveData {
         loader.postValue(true)
         try {
             emitSource(repository.getNoteList()
@@ -35,28 +32,21 @@ class NotesPageViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 1. Toggle search field
-     * 2. Searchfield value
-     */
-    val isSearching = mutableStateOf(false)
-    val searchedTitleText = mutableStateOf("")
+    override val isSearching = mutableStateOf(false)
+    override val searchedTitleText = mutableStateOf("")
 
-    /**
-     * 1. Toggle marking action
-     * 2. List of marked note
-     * */
-    val isMarking = mutableStateOf(false)
-    val markedNoteList = mutableStateListOf<NoteModel>()
+    override val isMarking = mutableStateOf(false)
+    override val markedNoteList = mutableStateListOf<NoteModel>()
 
-    fun markAllNote(notes: List<NoteModel>) {
+    override fun markAllNote(notes: List<NoteModel>) {
         markedNoteList.addAll(notes.minus((markedNoteList).toSet()))
     }
 
-    /**
-     * Add data to markedNoteList, if exist remove instead
-     * */
-    fun addToMarkedNoteList(note: NoteModel) {
+    override fun unMarkAllNote() {
+        markedNoteList.clear()
+    }
+
+    override fun addToMarkedNoteList(note: NoteModel) {
         if (note in markedNoteList) {
             markedNoteList.remove(note)
         } else {
@@ -64,14 +54,7 @@ class NotesPageViewModel @Inject constructor(
         }
     }
 
-    fun unMarkAllNote() {
-        markedNoteList.clear()
-    }
-
-    /**
-     * Delete notes action
-     */
-    suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = withContext(Dispatchers.IO) {
+    override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = withContext(Dispatchers.IO) {
         loader.postValue(true)
         try {
             val items: List<NoteModel> = if (notes.isEmpty()) { markedNoteList } else { notes.toList() }
