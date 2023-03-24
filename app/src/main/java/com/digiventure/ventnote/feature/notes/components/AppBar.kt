@@ -21,11 +21,9 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -2,7 +2,10 @@ package com.digiventure.ventnote.feature.notes.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.local.NoteModel
 
 class NotesPageMockVM: ViewModel(), NotesPageBaseVM {
