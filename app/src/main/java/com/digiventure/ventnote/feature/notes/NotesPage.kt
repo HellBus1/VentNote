@@ -17,23 +17,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.components.NavDrawer
 import com.digiventure.ventnote.feature.notes.components.NotesAppBar
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageMockVM
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
 @Composable
-fun NotesPage(navHostController: NavHostController) {
-    val viewModel: NotesPageViewModel = hiltViewModel()
+fun NotesPage(
+    navHostController: NavHostController,
+    viewModel: NotesPageBaseVM = hiltViewModel<NotesPageVM>()
+) {
     val noteListState = viewModel.noteList.observeAsState()
     val loadingState = viewModel.loader.observeAsState()
 
@@ -183,5 +189,14 @@ fun ItemText(text: String, color: Color = Color.Black) {
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         color = color
+    )
+}
+
+@Preview
+@Composable
+fun NotesPagePreview() {
+    NotesPage(
+        navHostController = rememberNavController(),
+        viewModel = NotesPageMockVM()
     )
 }

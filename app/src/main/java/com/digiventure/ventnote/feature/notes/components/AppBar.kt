@@ -23,12 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit, showSnackbar: (message: String) -> Unit) {
+fun NotesAppBar(viewModel: NotesPageBaseVM, toggleDrawerCallback: () -> Unit, showSnackbar: (message: String) -> Unit) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(false) }
@@ -147,17 +147,16 @@ fun NotesAppBar(viewModel: NotesPageViewModel, toggleDrawerCallback: () -> Unit,
 
     TextDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
         scope.launch {
-            val result = viewModel.deleteNoteList()
-
-            openDialog.value = false
-            if (result.isSuccess) {
-                viewModel.unMarkAllNote()
-            } else {
-                result.getOrElse { error ->
+            viewModel.deleteNoteList()
+                .onSuccess {
                     openDialog.value = false
-                    showSnackbar(error.message ?: "")
+                    viewModel.unMarkAllNote()
                 }
-            }
+                .onFailure {
+                    openDialog.value = false
+                    openDialog.value = false
+                    showSnackbar(it.message ?: "")
+                }
         }
     })
 }

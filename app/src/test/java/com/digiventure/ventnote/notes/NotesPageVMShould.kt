@@ -5,7 +5,7 @@ import com.digiventure.utils.captureValues
 import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageViewModel
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -19,7 +19,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class NotesPageViewModelShould: BaseUnitTest() {
+class NotesPageVMShould: BaseUnitTest() {
     private val repository: NoteRepository = mock()
     private val notes = mock<List<NoteModel>>()
     private val note = mock<NoteModel>()
@@ -30,11 +30,11 @@ class NotesPageViewModelShould: BaseUnitTest() {
     private val expectedDeletion = Result.success(true)
     private val exceptionDeletion = RuntimeException("Failed to delete list of notes")
 
-    private lateinit var viewModel: NotesPageViewModel
+    private lateinit var viewModel: NotesPageVM
 
     @Before
     fun setup() {
-        viewModel = NotesPageViewModel(repository)
+        viewModel = NotesPageVM(repository)
     }
 
     @Test
