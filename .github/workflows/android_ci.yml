@@ -2,7 +2,7 @@ name: VentNote Build and Test CI
 
 on:
   pull_request:
-    branches: [ staging ]
+    branches: [ master ]
 
 jobs:
   test:
