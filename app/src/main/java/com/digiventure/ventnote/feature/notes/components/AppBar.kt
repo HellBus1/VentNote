@@ -167,11 +167,12 @@ fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDraw
         TopNavBarIcon(Icons.Filled.Close, stringResource(R.string.close_nav_icon), Modifier.semantics {  }) {
             closeMarkingCallback()
         }
-    } else {
-        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon), Modifier.semantics {  }) {
-            toggleDrawerCallback()
-        }
     }
+//    else {
+//        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon), Modifier.semantics {  }) {
+//            toggleDrawerCallback()
+//        }
+//    }
 }
 
 @Composable
