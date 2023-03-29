@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.noteDetail
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -9,9 +10,14 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -33,7 +39,7 @@ import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageVM
 import com.digiventure.ventnote.ui.theme.PurpleGrey80
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun NoteDetailPage(
     navHostController: NavHostController,
@@ -52,6 +58,12 @@ fun NoteDetailPage(
     }
 
     val isEditingState = viewModel.isEditing.value
+    val focusManager = LocalFocusManager.current
+    LaunchedEffect(key1 = isEditingState) {
+        if (!isEditingState) {
+            focusManager.clearFocus()
+        }
+    }
 
     val requiredDialogState = remember { mutableStateOf(false) }
     val deleteDialogState = remember { mutableStateOf(false) }
