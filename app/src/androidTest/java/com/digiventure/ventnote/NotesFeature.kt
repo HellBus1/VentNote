@@ -1,6 +1,7 @@
 package com.digiventure.ventnote
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.NavHostController
@@ -17,24 +18,14 @@ import org.junit.Test
 @HiltAndroidTest
 class NotesFeature {
     @get:Rule(order = 0)
-    var composeTestRule = createComposeRule()
-
-    @get:Rule(order = 1)
     var hiltRule = HiltAndroidRule(this)
 
-    private lateinit var navHostController: NavHostController
+    @get:Rule(order = 1)
+    var composeTestRule = createAndroidComposeRule(MainActivity::class.java)
 
     @Before
     fun setUp() {
         hiltRule.inject()
-
-        composeTestRule.setContent {
-            navHostController = rememberNavController()
-
-            VentNoteTheme {
-                NotesPage(navHostController)
-            }
-        }
     }
 
     @Test
