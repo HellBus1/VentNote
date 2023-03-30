@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.components.dialog.LoadingDialog
+import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.components.NavDrawer
 import com.digiventure.ventnote.feature.notes.components.NotesAppBar
@@ -47,12 +48,14 @@ fun NotesPage(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val openDialog = remember { mutableStateOf(false) }
+    val loadingDialog = remember { mutableStateOf(false) }
+    val deleteDialog = remember { mutableStateOf(false) }
 
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
 
-    noteListState.value?.getOrElse {
-        if (it.message != null) {
+    LaunchedEffect(key1 = noteListState.value) {
+        // Showing error snackbar on error
+        noteListState.value?.onFailure {
             scope.launch {
                 snackbarHostState.showSnackbar(
                     message = it.message ?: "",
@@ -63,13 +66,34 @@ fun NotesPage(
     }
 
     LaunchedEffect(noteListState.value, viewModel.searchedTitleText.value) {
+        // Replace filteredNotelistState value with filtered notelist state every searchedTitleText
+        // changed
         filteredNoteListState.value = noteListState.value?.getOrNull()?.filter { note ->
             note.title.contains(viewModel.searchedTitleText.value, true)
         } ?: listOf()
     }
 
     LaunchedEffect(key1 = loadingState.value) {
-        openDialog.value = loadingState.value == true
+        // Showing loading dialog whenever loading state is true
+        loadingDialog.value = (loadingState.value == true)
+    }
+
+    fun deleteNoteList() {
+        scope.launch {
+            viewModel.deleteNoteList()
+                .onSuccess {
+                    deleteDialog.value = false
+                    viewModel.unMarkAllNote()
+                }
+                .onFailure {
+                    deleteDialog.value = false
+
+                    snackbarHostState.showSnackbar(
+                        message = it.message ?: "",
+                        withDismissAction = true
+                    )
+                }
+        }
     }
 
     NavDrawer(
@@ -78,18 +102,40 @@ fun NotesPage(
         content = {
             Scaffold(
                 topBar = {
-                    NotesAppBar(viewModel, toggleDrawerCallback = {
-                        scope.launch {
-                            drawerState.open()
+                    NotesAppBar(
+                        isMarking = viewModel.isMarking.value,
+                        markedNoteListSize = viewModel.markedNoteList.size,
+                        isSearching = viewModel.isSearching.value,
+                        searchedTitle = viewModel.searchedTitleText.value,
+                        toggleDrawerCallback = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        },
+                        selectAllCallback = {
+                            viewModel.noteList.value?.getOrNull().let {
+                                if (it != null) viewModel.markAllNote(it)
+                            }
+                        },
+                        unSelectAllCallback = {
+                            viewModel.unMarkAllNote()
+                        },
+                        onSearchValueChange = {
+                            viewModel.searchedTitleText.value = it
+                        },
+                        closeMarkingCallback = {
+                            // Close marking state and clear marked notes
+                            viewModel.isMarking.value = false
+                            viewModel.markedNoteList.clear()
+                        },
+                        searchCallback = {
+                            viewModel.isSearching.value = !viewModel.isSearching.value
+                            viewModel.searchedTitleText.value = ""
+                        },
+                        deleteCallback = {
+                            deleteDialog.value = true
                         }
-                    }, showSnackbar = {
-                        scope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = it,
-                                withDismissAction = true
-                            )
-                        }
-                    })
+                    )
                 },
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 floatingActionButton = {
@@ -141,7 +187,11 @@ fun NotesPage(
                         }
                     }
 
-                    LoadingDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false })
+                    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false })
+
+                    TextDialog(isOpened = deleteDialog.value, onDismissCallback = { deleteDialog.value = false }, onConfirmCallback = {
+                        deleteNoteList()
+                    })
                 },
             )
         }
