@@ -20,7 +20,8 @@ android {
         versionCode 2
         versionName "1.0.0"
 
-        testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
+//        testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
         }
@@ -33,7 +34,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             debuggable true
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -98,10 +99,6 @@ dependencies {
     kapt 'com.google.dagger:hilt-android-compiler:2.44'
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0-alpha01'
 
-    // Hilt instrumented test
-    androidTestImplementation "com.google.dagger:hilt-android-testing:2.44"
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.44"
-
     // Instrumented test
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
@@ -123,6 +120,9 @@ dependencies {
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation 'com.google.firebase:firebase-analytics'
 
+    // MockK
+    androidTestImplementation "io.mockk:mockk-android:1.13.4"
+    androidTestImplementation "io.mockk:mockk-agent:1.13.4"
 }
 
 kapt {

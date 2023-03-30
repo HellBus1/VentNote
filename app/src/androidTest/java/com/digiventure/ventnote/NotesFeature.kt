@@ -6,27 +6,26 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.utils.BaseAcceptanceTest
 import com.digiventure.ventnote.feature.notes.NotesPage
+import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.ui.theme.VentNoteTheme
-import dagger.hilt.android.testing.HiltAndroidRule
+import io.mockk.mockk
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 class NotesFeature: BaseAcceptanceTest() {
-    @get:Rule(order = 0)
-    var hiltRule = HiltAndroidRule(this)
 
     private lateinit var navHostController: NavHostController
+    private lateinit var viewModel: NotesPageVM
 
     @Before
     fun setUp() {
-        hiltRule.inject()
+        viewModel = mockk(relaxed = true)
 
         composeTestRule.setContent {
             navHostController = rememberNavController()
 
             VentNoteTheme {
-                NotesPage(navHostController)
+                NotesPage(navHostController, viewModel)
             }
         }
     }
