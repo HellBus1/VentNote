@@ -153,11 +153,11 @@ fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDraw
             closeMarkingCallback()
         }
     }
-//    else {
-//        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon), Modifier.semantics {  }) {
-//            toggleDrawerCallback()
-//        }
-//    }
+    else {
+        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon), Modifier.semantics {  }) {
+            toggleDrawerCallback()
+        }
+    }
 }
 
 @Composable

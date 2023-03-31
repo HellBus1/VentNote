@@ -99,6 +99,14 @@ fun NotesPage(
     NavDrawer(
         navHostController = navHostController,
         drawerState = drawerState,
+        onError = {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = it,
+                    withDismissAction = true
+                )
+            }
+        },
         content = {
             Scaffold(
                 topBar = {
