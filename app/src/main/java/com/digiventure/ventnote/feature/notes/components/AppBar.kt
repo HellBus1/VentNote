@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,25 +21,31 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesAppBar(viewModel: NotesPageBaseVM, toggleDrawerCallback: () -> Unit, showSnackbar: (message: String) -> Unit) {
+fun NotesAppBar(
+    isMarking: Boolean,
+    markedNoteListSize: Int,
+    isSearching: Boolean,
+    searchedTitle: String,
+    toggleDrawerCallback: () -> Unit,
+    selectAllCallback: () -> Unit,
+    unSelectAllCallback: () -> Unit,
+    onSearchValueChange: (String) -> Unit,
+    closeMarkingCallback: () -> Unit,
+    searchCallback: () -> Unit,
+    deleteCallback: () -> Unit
+) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
-    val openDialog = remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
 
     TopAppBar(
         title = {
-            if (viewModel.isMarking.value) {
+            if (isMarking) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { expanded.value = true }) {
                     NavText(
-                        text = viewModel.markedNoteList.size.toString(),
+                        text = markedNoteListSize.toString(),
                         size = 16.sp,
                         modifier = Modifier.padding(start = 8.dp)
                     )
@@ -60,9 +65,7 @@ fun NotesAppBar(viewModel: NotesPageBaseVM, toggleDrawerCallback: () -> Unit, sh
                             modifier = Modifier.semantics {  })
                         },
                         onClick = {
-                            viewModel.noteList.value?.getOrNull().let {
-                                if (it != null) viewModel.markAllNote(it)
-                            }
+                            selectAllCallback()
                             expanded.value = false
                         },
                     )
@@ -74,16 +77,16 @@ fun NotesAppBar(viewModel: NotesPageBaseVM, toggleDrawerCallback: () -> Unit, sh
                             modifier = Modifier.semantics {  })
                         },
                         onClick = {
-                            viewModel.unMarkAllNote()
+                            unSelectAllCallback()
                             expanded.value = false
                         },
                     )
                 }
-            } else if (viewModel.isSearching.value) {
+            } else if (isSearching) {
                 TextField(
-                    value = viewModel.searchedTitleText.value,
+                    value = searchedTitle,
                     onValueChange = {
-                        viewModel.searchedTitleText.value = it
+                        onSearchValueChange(it)
                     },
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
@@ -118,47 +121,29 @@ fun NotesAppBar(viewModel: NotesPageBaseVM, toggleDrawerCallback: () -> Unit, sh
         ),
         navigationIcon = {
             LeadingIcon(
-                isMarking = viewModel.isMarking.value,
+                isMarking = isMarking,
                 closeMarkingCallback = {
-                    // Close marking state and clear marked notes
-                    viewModel.isMarking.value = false
-                    viewModel.markedNoteList.clear()
+                    closeMarkingCallback()
                 },
                 toggleDrawerCallback = { toggleDrawerCallback() })
         },
         actions = {
             TrailingMenuIcons(
-                isMarking = viewModel.isMarking.value,
-                markedItemsCount = viewModel.markedNoteList.size,
-                isSearching = viewModel.isSearching.value,
+                isMarking = isMarking,
+                markedItemsCount = markedNoteListSize,
+                isSearching = isSearching,
                 searchCallback = {
-                    viewModel.isSearching.value = !viewModel.isSearching.value
-                    viewModel.searchedTitleText.value = ""
+                    searchCallback()
                     focusManager.clearFocus()
                 },
                 deleteCallback = {
-                    openDialog.value = true
+                    deleteCallback()
                 })
         },
         modifier = Modifier.semantics {
             testTag = "top-appBar"
         }
     )
-
-    TextDialog(isOpened = openDialog.value, onDismissCallback = { openDialog.value = false }, onConfirmCallback = {
-        scope.launch {
-            viewModel.deleteNoteList()
-                .onSuccess {
-                    openDialog.value = false
-                    viewModel.unMarkAllNote()
-                }
-                .onFailure {
-                    openDialog.value = false
-                    openDialog.value = false
-                    showSnackbar(it.message ?: "")
-                }
-        }
-    })
 }
 
 @Composable
@@ -168,11 +153,11 @@ fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDraw
             closeMarkingCallback()
         }
     }
-//    else {
-//        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon), Modifier.semantics {  }) {
-//            toggleDrawerCallback()
-//        }
-//    }
+    else {
+        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon), Modifier.semantics {  }) {
+            toggleDrawerCallback()
+        }
+    }
 }
 
 @Composable

@@ -1,5 +1,5 @@
 <div style="text-align: center;">
-  <img src="assets/banner.png" width="60%"/>
+  <img src="assets/banner.png" width="100%"/>
 </div>
 
 ## VentNote
