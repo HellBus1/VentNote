@@ -98,6 +98,8 @@ fun NoteDetailPage(
             requiredDialogState.value = true
         } else {
             if (data != null) {
+                focusManager.clearFocus()
+
                 scope.launch {
                     val updatedNote = data.copy(title = viewModel.titleText.value, note = viewModel.descriptionText.value)
                     viewModel.updateNoteList(updatedNote)
