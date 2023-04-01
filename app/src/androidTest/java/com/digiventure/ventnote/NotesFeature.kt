@@ -3,6 +3,7 @@ package com.digiventure.ventnote
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import com.digiventure.ventnote.commons.TestTags
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -22,8 +23,19 @@ class NotesFeature {
         hiltRule.inject()
     }
 
+    /**
+     * Ensure top appbar and its children is showing
+     * */
     @Test
-    fun displayTopAppBar() {
-        composeTestRule.onNodeWithTag("top-appBar").assertIsDisplayed()
+    fun ensureDisplayTopAppBar() {
+        // Initial state
+        composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.SEARCH_ICON_BUTTON).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.MENU_ICON_BUTTON).assertIsDisplayed()
+    }
+
+    @Test
+    fun ensureDisplayNavDrawer() {
+
     }
 }

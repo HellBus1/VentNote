@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.StringUtil
+import com.digiventure.ventnote.commons.TestTags
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +52,7 @@ fun NotesAppBar(
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     NavText(
-                        text = "Selected",
+                        text = StringUtil.getStringFromResources(R.string.selected_text),
                         size = 16.sp,
                         modifier = Modifier.padding(start = 8.dp)
                     )
@@ -60,7 +62,7 @@ fun NotesAppBar(
                 DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
                     DropdownMenuItem(
                         text = { Text(
-                            text = "Select All",
+                            text = StringUtil.getStringFromResources(R.string.select_all),
                             fontSize = 16.sp,
                             modifier = Modifier.semantics {  })
                         },
@@ -72,7 +74,7 @@ fun NotesAppBar(
                     Divider()
                     DropdownMenuItem(
                         text =  { Text(
-                            text = "Unselect All",
+                            text = StringUtil.getStringFromResources(R.string.unselect_all),
                             fontSize = 16.sp,
                             modifier = Modifier.semantics {  })
                         },
@@ -103,7 +105,7 @@ fun NotesAppBar(
                     modifier = Modifier.padding(bottom = 0.dp),
                     placeholder = {
                         NavText(
-                            text = "Input title here",
+                            text = StringUtil.getStringFromResources(R.string.search_textField),
                             size = 16.sp,
                             modifier = Modifier.semantics {  })
                     }
@@ -125,7 +127,8 @@ fun NotesAppBar(
                 closeMarkingCallback = {
                     closeMarkingCallback()
                 },
-                toggleDrawerCallback = { toggleDrawerCallback() })
+                toggleDrawerCallback = { toggleDrawerCallback() }
+            )
         },
         actions = {
             TrailingMenuIcons(
@@ -141,7 +144,7 @@ fun NotesAppBar(
                 })
         },
         modifier = Modifier.semantics {
-            testTag = "top-appBar"
+            testTag = TestTags.TOP_APPBAR
         }
     )
 }
@@ -149,12 +152,14 @@ fun NotesAppBar(
 @Composable
 fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDrawerCallback: () -> Unit) {
     if (isMarking) {
-        TopNavBarIcon(Icons.Filled.Close, stringResource(R.string.close_nav_icon), Modifier.semantics {  }) {
+        TopNavBarIcon(Icons.Filled.Close, stringResource(R.string.close_nav_icon),
+            modifier = Modifier.semantics { testTag = TestTags.CLOSE_SELECT_ICON_BUTTON }) {
             closeMarkingCallback()
         }
     }
     else {
-        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon), Modifier.semantics {  }) {
+        TopNavBarIcon(Icons.Filled.Menu, stringResource(R.string.drawer_nav_icon),
+            modifier = Modifier.semantics { testTag = TestTags.MENU_ICON_BUTTON }) {
             toggleDrawerCallback()
         }
     }
@@ -163,16 +168,20 @@ fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDraw
 @Composable
 fun TrailingMenuIcons(isMarking: Boolean, markedItemsCount: Int, isSearching: Boolean, searchCallback: () -> Unit, deleteCallback: () -> Unit) {
     if (isMarking) {
-        TopNavBarIcon(Icons.Filled.Delete, stringResource(R.string.delete_nav_icon), Modifier.semantics {  },
-            tint = if (markedItemsCount > 0) MaterialTheme.colorScheme.onPrimary else Color.Gray) {
+        TopNavBarIcon(Icons.Filled.Delete, stringResource(R.string.delete_nav_icon),
+            tint = if (markedItemsCount > 0) MaterialTheme.colorScheme.onPrimary else Color.Gray,
+            modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }
+        ) {
             if (markedItemsCount > 0) deleteCallback()
         }
     } else if (isSearching) {
-        TopNavBarIcon(Icons.Filled.Close, stringResource(R.string.delete_nav_icon), Modifier.semantics {  }) {
+        TopNavBarIcon(Icons.Filled.Close, stringResource(R.string.delete_nav_icon),
+            modifier = Modifier.semantics { testTag = TestTags.CLOSE_SEARCH_ICON_BUTTON }) {
             searchCallback()
         }
     } else {
-        TopNavBarIcon(Icons.Filled.Search, stringResource(R.string.search_nav_icon), Modifier.semantics {  }) {
+        TopNavBarIcon(Icons.Filled.Search, stringResource(R.string.search_nav_icon),
+            modifier = Modifier.semantics { testTag = TestTags.SEARCH_ICON_BUTTON }) {
             searchCallback()
         }
     }
