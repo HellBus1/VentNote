@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.commons.StringUtil
 import com.digiventure.ventnote.commons.TestTags
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +51,7 @@ fun NotesAppBar(
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     NavText(
-                        text = StringUtil.getStringFromResources(R.string.selected_text),
+                        text = stringResource(R.string.selected_text),
                         size = 16.sp,
                         modifier = Modifier.padding(start = 8.dp)
                     )
@@ -62,7 +61,7 @@ fun NotesAppBar(
                 DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
                     DropdownMenuItem(
                         text = { Text(
-                            text = StringUtil.getStringFromResources(R.string.select_all),
+                            text = stringResource(R.string.select_all),
                             fontSize = 16.sp,
                             modifier = Modifier.semantics {  })
                         },
@@ -74,7 +73,7 @@ fun NotesAppBar(
                     Divider()
                     DropdownMenuItem(
                         text =  { Text(
-                            text = StringUtil.getStringFromResources(R.string.unselect_all),
+                            text = stringResource(R.string.unselect_all),
                             fontSize = 16.sp,
                             modifier = Modifier.semantics {  })
                         },
@@ -102,19 +101,23 @@ fun NotesAppBar(
                         lineHeight = 0.sp
                     ),
                     singleLine = true,
-                    modifier = Modifier.padding(bottom = 0.dp),
+                    modifier = Modifier
+                        .padding(bottom = 0.dp)
+                        .semantics { testTag = TestTags.TOP_APPBAR_TEXTFIELD },
                     placeholder = {
                         NavText(
-                            text = StringUtil.getStringFromResources(R.string.search_textField),
+                            text = stringResource(R.string.search_textField),
                             size = 16.sp,
                             modifier = Modifier.semantics {  })
                     }
                 )
             } else {
                 Text(
-                    text = "VentNote",
+                    text = stringResource(id = R.string.title),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 8.dp),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .semantics { testTag = TestTags.TOP_APPBAR_TITLE },
                 )
             }
         },

@@ -33,4 +33,7 @@
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
+
+    <!--  Nav Drawer Tile  -->
+    <string name="rate_app">Rate App</string>
 </resources>
