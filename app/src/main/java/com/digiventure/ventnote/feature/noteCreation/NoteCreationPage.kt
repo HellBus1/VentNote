@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.noteCreation.components.NoteCreationAppBar
@@ -89,49 +90,51 @@ fun NoteCreationPage(
                     imageVector = Icons.Filled.Check,
                     contentDescription = stringResource(R.string.fab),)
             }
-        }
-    ) { contentPadding ->
-        Box(modifier = Modifier.padding(contentPadding)) {
-            Column {
-                Box() {
-                    OutlinedTextField(
-                        value = viewModel.titleText.value,
-                        onValueChange = {
-                            viewModel.titleText.value = it
-                        },
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        singleLine = true,
-                        modifier = Modifier
-                            .border(
-                                width = 3.dp,
-                                color = PurpleGrey80,
-                                shape = RectangleShape
-                            )
-                            .fillMaxWidth(),
-                        placeholder = { Text("Insert title", fontSize = 18.sp, color = PurpleGrey80) }
-                    )
-                }
-                Box() {
-                    TextField(
-                        value = viewModel.descriptionText.value,
-                        onValueChange = {
-                            viewModel.descriptionText.value = it
-                        },
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
-                        singleLine = false,
-                        shape = RectangleShape,
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                        placeholder = { Text("Insert note", fontSize = 18.sp, color = PurpleGrey80) }
-                    )
+        },
+        content = { contentPadding ->
+            Box(modifier = Modifier.padding(contentPadding)) {
+                Column {
+                    Box() {
+                        OutlinedTextField(
+                            value = viewModel.titleText.value,
+                            onValueChange = {
+                                viewModel.titleText.value = it
+                            },
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            singleLine = true,
+                            modifier = Modifier
+                                .border(
+                                    width = 3.dp,
+                                    color = PurpleGrey80,
+                                    shape = RectangleShape
+                                )
+                                .fillMaxWidth(),
+                            placeholder = { Text("Insert title", fontSize = 18.sp, color = PurpleGrey80) }
+                        )
+                    }
+                    Box() {
+                        TextField(
+                            value = viewModel.descriptionText.value,
+                            onValueChange = {
+                                viewModel.descriptionText.value = it
+                            },
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                            singleLine = false,
+                            shape = RectangleShape,
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color.Transparent,
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            placeholder = { Text("Insert note", fontSize = 18.sp, color = PurpleGrey80) }
+                        )
+                    }
                 }
             }
-        }
-    }
+        },
+        modifier = Modifier.semantics { testTag = TestTags.NOTE_CREATION_PAGE }
+    )
 
     val missingFieldName = if (viewModel.titleText.value.isEmpty()) {
         "Title"

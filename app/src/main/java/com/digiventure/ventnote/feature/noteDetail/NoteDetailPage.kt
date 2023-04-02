@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.noteDetail.components.NoteDetailAppBar
@@ -151,49 +152,51 @@ fun NoteDetailPage(
                     imageVector = if(isEditingState) Icons.Filled.Check else Icons.Filled.Edit,
                     contentDescription = stringResource(R.string.fab),)
             }
-        }
-    ) { contentPadding ->
-        Box(modifier = Modifier.padding(contentPadding)) {
-            Column {
-                Box() {
-                    OutlinedTextField(
-                        value = viewModel.titleText.value,
-                        onValueChange = {
-                            viewModel.titleText.value = it
-                        },
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        singleLine = true,
-                        readOnly = !isEditingState,
-                        modifier = Modifier
-                            .border(
-                                width = 3.dp,
-                                color = PurpleGrey80,
-                                shape = RectangleShape
-                            )
-                            .fillMaxWidth(),
-                    )
-                }
-                Box() {
-                    TextField(
-                        value = viewModel.descriptionText.value,
-                        onValueChange = {
-                            viewModel.descriptionText.value = it
-                        },
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
-                        singleLine = false,
-                        readOnly = !isEditingState,
-                        shape = RectangleShape,
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                    )
+        },
+        content = { contentPadding ->
+            Box(modifier = Modifier.padding(contentPadding)) {
+                Column {
+                    Box() {
+                        OutlinedTextField(
+                            value = viewModel.titleText.value,
+                            onValueChange = {
+                                viewModel.titleText.value = it
+                            },
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            singleLine = true,
+                            readOnly = !isEditingState,
+                            modifier = Modifier
+                                .border(
+                                    width = 3.dp,
+                                    color = PurpleGrey80,
+                                    shape = RectangleShape
+                                )
+                                .fillMaxWidth(),
+                        )
+                    }
+                    Box() {
+                        TextField(
+                            value = viewModel.descriptionText.value,
+                            onValueChange = {
+                                viewModel.descriptionText.value = it
+                            },
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                            singleLine = false,
+                            readOnly = !isEditingState,
+                            shape = RectangleShape,
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color.Transparent,
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                        )
+                    }
                 }
             }
-        }
-    }
+        },
+        modifier = Modifier.semantics { testTag = TestTags.NOTE_DETAIL_PAGE }
+    )
 
     val missingFieldName = if (viewModel.titleText.value.isEmpty()) {
         "Title"

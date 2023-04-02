@@ -31,9 +31,19 @@ class NotesFeature {
     private lateinit var topAppBarTitle: SemanticsNodeInteraction
     private lateinit var topAppBarTextField: SemanticsNodeInteraction
     private lateinit var closeSearchIconButton: SemanticsNodeInteraction
+    private lateinit var selectedCount: SemanticsNodeInteraction
+    private lateinit var dropdownSelect: SemanticsNodeInteraction
+    private lateinit var selectAllOption: SemanticsNodeInteraction
+    private lateinit var unselectAllOption: SemanticsNodeInteraction
+    private lateinit var closeSelectIconButton: SemanticsNodeInteraction
+    private lateinit var deleteIconButton: SemanticsNodeInteraction
+    private lateinit var selectedCountContainer: SemanticsNodeInteraction
 
     private lateinit var navDrawer: SemanticsNodeInteraction
     private lateinit var rateAppTile: SemanticsNodeInteraction
+
+    private lateinit var noteListRecyclerView: SemanticsNodeInteraction
+    private lateinit var addNoteFloatingActionButton: SemanticsNodeInteraction
 
     @Before
     fun setUp() {
@@ -47,9 +57,19 @@ class NotesFeature {
         topAppBarTitle = composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR_TITLE)
         topAppBarTextField = composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR_TEXTFIELD)
         closeSearchIconButton = composeTestRule.onNodeWithTag(TestTags.CLOSE_SEARCH_ICON_BUTTON)
+        selectedCount = composeTestRule.onNodeWithTag(TestTags.SELECTED_COUNT)
+        dropdownSelect = composeTestRule.onNodeWithTag(TestTags.DROPDOWN_SELECT)
+        selectAllOption = composeTestRule.onNodeWithTag(TestTags.SELECT_ALL_OPTION)
+        unselectAllOption = composeTestRule.onNodeWithTag(TestTags.UNSELECT_ALL_OPTION)
+        closeSelectIconButton = composeTestRule.onNodeWithTag(TestTags.CLOSE_SELECT_ICON_BUTTON)
+        deleteIconButton = composeTestRule.onNodeWithTag(TestTags.DELETE_ICON_BUTTON)
+        selectedCountContainer = composeTestRule.onNodeWithTag(TestTags.SELECTED_COUNT_CONTAINER)
 
         navDrawer = composeTestRule.onNodeWithTag(TestTags.NAV_DRAWER)
         rateAppTile = composeTestRule.onNodeWithTag(TestTags.RATE_APP_TILE)
+
+        noteListRecyclerView = composeTestRule.onNodeWithTag(TestTags.NOTE_RV)
+        addNoteFloatingActionButton = composeTestRule.onNodeWithTag(TestTags.ADD_NOTE_FAB)
     }
 
     @After
@@ -57,6 +77,9 @@ class NotesFeature {
         Intents.release()
     }
 
+    /**
+     * Ensure all top appBar initial functionality
+     * */
     @Test
     fun ensureTopAppBarFunctionality() {
         // Initial state
@@ -78,26 +101,81 @@ class NotesFeature {
         composeTestRule.onNodeWithText("Input Text").assertExists()
 
         /// 2. When close button is pressed
-        /// Scenario : when pressed, textfield is dismissed
+        /// Scenario : when pressed, textField is dismissed
         closeSearchIconButton.assertIsDisplayed()
         closeSearchIconButton.performClick()
         topAppBarTextField.assertDoesNotExist()
     }
 
+    /**
+     * Ensure all navDrawer initial functionality
+     * */
     @Test
     fun ensureNavDrawerFunctionality() {
         // When menu button is pressed
+        // Scenario : there is hamburger button, when it was pressed a nav drawer will shows
         menuIconButton.performClick()
         navDrawer.assertIsDisplayed()
 
         // When drawer is displayed
-        rateAppTile.assertIsDisplayed()
+        // Scenario : assert the children is displayed
         rateAppTile.assertIsDisplayed()
 
         /// 1. When rate app is pressed
-        ///
+        /// Scenario : the app will navigated to VentNote PlayStore Page
         rateAppTile.performClick()
         intended(hasAction(Intent.ACTION_VIEW))
         intended(hasData(Uri.parse("https://play.google.com/store/apps/details?id=com.digiventure.ventnote")))
+    }
+
+    /**
+     * Ensure noteList functionality (make sure there are few items)
+     * reside in the local database)
+     * you can use App Inspection -> Databases -> New Query to seed the data) or
+     * simply using add feature.
+     *
+     * Ensure it has three items
+     * (1, "title 1", "note 1", 1678158383000, 1678158383000),
+     * (2, "title 2", "note 2", 1678071983000, 1678071983000),
+     * (3, "title 3", "note 3", 1677899183000, 1677899183000);
+     * */
+    @Test
+    fun ensureNoteListFunctionality() {
+        // Initial state
+        // Scenario : assert if lazy column are displayed (it will not exist if there are no item exists)
+        noteListRecyclerView.assertIsDisplayed()
+
+        /// 1. When the three children is showing
+        /// Scenario : then assert the children by perform scroll and assert displayed
+        val nodeWithText1 = composeTestRule.onNodeWithText("title 1")
+        val nodeWithText2 = composeTestRule.onNodeWithText("title 2")
+        val nodeWithText3 = composeTestRule.onNodeWithText("title 3")
+        nodeWithText1.performScrollTo()
+        nodeWithText2.assertIsDisplayed()
+        nodeWithText3.assertIsDisplayed()
+
+        // When node with text title 1 is long pressed
+        // Scenario : the toolbar will show delete icon, close button, and selected count with
+        // dropdown menu, also the tile checkbox will checked
+        nodeWithText1.performTouchInput {
+            longClick()
+        }
+
+        val checkBoxForNodeWithText1 = composeTestRule.onNodeWithTag("title 1")
+        checkBoxForNodeWithText1.assertIsOn()
+        composeTestRule.onNodeWithText("1").assertIsDisplayed()
+        nodeWithText1.performClick()
+        composeTestRule.onNodeWithText("0").assertIsDisplayed()
+
+        closeSelectIconButton.assertIsDisplayed()
+        deleteIconButton.assertIsDisplayed()
+        selectedCountContainer.assertIsDisplayed()
+
+        /// 1. When menu dropdown is pressed
+
+        /// 2. When close button is pressed
+        /// Scenario :
+        closeSelectIconButton.performClick()
+        closeSelectIconButton.assertDoesNotExist()
     }
 }

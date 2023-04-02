@@ -44,11 +44,14 @@ fun NotesAppBar(
     TopAppBar(
         title = {
             if (isMarking) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { expanded.value = true }) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                    .clickable { expanded.value = true }
+                    .semantics { testTag = TestTags.SELECTED_COUNT_CONTAINER }) {
                     NavText(
                         text = markedNoteListSize.toString(),
                         size = 16.sp,
-                        modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier
+                            .padding(start = 8.dp)
                     )
                     NavText(
                         text = stringResource(R.string.selected_text),
@@ -58,12 +61,13 @@ fun NotesAppBar(
                     Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.dropdown_nav_icon), tint = MaterialTheme.colorScheme.onPrimary)
                 }
 
-                DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
+                DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false },
+                    modifier = Modifier.semantics { testTag = TestTags.DROPDOWN_SELECT }) {
                     DropdownMenuItem(
                         text = { Text(
                             text = stringResource(R.string.select_all),
                             fontSize = 16.sp,
-                            modifier = Modifier.semantics {  })
+                            modifier = Modifier.semantics { testTag = TestTags.SELECT_ALL_OPTION })
                         },
                         onClick = {
                             selectAllCallback()
@@ -75,7 +79,7 @@ fun NotesAppBar(
                         text =  { Text(
                             text = stringResource(R.string.unselect_all),
                             fontSize = 16.sp,
-                            modifier = Modifier.semantics {  })
+                            modifier = Modifier.semantics { testTag = TestTags.UNSELECT_ALL_OPTION })
                         },
                         onClick = {
                             unSelectAllCallback()

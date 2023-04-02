@@ -19,8 +19,8 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 
 @Composable
 fun NavDrawer(
