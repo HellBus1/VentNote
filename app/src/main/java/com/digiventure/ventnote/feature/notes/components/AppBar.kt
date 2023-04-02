@@ -66,25 +66,25 @@ fun NotesAppBar(
                     DropdownMenuItem(
                         text = { Text(
                             text = stringResource(R.string.select_all),
-                            fontSize = 16.sp,
-                            modifier = Modifier.semantics { testTag = TestTags.SELECT_ALL_OPTION })
+                            fontSize = 16.sp)
                         },
                         onClick = {
                             selectAllCallback()
                             expanded.value = false
                         },
+                        modifier = Modifier.semantics { testTag = TestTags.SELECT_ALL_OPTION }
                     )
                     Divider()
                     DropdownMenuItem(
                         text =  { Text(
                             text = stringResource(R.string.unselect_all),
-                            fontSize = 16.sp,
-                            modifier = Modifier.semantics { testTag = TestTags.UNSELECT_ALL_OPTION })
+                            fontSize = 16.sp)
                         },
                         onClick = {
                             unSelectAllCallback()
                             expanded.value = false
                         },
+                        modifier = Modifier.semantics { testTag = TestTags.UNSELECT_ALL_OPTION }
                     )
                 }
             } else if (isSearching) {

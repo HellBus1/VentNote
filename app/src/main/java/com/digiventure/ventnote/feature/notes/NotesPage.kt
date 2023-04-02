@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -79,6 +80,8 @@ fun NotesPage(
         loadingDialog.value = (loadingState.value == true)
     }
 
+    val deletedMessage = stringResource(id = R.string.note_successfully_deleted)
+
     fun deleteNoteList() {
         scope.launch {
             viewModel.deleteNoteList()
@@ -87,7 +90,7 @@ fun NotesPage(
                     viewModel.unMarkAllNote()
 
                     snackbarHostState.showSnackbar(
-                        message = "Note successfully deleted",
+                        message = deletedMessage,
                         withDismissAction = true
                     )
                 }
@@ -200,17 +203,19 @@ fun NotesPage(
                             }
                         }
                     }
-
-                    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false })
-
-                    TextDialog(isOpened = deleteDialog.value, onDismissCallback = { deleteDialog.value = false }, onConfirmCallback = {
-                        deleteNoteList()
-                    })
                 },
                 modifier = Modifier.semantics { testTag = TestTags.NOTES_PAGE }
             )
         }
     )
+
+    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
+        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
+
+    TextDialog(isOpened = deleteDialog.value,
+        onDismissCallback = { deleteDialog.value = false },
+        onConfirmCallback = { deleteNoteList() },
+        modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
 }
 
 @OptIn(ExperimentalFoundationApi::class)

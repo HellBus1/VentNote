@@ -16,12 +16,14 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoadingDialog(
+    modifier: Modifier = Modifier,
     isOpened: Boolean,
     onDismissCallback: () -> Unit,
 ) {
     if (isOpened) {
         AlertDialog(
             onDismissRequest = { onDismissCallback() },
+            modifier = modifier,
             content = {
                 Surface(shape = RoundedCornerShape(8.dp)) {
                     Row(

@@ -2,6 +2,7 @@ package com.digiventure.ventnote
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
@@ -108,27 +109,6 @@ class NotesFeature {
     }
 
     /**
-     * Ensure all navDrawer initial functionality
-     * */
-    @Test
-    fun ensureNavDrawerFunctionality() {
-        // When menu button is pressed
-        // Scenario : there is hamburger button, when it was pressed a nav drawer will shows
-        menuIconButton.performClick()
-        navDrawer.assertIsDisplayed()
-
-        // When drawer is displayed
-        // Scenario : assert the children is displayed
-        rateAppTile.assertIsDisplayed()
-
-        /// 1. When rate app is pressed
-        /// Scenario : the app will navigated to VentNote PlayStore Page
-        rateAppTile.performClick()
-        intended(hasAction(Intent.ACTION_VIEW))
-        intended(hasData(Uri.parse("https://play.google.com/store/apps/details?id=com.digiventure.ventnote")))
-    }
-
-    /**
      * Ensure noteList functionality (make sure there are few items)
      * reside in the local database)
      * you can use App Inspection -> Databases -> New Query to seed the data) or
@@ -171,11 +151,68 @@ class NotesFeature {
         deleteIconButton.assertIsDisplayed()
         selectedCountContainer.assertIsDisplayed()
 
-        /// 1. When menu dropdown is pressed
+        /// 1. When selected count container is pressed
+        /// Scenario : it will show dropdown menu with select all and unselect all tile
+        selectedCountContainer.performClick()
+        dropdownSelect.assertIsDisplayed()
+        dropdownSelect.performClick()
+        unselectAllOption.performClick()
+        composeTestRule.onNodeWithText("0").assertIsDisplayed()
+
+        selectedCountContainer.performClick()
+        dropdownSelect.assertIsDisplayed()
+        dropdownSelect.performClick()
+        selectAllOption.performClick()
+        composeTestRule.onNodeWithText("3").assertIsDisplayed()
+
+        /// 2. Delete selected note
+        /// Scenario : it will show loading dialog when delete is being processed
+        /// then it will show snackbar either success or failed
+        /// note : insert the data again after this action
+        deleteIconButton.performClick()
+        // TODO : Assert dialog displayed (it returned error that the dialog show two times at same time)
+        // TODO : the functionality is good when tested manually
+        val dismissButton = composeTestRule.onNodeWithTag(TestTags.DISMISS_BUTTON)
+        dismissButton.assertIsDisplayed()
+        val confirmButton = composeTestRule.onNodeWithTag(TestTags.CONFIRM_BUTTON)
+        confirmButton.assertIsDisplayed()
+
+        dismissButton.performClick()
+        composeTestRule.onNodeWithTag(TestTags.CONFIRMATION_DIALOG).assertDoesNotExist()
+
+        // TODO : check delete action that will show snackBar when success or error
+        // TODO : the functionality is good when tested manually
 
         /// 2. When close button is pressed
-        /// Scenario :
+        /// Scenario : it will turn into initial state
         closeSelectIconButton.performClick()
         closeSelectIconButton.assertDoesNotExist()
+
+        // TODO : check filter functionality (it returned error that the note tile show two times at same time)
+        // TODO : the functionality is good when tested manually
+    }
+
+    /**
+     * Ensure all navDrawer initial functionality
+     *
+     * Ensure the emulator / device has play store and an account already
+     * logged in there
+     * */
+    @Test
+    fun ensureNavDrawerFunctionality() {
+        // When menu button is pressed
+        // Scenario : there is hamburger button, when it was pressed a nav drawer will shows
+        menuIconButton.performClick()
+        navDrawer.assertIsDisplayed()
+
+        // When drawer is displayed
+        // Scenario : assert the children is displayed
+        rateAppTile.assertIsDisplayed()
+
+        /// 1. When rate app is pressed
+        /// Scenario : the app will navigated to VentNote PlayStore Page
+        rateAppTile.performClick()
+        intended(hasAction(Intent.ACTION_VIEW))
+        intended(hasData(Uri.parse("https://play.google.com/store/apps/details?id=com.digiventure.ventnote")))
     }
 }

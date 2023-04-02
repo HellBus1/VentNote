@@ -29,4 +29,10 @@ object TestTags {
     // Note lists test tags
     const val ADD_NOTE_FAB = "add_note_fab"
     const val NOTE_RV = "note_rv"
+    const val LOADING_DIALOG = "loading_dialog"
+    const val CONFIRMATION_DIALOG = "confirmation_dialog"
+
+    // Dialog Button
+    const val CONFIRM_BUTTON = "confirm_button"
+    const val DISMISS_BUTTON = "dismiss_button"
 }

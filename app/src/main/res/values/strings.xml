@@ -36,4 +36,7 @@
 
     <!--  Nav Drawer Tile  -->
     <string name="rate_app">Rate App</string>
+
+    <!--  SnackBar alert message  -->
+    <string name="note_successfully_deleted">Note successfully deleted</string>
 </resources>
