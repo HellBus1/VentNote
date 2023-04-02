@@ -34,7 +34,7 @@ android {
         }
         debug {
             minifyEnabled false
-            debuggable true
+//            debuggable true
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -100,10 +100,17 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0-alpha01'
 
     // Instrumented test
+    /// Espresso (for ui interaction purpose)
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+    /// Hilt test (for handling service locator when test)
     androidTestImplementation "com.google.dagger:hilt-android-testing:2.44"
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.44"
 

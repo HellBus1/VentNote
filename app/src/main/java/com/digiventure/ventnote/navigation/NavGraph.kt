@@ -6,8 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.digiventure.ventnote.feature.about.AboutPage
-import com.digiventure.ventnote.feature.help.HelpPage
 import com.digiventure.ventnote.feature.noteCreation.NoteCreationPage
 import com.digiventure.ventnote.feature.noteDetail.NoteDetailPage
 import com.digiventure.ventnote.feature.notes.NotesPage
@@ -33,12 +31,6 @@ fun NavGraph(navHostController: NavHostController) {
         }
         composable(Route.NoteCreationPage.routeName) {
             NoteCreationPage(navHostController = navHostController)
-        }
-        composable(Route.HelpPage.routeName) {
-            HelpPage(navHostController = navHostController)
-        }
-        composable(Route.AboutPage.routeName) {
-            AboutPage(navHostController = navHostController)
         }
     }
 }

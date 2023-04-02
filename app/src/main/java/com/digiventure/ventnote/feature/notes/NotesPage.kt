@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
@@ -54,7 +56,7 @@ fun NotesPage(
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
 
     LaunchedEffect(key1 = noteListState.value) {
-        // Showing error snackbar on error
+        // Showing error snackBar on error
         noteListState.value?.onFailure {
             scope.launch {
                 snackbarHostState.showSnackbar(
@@ -66,8 +68,8 @@ fun NotesPage(
     }
 
     LaunchedEffect(noteListState.value, viewModel.searchedTitleText.value) {
-        // Replace filteredNotelistState value with filtered notelist state every searchedTitleText
-        // changed
+        // Replace filteredNoteListState value with filtered noteList state
+        // every searchedTitleText changed
         filteredNoteListState.value = noteListState.value?.getOrNull()?.filter { note ->
             note.title.contains(viewModel.searchedTitleText.value, true)
         } ?: listOf()
@@ -78,12 +80,19 @@ fun NotesPage(
         loadingDialog.value = (loadingState.value == true)
     }
 
+    val deletedMessage = stringResource(id = R.string.note_successfully_deleted)
+
     fun deleteNoteList() {
         scope.launch {
             viewModel.deleteNoteList()
                 .onSuccess {
                     deleteDialog.value = false
                     viewModel.unMarkAllNote()
+
+                    snackbarHostState.showSnackbar(
+                        message = deletedMessage,
+                        withDismissAction = true
+                    )
                 }
                 .onFailure {
                     deleteDialog.value = false
@@ -150,7 +159,7 @@ fun NotesPage(
                     FloatingActionButton(
                         onClick = { navHostController.navigate(Route.NoteCreationPage.routeName) },
                         modifier = Modifier.semantics {
-                            testTag = "add-note-fab"
+                            testTag = TestTags.ADD_NOTE_FAB
                         }) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -161,8 +170,8 @@ fun NotesPage(
                     Box(modifier = Modifier.padding(contentPadding)) {
                         LazyColumn(
                             modifier = Modifier
-                                .semantics { testTag = "notes-rv" }
-                                .fillMaxSize(),
+                                .fillMaxSize()
+                                .semantics { testTag = TestTags.NOTE_RV },
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             contentPadding = PaddingValues(
                                 top = 24.dp,
@@ -194,16 +203,19 @@ fun NotesPage(
                             }
                         }
                     }
-
-                    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false })
-
-                    TextDialog(isOpened = deleteDialog.value, onDismissCallback = { deleteDialog.value = false }, onConfirmCallback = {
-                        deleteNoteList()
-                    })
                 },
+                modifier = Modifier.semantics { testTag = TestTags.NOTES_PAGE }
             )
         }
     )
+
+    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
+        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
+
+    TextDialog(isOpened = deleteDialog.value,
+        onDismissCallback = { deleteDialog.value = false },
+        onConfirmCallback = { deleteNoteList() },
+        modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -224,7 +236,8 @@ fun NotesItem(isMarking: Boolean, isMarked: Boolean, data: NoteModel, onClick: (
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (isMarking) {
-                    Checkbox(checked = isMarked, onCheckedChange = { onCheckClick() })
+                    Checkbox(checked = isMarked, onCheckedChange = { onCheckClick() },
+                        modifier = Modifier.semantics { testTag = data.title })
                 }
                 
                 Column(modifier = Modifier.weight(2f)) {
