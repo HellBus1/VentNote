@@ -21,7 +21,13 @@ import com.digiventure.ventnote.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteDetailAppBar(isEditing: Boolean, descriptionTextLength: Int, onBackPressed: () -> Unit, onClosePressed: () -> Unit, onDeletePressed: () -> Unit) {
+fun NoteDetailAppBar(
+    isEditing: Boolean,
+    descriptionTextLength: Int,
+    onBackPressed: () -> Unit,
+    onClosePressed: () -> Unit,
+    onDeletePressed: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior) {
     val expanded = remember { mutableStateOf(false) }
 
     TopAppBar(
@@ -67,6 +73,7 @@ fun NoteDetailAppBar(isEditing: Boolean, descriptionTextLength: Int, onBackPress
                 )
             }
         },
+        scrollBehavior = scrollBehavior,
         modifier = Modifier.semantics {  },
     )
 }

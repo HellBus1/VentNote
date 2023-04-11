@@ -2,7 +2,6 @@ package com.digiventure.ventnote
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
