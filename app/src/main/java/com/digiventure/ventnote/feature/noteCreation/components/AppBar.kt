@@ -15,7 +15,10 @@ import com.digiventure.ventnote.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteCreationAppBar(descriptionTextLength: Int, onBackPressed: () -> Unit) {
+fun NoteCreationAppBar(
+    descriptionTextLength: Int,
+    onBackPressed: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior) {
     TopAppBar(
         title = {
             Text(
@@ -32,6 +35,7 @@ fun NoteCreationAppBar(descriptionTextLength: Int, onBackPressed: () -> Unit) {
                 onBackPressed()
             }
         },
+        scrollBehavior = scrollBehavior,
         modifier = Modifier.semantics {  },
     )
 }

@@ -13,9 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 
 @Composable
 fun NavDrawer(
@@ -50,16 +55,19 @@ fun NavDrawer(
             ) {
                 NavigationDrawerItem(
                     icon = { Icon(Icons.Filled.Star, contentDescription = null, modifier = Modifier.size(24.dp)) },
-                    label = { Text("Rate App", fontSize = 16.sp) },
+                    label = { Text(stringResource(id = R.string.rate_app), fontSize = 16.sp) },
                     selected = false,
                     onClick = {
                         openPlayStore("https://play.google.com/store/apps/details?id=com.digiventure.ventnote")
                     },
                     shape = RectangleShape,
-                    modifier = Modifier.padding(0.dp),
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .semantics { testTag = TestTags.RATE_APP_TILE },
                 )
             }
         },
-        content = { content() }
+        content = { content() },
+        modifier = Modifier.semantics { testTag = TestTags.NAV_DRAWER }
     )
 }
