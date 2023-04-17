@@ -52,10 +52,14 @@ fun NoteDetailPage(
     LaunchedEffect(key1 = Unit) {
         viewModel.getNoteDetail(id.toInt())
     }
-
-    LaunchedEffect(key1 = noteDetailState.value) {
+    
+    fun initData() {
         viewModel.titleText.value = data?.title ?: ""
         viewModel.descriptionText.value = data?.note ?: ""
+    }
+
+    LaunchedEffect(key1 = noteDetailState.value) {
+        initData()
     }
 
     val isEditingState = viewModel.isEditing.value
@@ -263,6 +267,8 @@ fun NoteDetailPage(
         onConfirmCallback = {
             viewModel.isEditing.value = false
             cancelDialogState.value = false
+
+            initData()
         })
 
     TextDialog(
