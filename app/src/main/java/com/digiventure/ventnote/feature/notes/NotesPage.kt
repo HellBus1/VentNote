@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,6 +38,8 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
+const val TAG : String = "NotesPage"
+
 @Composable
 fun NotesPage(
     navHostController: NavHostController,
@@ -47,18 +50,17 @@ fun NotesPage(
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
+    val snackBarHostState = remember { SnackbarHostState() }
+    val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
     val loadingDialog = remember { mutableStateOf(false) }
     val deleteDialog = remember { mutableStateOf(false) }
-
-    val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
 
     LaunchedEffect(key1 = noteListState.value) {
         // Showing error snackBar on error
         noteListState.value?.onFailure {
             scope.launch {
-                snackbarHostState.showSnackbar(
+                snackBarHostState.showSnackbar(
                     message = it.message ?: "",
                     withDismissAction = true
                 )
@@ -88,7 +90,7 @@ fun NotesPage(
                     deleteDialog.value = false
                     viewModel.unMarkAllNote()
 
-                    snackbarHostState.showSnackbar(
+                    snackBarHostState.showSnackbar(
                         message = deletedMessage,
                         withDismissAction = true
                     )
@@ -96,7 +98,7 @@ fun NotesPage(
                 .onFailure {
                     deleteDialog.value = false
 
-                    snackbarHostState.showSnackbar(
+                    snackBarHostState.showSnackbar(
                         message = it.message ?: "",
                         withDismissAction = true
                     )
@@ -109,7 +111,7 @@ fun NotesPage(
         drawerState = drawerState,
         onError = {
             scope.launch {
-                snackbarHostState.showSnackbar(
+                snackBarHostState.showSnackbar(
                     message = it,
                     withDismissAction = true
                 )
@@ -153,7 +155,7 @@ fun NotesPage(
                         }
                     )
                 },
-                snackbarHost = { SnackbarHost(snackbarHostState) },
+                snackbarHost = { SnackbarHost(snackBarHostState) },
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
@@ -223,8 +225,17 @@ fun NotesPage(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NotesItem(isMarking: Boolean, isMarked: Boolean, data: NoteModel, onClick: () -> Unit, onLongClick: () -> Unit, onCheckClick: () -> Unit) {
-    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+fun NotesItem(
+    isMarking: Boolean,
+    isMarked: Boolean,
+    data: NoteModel,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    onCheckClick: () -> Unit)
+{
+    Box(modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .semantics { contentDescription = "Note item ${data.id}" }) {
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(4.dp),

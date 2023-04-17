@@ -30,6 +30,8 @@
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>
+    <string name="title_textField_input">Insert title</string>
+    <string name="body_textField_input">Insert note</string>
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
@@ -39,4 +41,8 @@
 
     <!--  SnackBar alert message  -->
     <string name="note_successfully_deleted">Note successfully deleted</string>
+
+    <!--  TextField Content Description  -->
+    <string name="title_textField">title textField</string>
+    <string name="body_textField">body textField</string>
 </resources>
