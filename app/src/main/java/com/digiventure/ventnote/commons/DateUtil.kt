@@ -2,7 +2,8 @@ package com.digiventure.ventnote.commons
 
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object DateUtil {
     /**

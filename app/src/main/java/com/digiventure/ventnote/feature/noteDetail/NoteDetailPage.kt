@@ -1,19 +1,23 @@
 package com.digiventure.ventnote.feature.noteDetail
 
+import android.view.ViewTreeObserver
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -36,7 +40,7 @@ import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageVM
 import com.digiventure.ventnote.ui.theme.PurpleGrey80
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDetailPage(
     navHostController: NavHostController,
@@ -48,10 +52,14 @@ fun NoteDetailPage(
     LaunchedEffect(key1 = Unit) {
         viewModel.getNoteDetail(id.toInt())
     }
-
-    LaunchedEffect(key1 = noteDetailState.value) {
+    
+    fun initData() {
         viewModel.titleText.value = data?.title ?: ""
         viewModel.descriptionText.value = data?.note ?: ""
+    }
+
+    LaunchedEffect(key1 = noteDetailState.value) {
+        initData()
     }
 
     val isEditingState = viewModel.isEditing.value
@@ -122,6 +130,33 @@ fun NoteDetailPage(
         }
     }
 
+    val appBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
+    val rememberedScrollBehavior = remember { scrollBehavior }
+
+    val view = LocalView.current
+    val keyboardHeight = remember { mutableStateOf(0.dp) }
+
+    val viewTreeObserver = remember { view.viewTreeObserver }
+    val onGlobalLayoutListener = remember {
+        ViewTreeObserver.OnGlobalLayoutListener {
+            val rect = android.graphics.Rect().apply {
+                view.getWindowVisibleDisplayFrame(this)
+            }
+            val keyboardHeightNew = view.rootView.height - rect.bottom
+            if (keyboardHeightNew.dp != keyboardHeight.value) {
+                keyboardHeight.value = keyboardHeightNew.dp
+            }
+        }
+    }
+
+    DisposableEffect(view) {
+        viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
+        onDispose {
+            viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+        }
+    }
+
     Scaffold(
         topBar = {
             NoteDetailAppBar(
@@ -129,11 +164,14 @@ fun NoteDetailPage(
                 descriptionTextLength = viewModel.descriptionText.value.length,
                 onBackPressed = {
                     navHostController.popBackStack()
-                }, onClosePressed = {
+                },
+                onClosePressed = {
                     cancelDialogState.value = true
-                }, onDeletePressed = {
+                },
+                onDeletePressed = {
                     deleteDialogState.value = true
-                })
+                },
+                scrollBehavior = rememberedScrollBehavior)
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
@@ -155,47 +193,55 @@ fun NoteDetailPage(
         },
         content = { contentPadding ->
             Box(modifier = Modifier.padding(contentPadding)) {
-                Column {
-                    Box() {
-                        OutlinedTextField(
-                            value = viewModel.titleText.value,
-                            onValueChange = {
-                                viewModel.titleText.value = it
-                            },
-                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                            singleLine = true,
-                            readOnly = !isEditingState,
-                            modifier = Modifier
-                                .border(
-                                    width = 3.dp,
-                                    color = PurpleGrey80,
-                                    shape = RectangleShape
-                                )
-                                .fillMaxWidth(),
-                        )
-                    }
-                    Box() {
-                        TextField(
-                            value = viewModel.descriptionText.value,
-                            onValueChange = {
-                                viewModel.descriptionText.value = it
-                            },
-                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
-                            singleLine = false,
-                            readOnly = !isEditingState,
-                            shape = RectangleShape,
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
-                        )
-                    }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = keyboardHeight.value)
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.titleText.value,
+                        onValueChange = {
+                            viewModel.titleText.value = it
+                        },
+                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                        singleLine = true,
+                        readOnly = !isEditingState,
+                        modifier = Modifier
+                            .border(
+                                width = 3.dp,
+                                color = PurpleGrey80,
+                                shape = RectangleShape
+                            )
+                            .fillMaxWidth(),
+                    )
+                    TextField(
+                        value = viewModel.descriptionText.value,
+                        onValueChange = {
+                            viewModel.descriptionText.value = it
+                        },
+                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                        singleLine = false,
+                        readOnly = !isEditingState,
+                        shape = RectangleShape,
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            disabledTextColor = Color.Transparent,
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                    )
                 }
             }
         },
-        modifier = Modifier.semantics { testTag = TestTags.NOTE_DETAIL_PAGE }
+        modifier = Modifier
+            .semantics { testTag = TestTags.NOTE_DETAIL_PAGE }
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
     )
 
     val missingFieldName = if (viewModel.titleText.value.isEmpty()) {
@@ -221,6 +267,8 @@ fun NoteDetailPage(
         onConfirmCallback = {
             viewModel.isEditing.value = false
             cancelDialogState.value = false
+
+            initData()
         })
 
     TextDialog(

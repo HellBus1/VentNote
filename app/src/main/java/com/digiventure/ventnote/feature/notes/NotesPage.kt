@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.notes
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -157,7 +156,11 @@ fun NotesPage(
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 floatingActionButton = {
                     FloatingActionButton(
-                        onClick = { navHostController.navigate(Route.NoteCreationPage.routeName) },
+                        onClick = {
+                            viewModel.isMarking.value = false
+                            viewModel.markedNoteList.clear()
+                            navHostController.navigate(Route.NoteCreationPage.routeName)
+                        },
                         modifier = Modifier.semantics {
                             testTag = TestTags.ADD_NOTE_FAB
                         }) {

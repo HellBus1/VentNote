@@ -1,17 +1,40 @@
 package com.digiventure.ventnote.feature.noteCreation
 
+import android.view.ViewTreeObserver
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -34,7 +57,9 @@ import com.digiventure.ventnote.feature.noteCreation.viewmodel.NoteCreationPageV
 import com.digiventure.ventnote.ui.theme.PurpleGrey80
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
+    ExperimentalComposeUiApi::class
+)
 @Composable
 fun NoteCreationPage(
     navHostController: NavHostController,
@@ -73,11 +98,42 @@ fun NoteCreationPage(
         }
     }
 
+    val appBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
+    val rememberedScrollBehavior = remember { scrollBehavior }
+
+    val view = LocalView.current
+    val keyboardHeight = remember { mutableStateOf(0.dp) }
+
+    val viewTreeObserver = remember { view.viewTreeObserver }
+    val onGlobalLayoutListener = remember {
+        ViewTreeObserver.OnGlobalLayoutListener {
+            val rect = android.graphics.Rect().apply {
+                view.getWindowVisibleDisplayFrame(this)
+            }
+            val keyboardHeightNew = view.rootView.height - rect.bottom
+            if (keyboardHeightNew.dp != keyboardHeight.value) {
+                keyboardHeight.value = keyboardHeightNew.dp
+            }
+        }
+    }
+
+    DisposableEffect(view) {
+        viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
+        onDispose {
+            viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+        }
+    }
+
     Scaffold(
         topBar = {
-            NoteCreationAppBar(descriptionTextLength = length, onBackPressed = {
-                cancelDialogState.value = true
-            })
+            NoteCreationAppBar(
+                descriptionTextLength = length,
+                onBackPressed = {
+                    cancelDialogState.value = true
+                },
+                scrollBehavior = rememberedScrollBehavior
+            )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
@@ -93,47 +149,55 @@ fun NoteCreationPage(
         },
         content = { contentPadding ->
             Box(modifier = Modifier.padding(contentPadding)) {
-                Column {
-                    Box() {
-                        OutlinedTextField(
-                            value = viewModel.titleText.value,
-                            onValueChange = {
-                                viewModel.titleText.value = it
-                            },
-                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                            singleLine = true,
-                            modifier = Modifier
-                                .border(
-                                    width = 3.dp,
-                                    color = PurpleGrey80,
-                                    shape = RectangleShape
-                                )
-                                .fillMaxWidth(),
-                            placeholder = { Text("Insert title", fontSize = 18.sp, color = PurpleGrey80) }
-                        )
-                    }
-                    Box() {
-                        TextField(
-                            value = viewModel.descriptionText.value,
-                            onValueChange = {
-                                viewModel.descriptionText.value = it
-                            },
-                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
-                            singleLine = false,
-                            shape = RectangleShape,
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
-                            placeholder = { Text("Insert note", fontSize = 18.sp, color = PurpleGrey80) }
-                        )
-                    }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = keyboardHeight.value)
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.titleText.value,
+                        onValueChange = {
+                            viewModel.titleText.value = it
+                        },
+                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                        singleLine = true,
+                        modifier = Modifier
+                            .border(
+                                width = 3.dp,
+                                color = PurpleGrey80,
+                                shape = RectangleShape
+                            )
+                            .fillMaxWidth(),
+                        placeholder = { Text("Insert title", fontSize = 18.sp, color = PurpleGrey80) }
+                    )
+                    TextField(
+                        value = viewModel.descriptionText.value,
+                        onValueChange = {
+                            viewModel.descriptionText.value = it
+                        },
+                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                        singleLine = false,
+                        shape = RectangleShape,
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            disabledTextColor = Color.Transparent,
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxSize(),
+                        placeholder = { Text("Insert note", fontSize = 18.sp, color = PurpleGrey80) }
+                    )
                 }
             }
         },
-        modifier = Modifier.semantics { testTag = TestTags.NOTE_CREATION_PAGE }
+        modifier = Modifier
+            .semantics { testTag = TestTags.NOTE_CREATION_PAGE }
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
     )
 
     val missingFieldName = if (viewModel.titleText.value.isEmpty()) {
