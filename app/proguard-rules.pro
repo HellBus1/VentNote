@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-assumenosideeffects public class androidx.compose.runtime.ComposerKt {
+   boolean isTraceInProgress();
+   void traceEventStart(int,int,int,java.lang.String);
+   void traceEventEnd();
+}
