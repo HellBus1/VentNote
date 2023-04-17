@@ -19,6 +19,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
@@ -40,6 +41,8 @@ import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageVM
 import com.digiventure.ventnote.ui.theme.PurpleGrey80
 import kotlinx.coroutines.launch
 
+const val TAG : String = "NoteDetailPage"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDetailPage(
@@ -47,41 +50,50 @@ fun NoteDetailPage(
     viewModel: NoteDetailPageBaseVM = hiltViewModel<NoteDetailPageVM>(),
     id: String
 ) {
+    // String resource
+    val titleTextField = "${stringResource(R.string.title_textField)}-$TAG"
+    val bodyTextField = "${stringResource(R.string.body_textField)}-$TAG"
+    val titleInput = stringResource(R.string.title_textField_input)
+    val bodyInput = stringResource(R.string.body_textField_input)
+
     val noteDetailState = viewModel.noteDetail.observeAsState()
     val data = noteDetailState.value?.getOrNull()
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getNoteDetail(id.toInt())
-    }
+
+    val isEditingState = viewModel.isEditing.value
+    val focusManager = LocalFocusManager.current
+
+    val loadingState = viewModel.loader.observeAsState()
+
+    val scope = rememberCoroutineScope()
+
+    val requiredDialogState = remember { mutableStateOf(false) }
+    val deleteDialogState = remember { mutableStateOf(false) }
+    val cancelDialogState = remember { mutableStateOf(false) }
+    val openLoadingDialog = remember { mutableStateOf(false) }
+    val snackBarHostState = remember { SnackbarHostState() }
     
     fun initData() {
         viewModel.titleText.value = data?.title ?: ""
         viewModel.descriptionText.value = data?.note ?: ""
     }
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getNoteDetail(id.toInt())
+    }
+
     LaunchedEffect(key1 = noteDetailState.value) {
         initData()
     }
 
-    val isEditingState = viewModel.isEditing.value
-    val focusManager = LocalFocusManager.current
     LaunchedEffect(key1 = isEditingState) {
         if (!isEditingState) {
             focusManager.clearFocus()
         }
     }
 
-    val requiredDialogState = remember { mutableStateOf(false) }
-    val deleteDialogState = remember { mutableStateOf(false) }
-    val cancelDialogState = remember { mutableStateOf(false) }
-    val openLoadingDialog = remember { mutableStateOf(false) }
-
-    val loadingState = viewModel.loader.observeAsState()
     LaunchedEffect(key1 = loadingState.value) {
         openLoadingDialog.value = loadingState.value == true
     }
-
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     fun deleteNote() {
         if (data != null) {
@@ -93,7 +105,7 @@ fun NoteDetailPage(
                     }
                     .onFailure {
                         deleteDialogState.value = false
-                        snackbarHostState.showSnackbar(
+                        snackBarHostState.showSnackbar(
                             message = it.message ?: "",
                             withDismissAction = true
                         )
@@ -114,13 +126,13 @@ fun NoteDetailPage(
                     viewModel.updateNoteList(updatedNote)
                         .onSuccess {
                             viewModel.isEditing.value = false
-                            snackbarHostState.showSnackbar(
+                            snackBarHostState.showSnackbar(
                                 message = "Note successfully updated",
                                 withDismissAction = true
                             )
                         }
                         .onFailure {
-                            snackbarHostState.showSnackbar(
+                            snackBarHostState.showSnackbar(
                                 message = it.message ?: "",
                                 withDismissAction = true
                             )
@@ -173,7 +185,7 @@ fun NoteDetailPage(
                 },
                 scrollBehavior = rememberedScrollBehavior)
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -214,7 +226,9 @@ fun NoteDetailPage(
                                 color = PurpleGrey80,
                                 shape = RectangleShape
                             )
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .semantics { contentDescription = titleTextField },
+                        placeholder = { Text(titleInput, fontSize = 18.sp) }
                     )
                     TextField(
                         value = viewModel.descriptionText.value,
@@ -234,7 +248,9 @@ fun NoteDetailPage(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(),
+                            .fillMaxHeight()
+                            .semantics { contentDescription = bodyTextField },
+                        placeholder = { Text(bodyInput, fontSize = 18.sp) }
                     )
                 }
             }

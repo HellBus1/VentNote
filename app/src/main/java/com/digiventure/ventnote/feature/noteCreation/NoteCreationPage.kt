@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.feature.noteCreation
 
 import android.view.ViewTreeObserver
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,13 +28,13 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
@@ -57,21 +56,27 @@ import com.digiventure.ventnote.feature.noteCreation.viewmodel.NoteCreationPageV
 import com.digiventure.ventnote.ui.theme.PurpleGrey80
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
-    ExperimentalComposeUiApi::class
-)
+const val TAG : String = "NoteCreationPage"
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteCreationPage(
     navHostController: NavHostController,
     viewModel: NoteCreationPageBaseVM = hiltViewModel<NoteCreationPageVM>()
 ) {
+    // String resource
+    val titleTextField = "${stringResource(R.string.title_textField)}-${TAG}"
+    val bodyTextField = "${stringResource(R.string.body_textField)}-${TAG}"
+    val titleInput = stringResource(R.string.title_textField_input)
+    val bodyInput = stringResource(R.string.body_textField_input)
+
     val length = viewModel.descriptionText.value.length
+
+    val scope = rememberCoroutineScope()
 
     val requiredDialogState = remember { mutableStateOf(false) }
     val cancelDialogState = remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     fun addNote() {
         if (viewModel.titleText.value.isEmpty() || viewModel.descriptionText.value.isEmpty()) {
@@ -83,13 +88,13 @@ fun NoteCreationPage(
                     note = viewModel.descriptionText.value))
                     .onSuccess {
                         navHostController.popBackStack()
-                        snackbarHostState.showSnackbar(
+                        snackBarHostState.showSnackbar(
                             message = "Note successfully added",
                             withDismissAction = true
                         )
                     }
                     .onFailure {
-                        snackbarHostState.showSnackbar(
+                        snackBarHostState.showSnackbar(
                             message = it.message ?: "",
                             withDismissAction = true
                         )
@@ -135,7 +140,7 @@ fun NoteCreationPage(
                 scrollBehavior = rememberedScrollBehavior
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { addNote() },
@@ -169,8 +174,9 @@ fun NoteCreationPage(
                                 color = PurpleGrey80,
                                 shape = RectangleShape
                             )
-                            .fillMaxWidth(),
-                        placeholder = { Text("Insert title", fontSize = 18.sp, color = PurpleGrey80) }
+                            .fillMaxWidth()
+                            .semantics { contentDescription = titleTextField },
+                        placeholder = { Text(titleInput, fontSize = 18.sp) }
                     )
                     TextField(
                         value = viewModel.descriptionText.value,
@@ -189,8 +195,9 @@ fun NoteCreationPage(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxSize(),
-                        placeholder = { Text("Insert note", fontSize = 18.sp, color = PurpleGrey80) }
+                            .fillMaxSize()
+                            .semantics { contentDescription = bodyTextField },
+                        placeholder = { Text(bodyInput, fontSize = 18.sp) }
                     )
                 }
             }
