@@ -4,9 +4,10 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
 
-    // disable for staging purpose
+    // disabled for internal purpose (if you want to enable, you must create firebase project first)
 //    id 'com.google.gms.google-services'
 //    id 'com.google.firebase.crashlytics'
+//    id 'com.google.firebase.firebase-perf'
 }
 
 android {
@@ -40,11 +41,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
@@ -76,8 +77,6 @@ dependencies {
 
     // Room
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
-    implementation 'com.google.firebase:firebase-appindexing:20.0.0'
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
 
@@ -124,21 +123,25 @@ dependencies {
     // For unit testing coroutines
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
 
-    // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:31.2.3')
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    // Add the dependency for the Firebase SDK for Google Analytics
-    implementation 'com.google.firebase:firebase-analytics'
-
     // MockK
     androidTestImplementation "io.mockk:mockk-android:1.13.4"
     androidTestImplementation "io.mockk:mockk-agent:1.13.4"
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation("com.google.android.play:app-update:2.0.1")
-
     // For Kotlin users also import the Kotlin extensions library for Play In-App Update:
     implementation("com.google.android.play:app-update-ktx:2.0.1")
+
+    // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    // Add the dependency for the Firebase SDK for Google Analytics
+    implementation 'com.google.firebase:firebase-analytics'
+
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
+    implementation 'com.google.firebase:firebase-appindexing:20.0.0'
+    implementation 'com.google.firebase:firebase-perf:20.3.0'
+    implementation 'com.google.firebase:firebase-perf-ktx:20.3.1'
 }
 
 kapt {
