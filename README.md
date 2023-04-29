@@ -21,6 +21,8 @@ Note management app built with jetpack compose
 - [v] Search and Find Notes
 - [v] Delete Notes
 
+<br />
+
 ## 🖨 Downloads
 [![Licence](https://img.shields.io/github/license/HellBus1/VentNote?style=for-the-badge&color=6650a4)](./LICENSE)
 [![GitHub release](https://img.shields.io/github/downloads/HellBus1/VentNote/total?color=6650a4&label=Downloads&logo=android&style=for-the-badge)](https://github.com/HellBus1/VentNote/releases) 
