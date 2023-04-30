@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -157,7 +158,7 @@ fun NotesPage(
                 },
                 snackbarHost = { SnackbarHost(snackBarHostState) },
                 floatingActionButton = {
-                    FloatingActionButton(
+                    ExtendedFloatingActionButton(
                         onClick = {
                             viewModel.isMarking.value = false
                             viewModel.markedNoteList.clear()
@@ -165,11 +166,17 @@ fun NotesPage(
                         },
                         modifier = Modifier.semantics {
                             testTag = TestTags.ADD_NOTE_FAB
-                        }) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.fab),)
-                    }
+                        },
+                        text = {
+                            Text(stringResource(R.string.add), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.fab)
+                            )
+                        }
+                    )
                 },
                 content = { contentPadding ->
                     Box(modifier = Modifier.padding(contentPadding)) {
