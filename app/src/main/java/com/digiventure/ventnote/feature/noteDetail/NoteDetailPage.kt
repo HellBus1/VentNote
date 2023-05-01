@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.noteDetail
 
+import android.net.Uri
 import android.view.ViewTreeObserver
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
@@ -38,7 +39,9 @@ import com.digiventure.ventnote.feature.noteDetail.components.NoteDetailAppBar
 import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageBaseVM
 import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageMockVM
 import com.digiventure.ventnote.feature.noteDetail.viewmodel.NoteDetailPageVM
+import com.digiventure.ventnote.navigation.Route
 import com.digiventure.ventnote.ui.theme.PurpleGrey80
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 const val TAG : String = "NoteDetailPage"
@@ -183,11 +186,16 @@ fun NoteDetailPage(
                 onDeletePressed = {
                     deleteDialogState.value = true
                 },
-                scrollBehavior = rememberedScrollBehavior)
+                scrollBehavior = rememberedScrollBehavior,
+                onSharePressed = {
+                    val json = Uri.encode(Gson().toJson(data))
+                    navHostController.navigate("${Route.SharePreviewPage.routeName}/${json}")
+                }
+            )
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = {
                     if(isEditingState) {
                         updateNote()
@@ -197,11 +205,19 @@ fun NoteDetailPage(
                 },
                 modifier = Modifier.semantics {
                     testTag = "edit-note-fab"
-                }) {
-                Icon(
-                    imageVector = if(isEditingState) Icons.Filled.Check else Icons.Filled.Edit,
-                    contentDescription = stringResource(R.string.fab),)
-            }
+                },
+                text = {
+                    Text(if(isEditingState) stringResource(R.string.save) else stringResource(R.string.edit),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium)
+                },
+                icon = {
+                    Icon(
+                        imageVector = if(isEditingState) Icons.Filled.Check else Icons.Filled.Edit,
+                        contentDescription = stringResource(R.string.fab),
+                    )
+                }
+            )
         },
         content = { contentPadding ->
             Box(modifier = Modifier.padding(contentPadding)) {

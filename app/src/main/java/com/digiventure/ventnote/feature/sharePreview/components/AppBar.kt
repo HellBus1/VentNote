@@ -1,8 +1,9 @@
-package com.digiventure.ventnote.feature.noteCreation.components
+package com.digiventure.ventnote.feature.sharePreview.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,14 +15,15 @@ import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteCreationAppBar(
-    descriptionTextLength: Int,
+fun SharePreviewAppBar(
     onBackPressed: () -> Unit,
+    onHelpPressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior) {
+
     TopAppBar(
         title = {
             Text(
-                text = if(descriptionTextLength > 0) "$descriptionTextLength" else "Add New Note",
+                text = "Share Preview",
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 8.dp),
             )
@@ -32,6 +34,11 @@ fun NoteCreationAppBar(
         navigationIcon = {
             TopNavBarIcon(Icons.Filled.ArrowBack, stringResource(R.string.back_nav_icon), Modifier.semantics {  }) {
                 onBackPressed()
+            }
+        },
+        actions = {
+            TopNavBarIcon(Icons.Default.Help, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
+                onHelpPressed()
             }
         },
         scrollBehavior = scrollBehavior,

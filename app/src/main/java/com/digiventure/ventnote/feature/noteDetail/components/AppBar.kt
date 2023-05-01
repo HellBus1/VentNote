@@ -5,19 +5,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,8 +27,10 @@ fun NoteDetailAppBar(
     onBackPressed: () -> Unit,
     onClosePressed: () -> Unit,
     onDeletePressed: () -> Unit,
+    onSharePressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior) {
-    val expanded = remember { mutableStateOf(false) }
+
+    val isMenuExpanded = remember { mutableStateOf(false) }
 
     TopAppBar(
         title = {
@@ -53,13 +55,16 @@ fun NoteDetailAppBar(
             }
         },
         actions = {
+            TopNavBarIcon(Icons.Filled.Share, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
+                onSharePressed()
+            }
             TopNavBarIcon(Icons.Filled.MoreVert, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
-                expanded.value = true
+                isMenuExpanded.value = true
             }
             DropdownMenu(
                 offset = DpOffset((10).dp, 0.dp),
-                expanded = expanded.value,
-                onDismissRequest = { expanded.value = false }) {
+                expanded = isMenuExpanded.value,
+                onDismissRequest = { isMenuExpanded.value = false }) {
                 DropdownMenuItem(
                     text = { Text(
                         text = "Delete Note",
@@ -68,7 +73,7 @@ fun NoteDetailAppBar(
                     },
                     onClick = {
                         onDeletePressed()
-                        expanded.value = false
+                        isMenuExpanded.value = false
                     },
                 )
             }
@@ -76,21 +81,4 @@ fun NoteDetailAppBar(
         scrollBehavior = scrollBehavior,
         modifier = Modifier.semantics {  },
     )
-}
-
-@Composable
-fun TopNavBarIcon(
-    image: ImageVector,
-    description: String,
-    modifier: Modifier,
-    tint: Color = MaterialTheme.colorScheme.onPrimary,
-    onClick: () -> Unit,
-) {
-    IconButton(onClick = { onClick() }, modifier = modifier) {
-        Icon(
-            imageVector = image,
-            contentDescription = description,
-            tint = tint,
-        )
-    }
 }

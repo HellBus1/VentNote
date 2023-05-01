@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -191,23 +191,6 @@ fun TrailingMenuIcons(isMarking: Boolean, markedItemsCount: Int, isSearching: Bo
             modifier = Modifier.semantics { testTag = TestTags.SEARCH_ICON_BUTTON }) {
             searchCallback()
         }
-    }
-}
-
-@Composable
-fun TopNavBarIcon(
-    image: ImageVector,
-    description: String,
-    modifier: Modifier,
-    tint: Color = MaterialTheme.colorScheme.onPrimary,
-    onClick: () -> Unit,
-) {
-    IconButton(onClick = { onClick() }, modifier = modifier) {
-        Icon(
-            imageVector = image,
-            contentDescription = description,
-            tint = tint,
-        )
     }
 }
 

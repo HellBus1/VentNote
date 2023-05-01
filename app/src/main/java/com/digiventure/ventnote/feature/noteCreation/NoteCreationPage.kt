@@ -12,7 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -142,15 +142,21 @@ fun NoteCreationPage(
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = { addNote() },
                 modifier = Modifier.semantics {
                     testTag = "add-note-fab"
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = stringResource(R.string.fab),)
-            }
+                },
+                text = {
+                    Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = stringResource(R.string.fab)
+                    )
+                }
+            )
         },
         content = { contentPadding ->
             Box(modifier = Modifier.padding(contentPadding)) {

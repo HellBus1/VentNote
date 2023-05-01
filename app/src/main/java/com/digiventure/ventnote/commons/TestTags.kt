@@ -28,6 +28,8 @@ object TestTags {
 
     // Note lists test tags
     const val ADD_NOTE_FAB = "add_note_fab"
+    const val SHARE_NOTE_FAB = "share_note_fab"
+    const val SHARE_NOTE_HELP_FAB = "share_note_help_fab"
     const val NOTE_RV = "note_rv"
     const val LOADING_DIALOG = "loading_dialog"
     const val CONFIRMATION_DIALOG = "confirmation_dialog"
