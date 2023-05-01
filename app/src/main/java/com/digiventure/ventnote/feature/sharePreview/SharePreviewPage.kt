@@ -13,15 +13,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,8 +38,10 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.sharePreview.components.SharePreviewAppBar
+import kotlinx.coroutines.launch
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,11 +54,21 @@ fun SharePreviewPage(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val rememberedScrollBehavior = remember { scrollBehavior }
 
+    val shareNoteDialogState = remember { mutableStateOf(false) }
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    val scope = rememberCoroutineScope()
+
     val date = DateUtil.convertDateString("EEE, MMM dd HH:mm yyyy",
         note?.createdAt?.toString() ?: Date().toString()
     )
     val title = note?.title ?: "title"
     val text = note?.note ?: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras eget egestas nisi, sit amet tincidunt lorem. Aliquam pharetra, tortor nec bibendum rhoncus, lorem est placerat quam, vitae posuere dui massa eu tortor. Nullam nibh turpis, egestas id sollicitudin nec, placerat vitae libero. Nulla commodo ex orci, et commodo leo tempor vitae. Sed posuere dolor urna, vitae tempus magna lobortis ac. Fusce dignissim eros sit amet velit commodo, ac viverra augue iaculis. Aenean facilisis, est ut gravida feugiat, est sem varius neque, at ultricies lectus nisi sed urna. Ut sagittis orci ac ante convallis eleifend. Nulla nec congue purus, at sagittis felis. Sed mattis quam orci, molestie auctor orci venenatis et. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed vestibulum placerat enim eu tempor. Aenean sed augue ut eros hendrerit porttitor.\n"
+    val joinedText = date + "\n\n" + title + "\n\n" + text
+
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val textCopiedResource = stringResource(R.string.copied_to_clipboard)
 
     Scaffold(
         topBar = {
@@ -57,11 +76,23 @@ fun SharePreviewPage(
                 onBackPressed = {
                     navHostController.popBackStack()
                 },
-                onCopyPressed = {},
-                onHelpPressed = {},
+                onCopyPressed = {
+                    clipboardManager.setText(AnnotatedString(joinedText)).apply {
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                message = textCopiedResource,
+                                withDismissAction = true
+                            )
+                        }
+                    }
+                },
+                onHelpPressed = {
+                    shareNoteDialogState.value = true
+                },
                 scrollBehavior = rememberedScrollBehavior
             )
         },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {  },
@@ -105,6 +136,13 @@ fun SharePreviewPage(
             }
         }
     }
+
+    TextDialog(
+        title = stringResource(R.string.information),
+        description = stringResource(R.string.share_note_information),
+        isOpened = shareNoteDialogState.value,
+        onDismissCallback = { shareNoteDialogState.value = false }
+    )
 }
 
 @Preview

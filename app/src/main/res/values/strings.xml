@@ -21,6 +21,8 @@
     <string name="required_confirmation_text">%1$s is required</string>
     <string name="cancel_title">Are you sure</string>
     <string name="cancel_confirmation_text">The text change will not be saved</string>
+    <string name="information">Information</string>
+    <string name="share_note_information">If you press \'copy\' or \'share as text\', the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
 
     <!--  Button and clickable  -->
     <string name="confirm">Confirm</string>
@@ -45,6 +47,7 @@
 
     <!--  SnackBar alert message  -->
     <string name="note_successfully_deleted">Note successfully deleted</string>
+    <string name="copied_to_clipboard">Text copied to clipboard</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>

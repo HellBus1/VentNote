@@ -20,7 +20,7 @@ fun TextDialog(
     modifier: Modifier = Modifier,
     isOpened: Boolean,
     onDismissCallback: () -> Unit,
-    onConfirmCallback: () -> Unit,
+    onConfirmCallback: (() -> Unit)? = null,
     title: String = stringResource(R.string.warning_title),
     description: String = stringResource(R.string.delete_confirmation_text),
 ) {
@@ -34,12 +34,14 @@ fun TextDialog(
                 Text(text = description, fontSize = 16.sp)
             },
             confirmButton = {
-                TextButton(
-                    onClick = { onConfirmCallback() },
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.semantics { testTag = TestTags.CONFIRM_BUTTON }
-                ) {
-                    Text(stringResource(R.string.confirm), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                if (onConfirmCallback != null) {
+                    TextButton(
+                        onClick = { onConfirmCallback() },
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.semantics { testTag = TestTags.CONFIRM_BUTTON }
+                    ) {
+                        Text(stringResource(R.string.confirm), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    }
                 }
             },
             dismissButton = {
