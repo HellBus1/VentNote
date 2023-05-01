@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.digiventure.ventnote.data.local.NoteModel
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 
 interface NotesPageBaseVM {
     /**
@@ -52,4 +53,6 @@ interface NotesPageBaseVM {
      * @param notes is vararg of note
      * */
     suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean>
+
+    fun uploadDBtoDrive(): GoogleSignInClient
 }

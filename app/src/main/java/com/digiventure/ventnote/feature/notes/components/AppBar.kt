@@ -36,7 +36,8 @@ fun NotesAppBar(
     onSearchValueChange: (String) -> Unit,
     closeMarkingCallback: () -> Unit,
     searchCallback: () -> Unit,
-    deleteCallback: () -> Unit
+    deleteCallback: () -> Unit,
+    uploadCallback: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
@@ -149,6 +150,11 @@ fun NotesAppBar(
                 deleteCallback = {
                     deleteCallback()
                 })
+
+            TopNavBarIcon(Icons.Filled.CloudUpload, stringResource(R.string.search_nav_icon),
+                modifier = Modifier.semantics {  }) {
+                uploadCallback()
+            }
         },
         modifier = Modifier.semantics {
             testTag = TestTags.TOP_APPBAR

@@ -9,6 +9,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesPageVM @Inject constructor(
-    private val repository: NoteRepository
+    private val repository: NoteRepository,
+    private val signClient: GoogleSignInClient
 ): ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
 
@@ -69,6 +71,10 @@ class NotesPageVM @Inject constructor(
             loader.postValue(false)
             Result.failure(e)
         }
+    }
+
+    override fun uploadDBtoDrive(): GoogleSignInClient {
+        return signClient
     }
 }
 

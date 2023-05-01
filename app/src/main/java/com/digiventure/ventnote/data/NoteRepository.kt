@@ -2,12 +2,14 @@ package com.digiventure.ventnote.data
 
 import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.remote.NoteRemoteService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class NoteRepository @Inject constructor(
-    private val service: NoteLocalService
+    private val service: NoteLocalService,
+    private val remoteService: NoteRemoteService
 ) {
     suspend fun getNoteList(): Flow<Result<List<NoteModel>>> =
         service.getNoteList().map {
@@ -53,4 +55,8 @@ class NoteRepository @Inject constructor(
                 Result.failure(it.exceptionOrNull()!!)
             }
         }
+
+    suspend fun uploadDBtoDrive() {
+        remoteService.uploadDBtoDrive()
+    }
 }

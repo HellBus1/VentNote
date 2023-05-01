@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.local.NoteModel
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 
 class NotesPageMockVM: ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
@@ -26,4 +27,7 @@ class NotesPageMockVM: ViewModel(), NotesPageBaseVM {
     override fun addToMarkedNoteList(note: NoteModel) {}
 
     override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = Result.success(true)
+    override fun uploadDBtoDrive(): GoogleSignInClient {
+        TODO("Not yet implemented")
+    }
 }

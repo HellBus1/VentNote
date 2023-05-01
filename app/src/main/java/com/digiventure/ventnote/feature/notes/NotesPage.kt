@@ -1,5 +1,9 @@
 package com.digiventure.ventnote.feature.notes
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -22,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -37,6 +43,16 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageMockVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
+import com.google.android.gms.auth.GoogleAuthUtil
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.Scopes
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.services.drive.Drive
+import com.google.api.services.drive.DriveScopes
 import kotlinx.coroutines.launch
 
 const val TAG : String = "NotesPage"
@@ -84,6 +100,8 @@ fun NotesPage(
 
     val deletedMessage = stringResource(id = R.string.note_successfully_deleted)
 
+    val context = LocalContext.current
+
     fun deleteNoteList() {
         scope.launch {
             viewModel.deleteNoteList()
@@ -104,6 +122,38 @@ fun NotesPage(
                         withDismissAction = true
                     )
                 }
+        }
+    }
+
+    fun handleTaskResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+            val credential = GoogleAccountCredential.usingOAuth2(
+                context,
+                setOf(DriveScopes.DRIVE_FILE)
+            )
+            credential.selectedAccount = account?.account
+            val accessToken = account?.account?.let {
+                GoogleAuthUtil.getToken(context,
+                    it, "oauth2:https://www.googleapis.com/auth/drive.file")
+            }
+            Log.d("Google Sign-In", "Sign-in successful. Access token: $accessToken")
+        } catch (e: ApiException) {
+            Log.w("Google Sign-In", "Sign-in failed with code ${e.statusCode}")
+        }
+    }
+
+    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            val intent = it.data
+
+            val task: Task<GoogleSignInAccount> =
+                GoogleSignIn.getSignedInAccountFromIntent(intent)
+
+            /**
+             * handle [task] result
+             */
+            handleTaskResult(task)
         }
     }
 
@@ -153,6 +203,18 @@ fun NotesPage(
                         },
                         deleteCallback = {
                             deleteDialog.value = true
+                        },
+                        uploadCallback = {
+                            scope.launch {
+                                Log.d("Upload", "kesini")
+
+//                                val googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context)
+//                                val credential = GoogleAccountCredential.usingOAuth2(context, setOf(
+//                                    Scopes.DRIVE_FILE))
+//                                credential.selectedAccount = googleSignInAccount?.account
+                                startForResult.launch(viewModel.uploadDBtoDrive().signInIntent)
+//                                viewModel.uploadDBtoDrive()
+                            }
                         }
                     )
                 },
