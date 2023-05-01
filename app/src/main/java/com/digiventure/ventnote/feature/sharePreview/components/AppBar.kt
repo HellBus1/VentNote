@@ -3,7 +3,6 @@ package com.digiventure.ventnote.feature.sharePreview.components
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,7 +17,6 @@ import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 @Composable
 fun SharePreviewAppBar(
     onBackPressed: () -> Unit,
-    onCopyPressed: () -> Unit,
     onHelpPressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior) {
 
@@ -41,9 +39,6 @@ fun SharePreviewAppBar(
         actions = {
             TopNavBarIcon(Icons.Default.Help, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
                 onHelpPressed()
-            }
-            TopNavBarIcon(Icons.Default.ContentCopy, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
-                onCopyPressed()
             }
         },
         scrollBehavior = scrollBehavior,

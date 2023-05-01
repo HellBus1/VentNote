@@ -33,6 +33,8 @@
     <string name="edit">Edit</string>
     <string name="add">Add</string>
     <string name="share_note">Share Note</string>
+    <string name="share_note_as_text">Share Note as Text</string>
+    <string name="share_note_as_image">Share Note as Image</string>
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>
