@@ -1,21 +1,11 @@
 package com.digiventure.ventnote.module
 
 import android.content.Context
-import android.util.Log
+import android.content.SharedPreferences
 import androidx.room.Room
+import com.digiventure.ventnote.data.google_api.NoteDatabasePathModel
 import com.digiventure.ventnote.data.local.NoteDAO
 import com.digiventure.ventnote.data.local.NoteDatabase
-import com.digiventure.ventnote.data.remote.NoteDatabasePathModel
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.Scopes
-import com.google.android.gms.common.api.Scope
-import com.google.api.client.extensions.android.http.AndroidHttp
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.json.gson.GsonFactory
-import com.google.api.services.drive.Drive
-import com.google.api.services.drive.DriveScopes
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,25 +30,9 @@ class NoteModule {
         }
 
     @Provides
-    fun googleAccountCredential(@ApplicationContext context: Context): GoogleSignInClient {
-        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestScopes(Scope(DriveScopes.DRIVE_FILE), Scope(DriveScopes.DRIVE))
-            .build()
-
-        return GoogleSignIn.getClient(context, signInOptions)
+    fun sharedPreference(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("note_shared_preference", Context.MODE_PRIVATE)
     }
-
-//    @Provides
-//    fun driveBuilder(@ApplicationContext context: Context): Drive {
-//        return Drive.Builder(
-//            AndroidHttp.newCompatibleTransport(),
-//            GsonFactory(),
-//            credential
-//        )
-//            .setApplicationName("VentNote")
-//            .build()
-//    }
 
     @Provides
     fun databasePath(@ApplicationContext context: Context): NoteDatabasePathModel {

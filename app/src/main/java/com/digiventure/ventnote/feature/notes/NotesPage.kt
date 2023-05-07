@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -43,15 +42,11 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageMockVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
-import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import kotlinx.coroutines.launch
 
@@ -128,16 +123,17 @@ fun NotesPage(
     fun handleTaskResult(completedTask: Task<GoogleSignInAccount>) {
         try {
             val account = completedTask.getResult(ApiException::class.java)
-            val credential = GoogleAccountCredential.usingOAuth2(
-                context,
-                setOf(DriveScopes.DRIVE_FILE)
-            )
-            credential.selectedAccount = account?.account
-            val accessToken = account?.account?.let {
-                GoogleAuthUtil.getToken(context,
-                    it, "oauth2:https://www.googleapis.com/auth/drive.file")
+            scope.launch {
+                val credential = GoogleAccountCredential.usingOAuth2(
+                    context,
+                    setOf(DriveScopes.DRIVE_FILE)
+                )
+                credential.selectedAccount = account?.account
+
+                viewModel.backupDB(credential)
             }
-            Log.d("Google Sign-In", "Sign-in successful. Access token: $accessToken")
+
+            Log.d("Google Sign-In", "Sign-in successful.")
         } catch (e: ApiException) {
             Log.w("Google Sign-In", "Sign-in failed with code ${e.statusCode}")
         }
@@ -150,9 +146,6 @@ fun NotesPage(
             val task: Task<GoogleSignInAccount> =
                 GoogleSignIn.getSignedInAccountFromIntent(intent)
 
-            /**
-             * handle [task] result
-             */
             handleTaskResult(task)
         }
     }
@@ -206,14 +199,7 @@ fun NotesPage(
                         },
                         uploadCallback = {
                             scope.launch {
-                                Log.d("Upload", "kesini")
-
-//                                val googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context)
-//                                val credential = GoogleAccountCredential.usingOAuth2(context, setOf(
-//                                    Scopes.DRIVE_FILE))
-//                                credential.selectedAccount = googleSignInAccount?.account
-                                startForResult.launch(viewModel.uploadDBtoDrive().signInIntent)
-//                                viewModel.uploadDBtoDrive()
+                                startForResult.launch(viewModel.signInClient.signInIntent)
                             }
                         }
                     )

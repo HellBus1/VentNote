@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.data.remote
+package com.digiventure.ventnote.data.google_api
 
 data class NoteDatabasePathModel(
     val mainDatabasePath: String = ""

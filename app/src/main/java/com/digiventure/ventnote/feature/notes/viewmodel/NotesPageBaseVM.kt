@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.digiventure.ventnote.data.local.NoteModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 
 interface NotesPageBaseVM {
     /**
@@ -32,6 +33,8 @@ interface NotesPageBaseVM {
     val isMarking: MutableState<Boolean>
     val markedNoteList: SnapshotStateList<NoteModel>
 
+    val signInClient: GoogleSignInClient
+
     /**
      * Mark all note
      * @param notes is list of note that will be marked
@@ -54,5 +57,5 @@ interface NotesPageBaseVM {
      * */
     suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean>
 
-    fun uploadDBtoDrive(): GoogleSignInClient
+    suspend fun backupDB(credential: GoogleAccountCredential)
 }

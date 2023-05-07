@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.notes.viewmodel
 
+import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -10,6 +11,8 @@ import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
@@ -20,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NotesPageVM @Inject constructor(
     private val repository: NoteRepository,
-    private val signClient: GoogleSignInClient
+    private val googleSignInClient: GoogleSignInClient,
 ): ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
 
@@ -43,6 +46,8 @@ class NotesPageVM @Inject constructor(
 
     override val isMarking = mutableStateOf(false)
     override val markedNoteList = mutableStateListOf<NoteModel>()
+    override val signInClient: GoogleSignInClient
+        get() = googleSignInClient
 
     override fun markAllNote(notes: List<NoteModel>) {
         markedNoteList.addAll(notes.minus((markedNoteList).toSet()))
@@ -73,8 +78,8 @@ class NotesPageVM @Inject constructor(
         }
     }
 
-    override fun uploadDBtoDrive(): GoogleSignInClient {
-        return signClient
+    override suspend fun backupDB(credential: GoogleAccountCredential) {
+        repository.uploadDBtoDrive(credential)
     }
 }
 

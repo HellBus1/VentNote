@@ -1,15 +1,16 @@
 package com.digiventure.ventnote.data
 
+import com.digiventure.ventnote.data.google_api.GoogleAPIService
 import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.data.remote.NoteRemoteService
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class NoteRepository @Inject constructor(
     private val service: NoteLocalService,
-    private val remoteService: NoteRemoteService
+    private val googleAPIService: GoogleAPIService
 ) {
     suspend fun getNoteList(): Flow<Result<List<NoteModel>>> =
         service.getNoteList().map {
@@ -56,7 +57,7 @@ class NoteRepository @Inject constructor(
             }
         }
 
-    suspend fun uploadDBtoDrive() {
-        remoteService.uploadDBtoDrive()
+    suspend fun uploadDBtoDrive(credential: GoogleAccountCredential) {
+        googleAPIService.uploadDBtoDrive(credential)
     }
 }
