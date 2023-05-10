@@ -1,8 +1,6 @@
 package com.digiventure.ventnote.module
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.digiventure.ventnote.data.google_api.GoogleApiHelper
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

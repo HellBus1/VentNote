@@ -1,8 +1,6 @@
 package com.digiventure.ventnote.data.google_api
 
-import android.util.Log
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.http.FileContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,51 +10,44 @@ import com.google.api.services.drive.model.File as DriveFile
 
 
 class GoogleAPIService @Inject constructor(
-    private val dbPath: NoteDatabasePathModel,
+    private val basePath: DatabaseFiles
 ) {
     suspend fun uploadDBtoDrive(credential: GoogleAccountCredential) = withContext(Dispatchers.IO) {
         val googleApiHelper = GoogleApiHelper(credential)
-        val currentDB = File(dbPath.mainDatabasePath)
+        val drive = googleApiHelper.driveInstance ?: throw Exception("Drive instance is null")
 
-        val gFolder = DriveFile()
-        gFolder.name = "VentNoteDataBackup"
-        gFolder.mimeType = "application/vnd.google-apps.folder"
+        val backupFolderName = "VentNoteDataBackup"
+        val folderQuery = drive.files().list()
+            .setQ("mimeType='application/vnd.google-apps.folder' and trashed=false and name='$backupFolderName'")
+        val folderList = folderQuery.execute().files
 
-        val drive = googleApiHelper.driveInstance
-
-        if (drive != null) {
-            try {
-                // check if backup folder exists
-                val folderQuery = drive.files().list().setQ("mimeType='application/vnd.google-apps.folder' and trashed=false and name='${gFolder.name}'")
-                var folderList = folderQuery.execute().files
-
-                if (folderList.isEmpty()) {
-                    // create the backup folder if it does not exist
-                    val folder = drive.files().create(gFolder).setFields("id").execute()
-                    folderList = listOf(folder)
-                }
-
-                // set the parent folder of the backup file
-                val storageFile = DriveFile()
-                storageFile.parents = listOf(folderList[0].id)
-                storageFile.name = currentDB.name
-
-                if (currentDB.exists()) {
-                    val mediaContent = FileContent("application/x-sqlite3", currentDB)
-                    val uploadDB = drive.files().create(storageFile, mediaContent).execute()
-                    Log.d("VentNote", "Filename: ${uploadDB.name}, File ID: ${uploadDB.id}")
-                } else {
-                    Log.e("VentNote", "Room database file does not exist")
-                }
-            } catch (e: GoogleJsonResponseException) {
-                Log.e("VentNote", "Unable to upload file: ${e.details}")
-                throw e
-            } catch (e: Exception) {
-                Log.e("VentNote", "Error uploading file: ${e.message}")
-                throw e
-            }
+        val backupFolderId = if (folderList.isNotEmpty()) {
+            folderList[0].id
         } else {
-            Log.e("VentNote", "Drive instance is null")
+            val backupFolder = DriveFile().apply {
+                name = backupFolderName
+                mimeType = "application/vnd.google-apps.folder"
+            }
+            drive.files().create(backupFolder).setFields("id").execute().id
+        }
+
+        val databaseFiles = listOf(
+            Pair(File(basePath.database), "note_database"),
+            Pair(File(basePath.databaseShm), "note_database-shm"),
+            Pair(File(basePath.databaseWal), "note_database-wal")
+        )
+
+        if (!databaseFiles.all { it.first.exists() }) {
+            throw Exception("Room database file does not exist")
+        }
+
+        for ((file, name) in databaseFiles) {
+            val storageFile = DriveFile().apply {
+                parents = listOf(backupFolderId)
+                this.name = name
+            }
+            val mediaContent = FileContent("application/x-sqlite3", file)
+            drive.files().create(storageFile, mediaContent).execute()
         }
     }
 }

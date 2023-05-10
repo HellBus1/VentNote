@@ -3,7 +3,7 @@ package com.digiventure.ventnote.module
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import com.digiventure.ventnote.data.google_api.NoteDatabasePathModel
+import com.digiventure.ventnote.data.google_api.DatabaseFiles
 import com.digiventure.ventnote.data.local.NoteDAO
 import com.digiventure.ventnote.data.local.NoteDatabase
 import dagger.Module
@@ -35,7 +35,11 @@ class NoteModule {
     }
 
     @Provides
-    fun databasePath(@ApplicationContext context: Context): NoteDatabasePathModel {
-        return NoteDatabasePathModel(context.getDatabasePath("note_database.db").absolutePath)
+    fun databasePath(@ApplicationContext context: Context): DatabaseFiles {
+        return DatabaseFiles(
+            database = context.getDatabasePath("note_database").absolutePath,
+            databaseShm = context.getDatabasePath("note_database-shm").absolutePath,
+            databaseWal = context.getDatabasePath("note_database-wal").absolutePath
+        )
     }
 }

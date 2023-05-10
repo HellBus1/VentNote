@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.notes.viewmodel
 
-import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -12,7 +11,6 @@ import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
