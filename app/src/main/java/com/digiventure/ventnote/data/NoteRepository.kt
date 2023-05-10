@@ -5,6 +5,7 @@ import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -57,7 +58,12 @@ class NoteRepository @Inject constructor(
             }
         }
 
-    suspend fun uploadDBtoDrive(credential: GoogleAccountCredential) {
-        googleAPIService.uploadDBtoDrive(credential)
+    suspend fun uploadDBtoDrive(credential: GoogleAccountCredential): Flow<Result<Unit>> = flow {
+        try {
+            googleAPIService.uploadDBtoDrive(credential)
+            emit(Result.success(Unit))
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
     }
 }

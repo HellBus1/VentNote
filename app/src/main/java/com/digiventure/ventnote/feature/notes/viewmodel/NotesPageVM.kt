@@ -76,8 +76,16 @@ class NotesPageVM @Inject constructor(
         }
     }
 
-    override suspend fun backupDB(credential: GoogleAccountCredential) {
-        repository.uploadDBtoDrive(credential)
+    override suspend fun backupDB(credential: GoogleAccountCredential): Result<Unit> = withContext(Dispatchers.IO) {
+        loader.postValue(true)
+        try {
+            repository.uploadDBtoDrive(credential).onEach {
+                loader.postValue(false)
+            }.last()
+        }catch (e: Exception) {
+            loader.postValue(false)
+            Result.failure(e)
+        }
     }
 }
 

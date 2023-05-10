@@ -30,7 +30,7 @@ class NotesPageMockVM: ViewModel(), NotesPageBaseVM {
     override fun addToMarkedNoteList(note: NoteModel) {}
 
     override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = Result.success(true)
-    override suspend fun backupDB(credential: GoogleAccountCredential) {
+    override suspend fun backupDB(credential: GoogleAccountCredential): Result<Unit> {
         TODO("Not yet implemented")
     }
 }

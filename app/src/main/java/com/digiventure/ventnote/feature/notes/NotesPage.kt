@@ -93,7 +93,8 @@ fun NotesPage(
         loadingDialog.value = (loadingState.value == true)
     }
 
-    val deletedMessage = stringResource(id = R.string.note_successfully_deleted)
+    val deletedMessage = stringResource(id = R.string.note_is_successfully_deleted)
+    val uploadedDatabase = stringResource(id = R.string.database_is_successfully_backed)
 
     val context = LocalContext.current
 
@@ -120,18 +121,34 @@ fun NotesPage(
         }
     }
 
-    fun handleTaskResult(completedTask: Task<GoogleSignInAccount>) {
+    fun uploadDatabaseToDrive(credential: GoogleAccountCredential) {
+        scope.launch {
+            viewModel.backupDB(credential)
+                .onSuccess {
+                    snackBarHostState.showSnackbar(
+                        message = uploadedDatabase,
+                        withDismissAction = true
+                    )
+                }
+                .onFailure {
+                    snackBarHostState.showSnackbar(
+                        message = it.message ?: "",
+                        withDismissAction = true
+                    )
+                }
+        }
+    }
+
+    fun getGoogleCredential(completedTask: Task<GoogleSignInAccount>) {
         try {
             val account = completedTask.getResult(ApiException::class.java)
-            scope.launch {
-                val credential = GoogleAccountCredential.usingOAuth2(
-                    context,
-                    setOf(DriveScopes.DRIVE_FILE)
-                )
-                credential.selectedAccount = account?.account
+            val credential = GoogleAccountCredential.usingOAuth2(
+                context,
+                setOf(DriveScopes.DRIVE_FILE)
+            )
+            credential.selectedAccount = account?.account
 
-                viewModel.backupDB(credential)
-            }
+            uploadDatabaseToDrive(credential)
 
             Log.d("Google Sign-In", "Sign-in successful.")
         } catch (e: ApiException) {
@@ -139,14 +156,14 @@ fun NotesPage(
         }
     }
 
-    val startForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    val handleDatabaseUploadResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             val intent = it.data
 
             val task: Task<GoogleSignInAccount> =
                 GoogleSignIn.getSignedInAccountFromIntent(intent)
 
-            handleTaskResult(task)
+            getGoogleCredential(task)
         }
     }
 
@@ -199,7 +216,7 @@ fun NotesPage(
                         },
                         uploadCallback = {
                             scope.launch {
-                                startForResult.launch(viewModel.signInClient.signInIntent)
+                                handleDatabaseUploadResult.launch(viewModel.signInClient.signInIntent)
                             }
                         }
                     )

@@ -48,8 +48,9 @@
     <string name="rate_app">Rate App</string>
 
     <!--  SnackBar alert message  -->
-    <string name="note_successfully_deleted">Note successfully deleted</string>
-    <string name="copied_to_clipboard">Text copied to clipboard</string>
+    <string name="note_is_successfully_deleted">Note is successfully deleted</string>
+    <string name="copied_to_clipboard">Text is copied to clipboard</string>
+    <string name="database_is_successfully_backed">Database is successfully backed</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>

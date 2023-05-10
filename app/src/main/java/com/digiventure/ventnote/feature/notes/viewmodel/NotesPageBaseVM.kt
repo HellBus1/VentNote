@@ -57,5 +57,5 @@ interface NotesPageBaseVM {
      * */
     suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean>
 
-    suspend fun backupDB(credential: GoogleAccountCredential)
+    suspend fun backupDB(credential: GoogleAccountCredential): Result<Unit>
 }
