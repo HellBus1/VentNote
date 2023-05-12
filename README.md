@@ -3,7 +3,7 @@
 </div>
 
 ## VentNote
-VentNote — Taking note like a breeze.   
+VentNote — Taking notes like a breeze.   
 Note management app built with jetpack compose
 <p>
   <img src="assets/screen_one.png" width="200"/>
