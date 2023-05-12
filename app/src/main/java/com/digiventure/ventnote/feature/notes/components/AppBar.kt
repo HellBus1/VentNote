@@ -19,6 +19,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.digiventure.ventnote.BuildConfig
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
@@ -151,9 +152,11 @@ fun NotesAppBar(
                     deleteCallback()
                 })
 
-            TopNavBarIcon(Icons.Filled.CloudUpload, stringResource(R.string.search_nav_icon),
-                modifier = Modifier.semantics {  }) {
-                uploadCallback()
+            if (BuildConfig.GDRIVE_SYNC_ENABLED) {
+                TopNavBarIcon(Icons.Filled.CloudUpload, stringResource(R.string.search_nav_icon),
+                    modifier = Modifier.semantics {  }) {
+                    uploadCallback()
+                }
             }
         },
         modifier = Modifier.semantics {

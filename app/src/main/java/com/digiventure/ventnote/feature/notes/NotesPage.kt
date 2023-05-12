@@ -139,31 +139,41 @@ fun NotesPage(
         }
     }
 
-    fun getGoogleCredential(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account = completedTask.getResult(ApiException::class.java)
-            val credential = GoogleAccountCredential.usingOAuth2(
-                context,
-                setOf(DriveScopes.DRIVE_FILE)
-            )
-            credential.selectedAccount = account?.account
-
-            uploadDatabaseToDrive(credential)
-
-            Log.d("Google Sign-In", "Sign-in successful.")
-        } catch (e: ApiException) {
-            Log.w("Google Sign-In", "Sign-in failed with code ${e.statusCode}")
+    fun handleDatabaseUpload(account: GoogleSignInAccount) {
+        val credential = GoogleAccountCredential.usingOAuth2(
+            context,
+            setOf(DriveScopes.DRIVE_FILE)
+        ).apply {
+            selectedAccount = account.account
         }
+
+        uploadDatabaseToDrive(credential)
     }
 
-    val handleDatabaseUploadResult = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    val signInWithGoogleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             val intent = it.data
 
             val task: Task<GoogleSignInAccount> =
                 GoogleSignIn.getSignedInAccountFromIntent(intent)
 
-            getGoogleCredential(task)
+            try {
+                val account = task.getResult(ApiException::class.java)
+
+                handleDatabaseUpload(account)
+            } catch (e: Exception) {
+                Log.e("Google Sign-In", "Sign-in failed with ${e.message}")
+            }
+        }
+    }
+
+    fun handleGoogleCredential() {
+        val account = GoogleSignIn.getLastSignedInAccount(context)
+
+        if (account == null) {
+            signInWithGoogleLauncher.launch(viewModel.signInClient.signInIntent)
+        } else {
+            handleDatabaseUpload(account)
         }
     }
 
@@ -215,9 +225,7 @@ fun NotesPage(
                             deleteDialog.value = true
                         },
                         uploadCallback = {
-                            scope.launch {
-                                handleDatabaseUploadResult.launch(viewModel.signInClient.signInIntent)
-                            }
+                            handleGoogleCredential()
                         }
                     )
                 },

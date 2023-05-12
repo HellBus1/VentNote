@@ -30,13 +30,16 @@ android {
 
     buildTypes {
         release {
+            buildConfigField "boolean", "GDRIVE_SYNC_ENABLED", "true"
+
             minifyEnabled true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            buildConfigField "boolean", "GDRIVE_SYNC_ENABLED", "true"
+
             minifyEnabled false
-//            debuggable true
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
