@@ -22,7 +22,9 @@
     <string name="cancel_title">Are you sure</string>
     <string name="cancel_confirmation_text">The text change will not be saved</string>
     <string name="information">Information</string>
-    <string name="share_note_information">If you press \'copy\' or \'share as text\', the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
+    <string name="share_note_information">If you press \"copy\" or \"share as text\", the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
+    <string name="backup_note_confirmation_text">Are you sure to %1$s your notes?</string>
+    <string name="backup_note_information">There are four buttons, listed from left to right: \n\n"Log In" (to log in to your account), \n\n"Backup" (to backup your notes to Google Drive), \n\n"Sync" (to sync your notes with your backed up notes, if they exist), and \n\n"Logout" (to log out from your account). \n\nPlease note that you must log in first in order to use the rest of the features.</string>
 
     <!--  Button and clickable  -->
     <string name="confirm">Confirm</string>
@@ -50,7 +52,8 @@
     <!--  SnackBar alert message  -->
     <string name="note_is_successfully_deleted">Note is successfully deleted</string>
     <string name="copied_to_clipboard">Text is copied to clipboard</string>
-    <string name="database_is_successfully_backed">Database is successfully backed</string>
+    <string name="database_is_successfully_backed">The database has been successfully backed up</string>
+    <string name="already_logged_in">Already logged in</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>

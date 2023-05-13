@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.feature.noteBackup.NoteBackupPage
 import com.digiventure.ventnote.feature.noteCreation.NoteCreationPage
 import com.digiventure.ventnote.feature.noteDetail.NoteDetailPage
 import com.digiventure.ventnote.feature.notes.NotesPage
@@ -42,6 +43,9 @@ fun NavGraph(navHostController: NavHostController) {
         ) {
             val note = it.arguments?.getParcelable<NoteModel>("noteData")
             SharePreviewPage(navHostController = navHostController, note = note)
+        }
+        composable(Route.NoteBackupPage.routeName) {
+            NoteBackupPage(navHostController = navHostController)
         }
     }
 }

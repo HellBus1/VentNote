@@ -42,12 +42,30 @@ class GoogleAPIService @Inject constructor(
         }
 
         for ((file, name) in databaseFiles) {
-            val storageFile = DriveFile().apply {
-                parents = listOf(backupFolderId)
-                this.name = name
+            val fileQuery = drive.files().list()
+                .setQ("parents='$backupFolderId' and trashed=false and name='$name'")
+            val fileList = fileQuery.execute().files
+
+            val storageFile = if (fileList.isNotEmpty()) {
+                fileList[0]
+            } else {
+                DriveFile().apply {
+                    parents = listOf(backupFolderId)
+                    this.name = name
+                }
             }
+
             val mediaContent = FileContent("application/x-sqlite3", file)
-            drive.files().create(storageFile, mediaContent).execute()
+
+            val updatedFile = if (storageFile.id != null) {
+                drive.files().update(storageFile.id, storageFile, mediaContent).execute()
+            } else {
+                drive.files().create(storageFile, mediaContent).execute()
+            }
+
+            if (updatedFile == null) {
+                throw Exception("Failed to upload file $name")
+            }
         }
     }
 }

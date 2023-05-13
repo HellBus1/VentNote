@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.feature.noteBackup
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +10,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDownload
@@ -35,20 +36,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.noteBackup.components.ActionImageButton
 import com.digiventure.ventnote.feature.noteBackup.components.NoteBackupAppBar
-import com.digiventure.ventnote.feature.noteBackup.components.ProfileImage
 import com.digiventure.ventnote.feature.noteBackup.viewmodel.NoteBackupPageBaseVM
 import com.digiventure.ventnote.feature.noteBackup.viewmodel.NoteBackupPageMockVM
 import com.digiventure.ventnote.feature.noteBackup.viewmodel.NoteBackupPageVM
@@ -67,18 +75,24 @@ fun NoteBackupPage(
     viewModel: NoteBackupPageBaseVM = hiltViewModel<NoteBackupPageVM>()
 ) {
     val googleSignInAccountState = viewModel.googleAccount.observeAsState()
+    val loadingState = viewModel.loader.observeAsState()
 
     val appBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val rememberedScrollBehavior = remember { scrollBehavior }
 
-    val shareNoteDialogState = remember { mutableStateOf(false) }
+    val backupStateType = remember { mutableStateOf("backup") }
+
+    val backupConfirmationDialogState = remember { mutableStateOf(false) }
+    val helpDialogState = remember { mutableStateOf(false) }
+    val loadingDialog = remember { mutableStateOf(false) }
 
     val snackBarHostState = remember { SnackbarHostState() }
 
     val scope = rememberCoroutineScope()
 
     val uploadedDatabase = stringResource(id = R.string.database_is_successfully_backed)
+    val loggedInAccount = stringResource(id = R.string.already_logged_in)
 
     val context = LocalContext.current
 
@@ -88,7 +102,19 @@ fun NoteBackupPage(
         }
     }
 
-    fun uploadDatabaseToDrive(credential: GoogleAccountCredential) {
+    LaunchedEffect(key1 = loadingState.value) {
+        // Showing loading dialog whenever loading state is true
+        loadingDialog.value = (loadingState.value == true)
+    }
+
+    fun backupDatabaseToDrive() {
+        val credential = GoogleAccountCredential.usingOAuth2(
+            context,
+            setOf(DriveScopes.DRIVE_FILE)
+        ).apply {
+            selectedAccount = googleSignInAccountState.value?.account
+        }
+
         scope.launch {
             viewModel.backupDB(credential)
                 .onSuccess {
@@ -106,6 +132,10 @@ fun NoteBackupPage(
         }
     }
 
+    fun syncDatabaseFromDrive() {
+
+    }
+
     val signInWithGoogleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             val intent = it.data
@@ -117,7 +147,12 @@ fun NoteBackupPage(
                 val account = task.getResult(ApiException::class.java)
                 viewModel.googleAccount.value = account
             } catch (e: Exception) {
-                Log.e("Google Sign-In", "Sign-in failed with ${e.message}")
+                scope.launch {
+                    snackBarHostState.showSnackbar(
+                        message = e.message ?: "",
+                        withDismissAction = true
+                    )
+                }
             }
         }
     }
@@ -128,22 +163,11 @@ fun NoteBackupPage(
         } else {
             scope.launch {
                 snackBarHostState.showSnackbar(
-                    message = "Already logged in",
+                    message = loggedInAccount,
                     withDismissAction = true
                 )
             }
         }
-    }
-
-    fun handleDatabaseUpload() {
-        val credential = GoogleAccountCredential.usingOAuth2(
-            context,
-            setOf(DriveScopes.DRIVE_FILE)
-        ).apply {
-            selectedAccount = googleSignInAccountState.value?.account
-        }
-
-        uploadDatabaseToDrive(credential)
     }
 
     Scaffold(
@@ -153,7 +177,7 @@ fun NoteBackupPage(
                     navHostController.popBackStack()
                 },
                 onHelpPressed = {
-                    shareNoteDialogState.value = true
+                    helpDialogState.value = true
                 },
                 scrollBehavior = rememberedScrollBehavior
             )
@@ -173,18 +197,36 @@ fun NoteBackupPage(
                     elevation = CardDefaults.cardElevation(2.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(15.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        ProfileImage()
-                        Text(text = "Syubban Fakhriya", fontSize = 16.sp,
-                            modifier = Modifier.padding(top = 8.dp))
-                        Text(text = "syubbanfakhriya@gmail.com", fontSize = 16.sp,
-                            modifier = Modifier.padding(top = 8.dp))
+                    val accountState = googleSignInAccountState.value
+                    if (accountState != null) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            AsyncImage(
+                                model = accountState.photoUrl.toString().ifEmpty { "https://picsum.photos/200" },
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(CircleShape)
+                            )
+                            Text(text = accountState.displayName ?: "name", fontSize = 16.sp,
+                                modifier = Modifier.padding(top = 8.dp))
+                            Text(text = accountState.email ?: "email", fontSize = 16.sp,
+                                modifier = Modifier.padding(top = 8.dp))
+                        }
+                    } else {
+                        Text(text = "Not signed-in",
+                            textAlign = TextAlign.Center,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                        )
                     }
                 }
 
@@ -209,12 +251,18 @@ fun NoteBackupPage(
                         ActionImageButton(
                             imageVector = Icons.Filled.CloudUpload,
                             enabled = googleSignInAccountState.value != null,
-                            onClick = { handleDatabaseUpload() }
+                            onClick = {
+                                backupConfirmationDialogState.value = true
+                                backupStateType.value = "backup"
+                            }
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.CloudDownload,
                             enabled = googleSignInAccountState.value != null,
-                            onClick = {}
+                            onClick = {
+                                backupConfirmationDialogState.value = true
+                                backupStateType.value = "sync"
+                            }
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.Logout,
@@ -227,11 +275,30 @@ fun NoteBackupPage(
         }
     }
 
+    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
+        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
+
     TextDialog(
         title = stringResource(R.string.information),
-        description = stringResource(R.string.share_note_information),
-        isOpened = shareNoteDialogState.value,
-        onDismissCallback = { shareNoteDialogState.value = false }
+        description = stringResource(R.string.backup_note_confirmation_text,
+            if (backupStateType.value == "backup") "backup" else "sync"),
+        isOpened = backupConfirmationDialogState.value,
+        onDismissCallback = { backupConfirmationDialogState.value = false },
+        onConfirmCallback = {
+            backupConfirmationDialogState.value = false
+            if (backupStateType.value == "backup") {
+                backupDatabaseToDrive()
+            } else {
+                syncDatabaseFromDrive()
+            }
+        }
+    )
+
+    TextDialog(
+        title = stringResource(R.string.information),
+        description = stringResource(R.string.backup_note_information),
+        isOpened = helpDialogState.value,
+        onDismissCallback = { helpDialogState.value = false },
     )
 }
 

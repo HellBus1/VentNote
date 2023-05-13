@@ -6,12 +6,14 @@ import com.digiventure.ventnote.data.NoteRepository
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@HiltViewModel
 class NoteBackupPageVM @Inject constructor(
     private val repository: NoteRepository,
     private val googleSignInClient: GoogleSignInClient,
