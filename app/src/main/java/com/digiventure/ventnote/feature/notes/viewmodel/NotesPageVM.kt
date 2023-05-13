@@ -10,7 +10,6 @@ import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
@@ -44,8 +43,6 @@ class NotesPageVM @Inject constructor(
 
     override val isMarking = mutableStateOf(false)
     override val markedNoteList = mutableStateListOf<NoteModel>()
-    override val signInClient: GoogleSignInClient
-        get() = googleSignInClient
 
     override fun markAllNote(notes: List<NoteModel>) {
         markedNoteList.addAll(notes.minus((markedNoteList).toSet()))
@@ -71,18 +68,6 @@ class NotesPageVM @Inject constructor(
                 loader.postValue(false)
             }.last()
         } catch (e: Exception) {
-            loader.postValue(false)
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun backupDB(credential: GoogleAccountCredential): Result<Unit> = withContext(Dispatchers.IO) {
-        loader.postValue(true)
-        try {
-            repository.uploadDBtoDrive(credential).onEach {
-                loader.postValue(false)
-            }.last()
-        }catch (e: Exception) {
             loader.postValue(false)
             Result.failure(e)
         }

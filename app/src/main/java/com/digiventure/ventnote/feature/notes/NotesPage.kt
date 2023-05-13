@@ -1,9 +1,5 @@
 package com.digiventure.ventnote.feature.notes
 
-import android.app.Activity
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -17,7 +13,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -42,12 +37,6 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageMockVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.services.drive.DriveScopes
 import kotlinx.coroutines.launch
 
 const val TAG : String = "NotesPage"
@@ -94,9 +83,6 @@ fun NotesPage(
     }
 
     val deletedMessage = stringResource(id = R.string.note_is_successfully_deleted)
-    val uploadedDatabase = stringResource(id = R.string.database_is_successfully_backed)
-
-    val context = LocalContext.current
 
     fun deleteNoteList() {
         scope.launch {
@@ -118,62 +104,6 @@ fun NotesPage(
                         withDismissAction = true
                     )
                 }
-        }
-    }
-
-    fun uploadDatabaseToDrive(credential: GoogleAccountCredential) {
-        scope.launch {
-            viewModel.backupDB(credential)
-                .onSuccess {
-                    snackBarHostState.showSnackbar(
-                        message = uploadedDatabase,
-                        withDismissAction = true
-                    )
-                }
-                .onFailure {
-                    snackBarHostState.showSnackbar(
-                        message = it.message ?: "",
-                        withDismissAction = true
-                    )
-                }
-        }
-    }
-
-    fun handleDatabaseUpload(account: GoogleSignInAccount) {
-        val credential = GoogleAccountCredential.usingOAuth2(
-            context,
-            setOf(DriveScopes.DRIVE_FILE)
-        ).apply {
-            selectedAccount = account.account
-        }
-
-        uploadDatabaseToDrive(credential)
-    }
-
-    val signInWithGoogleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            val intent = it.data
-
-            val task: Task<GoogleSignInAccount> =
-                GoogleSignIn.getSignedInAccountFromIntent(intent)
-
-            try {
-                val account = task.getResult(ApiException::class.java)
-
-                handleDatabaseUpload(account)
-            } catch (e: Exception) {
-                Log.e("Google Sign-In", "Sign-in failed with ${e.message}")
-            }
-        }
-    }
-
-    fun handleGoogleCredential() {
-        val account = GoogleSignIn.getLastSignedInAccount(context)
-
-        if (account == null) {
-            signInWithGoogleLauncher.launch(viewModel.signInClient.signInIntent)
-        } else {
-            handleDatabaseUpload(account)
         }
     }
 
@@ -225,7 +155,7 @@ fun NotesPage(
                             deleteDialog.value = true
                         },
                         uploadCallback = {
-                            handleGoogleCredential()
+
                         }
                     )
                 },
