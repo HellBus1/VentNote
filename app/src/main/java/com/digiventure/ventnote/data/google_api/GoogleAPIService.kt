@@ -2,6 +2,7 @@ package com.digiventure.ventnote.data.google_api
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.FileContent
+import com.google.api.services.drive.Drive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -16,20 +17,7 @@ class GoogleAPIService @Inject constructor(
         val googleApiHelper = GoogleApiHelper(credential)
         val drive = googleApiHelper.driveInstance ?: throw Exception("Drive instance is null")
 
-        val backupFolderName = "VentNoteDataBackup"
-        val folderQuery = drive.files().list()
-            .setQ("mimeType='application/vnd.google-apps.folder' and trashed=false and name='$backupFolderName'")
-        val folderList = folderQuery.execute().files
-
-        val backupFolderId = if (folderList.isNotEmpty()) {
-            folderList[0].id
-        } else {
-            val backupFolder = DriveFile().apply {
-                name = backupFolderName
-                mimeType = "application/vnd.google-apps.folder"
-            }
-            drive.files().create(backupFolder).setFields("id").execute().id
-        }
+        val backupFolderId = getOrCreateBackupFolderId(drive)
 
         val databaseFiles = listOf(
             Pair(File(basePath.database), "note_database"),
@@ -42,30 +30,38 @@ class GoogleAPIService @Inject constructor(
         }
 
         for ((file, name) in databaseFiles) {
-            val fileQuery = drive.files().list()
-                .setQ("parents='$backupFolderId' and trashed=false and name='$name'")
-            val fileList = fileQuery.execute().files
-
-            val storageFile = if (fileList.isNotEmpty()) {
-                fileList[0]
-            } else {
-                DriveFile().apply {
-                    parents = listOf(backupFolderId)
-                    this.name = name
-                }
-            }
-
-            val mediaContent = FileContent("application/x-sqlite3", file)
-
-            val updatedFile = if (storageFile.id != null) {
-                drive.files().update(storageFile.id, storageFile, mediaContent).execute()
-            } else {
-                drive.files().create(storageFile, mediaContent).execute()
-            }
-
-            if (updatedFile == null) {
-                throw Exception("Failed to upload file $name")
-            }
+            uploadDatabaseFileToDrive(drive, backupFolderId, file, name)
         }
+    }
+
+    private fun getOrCreateBackupFolderId(drive: Drive): String {
+        val backupFolderName = "VentNoteDataBackup"
+        val folderQuery = drive.files().list()
+            .setQ("mimeType='application/vnd.google-apps.folder' and trashed=false and name='$backupFolderName'")
+        val folderList = folderQuery.execute().files
+
+        return if (folderList.isNotEmpty()) {
+            folderList[0].id
+        } else {
+            val backupFolder = DriveFile().apply {
+                name = backupFolderName
+                mimeType = "application/vnd.google-apps.folder"
+            }
+            drive.files().create(backupFolder).setFields("id").execute().id
+        }
+    }
+
+    private fun uploadDatabaseFileToDrive(
+        drive: Drive,
+        backupFolderId: String,
+        file: File,
+        name: String
+    ): DriveFile {
+        val storageFile = DriveFile().apply {
+            parents = listOf(backupFolderId)
+            this.name = name
+        }
+        val mediaContent = FileContent("application/x-sqlite3", file)
+        return drive.files().create(storageFile, mediaContent).execute()
     }
 }

@@ -2,6 +2,7 @@ package com.digiventure.ventnote
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.ventnote.data.NoteRepository
+import com.digiventure.ventnote.data.google_api.GoogleAPIService
 import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
 import kotlinx.coroutines.flow.first
@@ -19,6 +20,7 @@ import org.mockito.kotlin.whenever
 
 class NoteRepositoryShould: BaseUnitTest() {
     private val service: NoteLocalService = mock()
+    private val googleService: GoogleAPIService = mock()
     private val noteList = mock<List<NoteModel>>()
     private val note = mock<NoteModel>()
 
@@ -34,7 +36,7 @@ class NoteRepositoryShould: BaseUnitTest() {
 
     @Before
     fun setup() {
-        repository = NoteRepository(service)
+        repository = NoteRepository(service, googleService)
     }
 
     /**
