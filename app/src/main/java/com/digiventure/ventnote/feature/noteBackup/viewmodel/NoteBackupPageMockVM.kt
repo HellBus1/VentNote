@@ -19,6 +19,10 @@ class NoteBackupPageMockVM: ViewModel(), NoteBackupPageBaseVM {
         TODO("Not yet implemented")
     }
 
+    override suspend fun syncDB(credential: GoogleAccountCredential): Result<Unit> {
+        TODO("Not yet implemented")
+    }
+
     override fun logout(): Result<Unit> {
         TODO("Not yet implemented")
     }

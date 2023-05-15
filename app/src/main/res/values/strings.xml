@@ -54,6 +54,7 @@
     <string name="copied_to_clipboard">Text is copied to clipboard</string>
     <string name="database_is_successfully_backed">The database has been successfully backed up</string>
     <string name="already_logged_in">Already logged in</string>
+    <string name="database_is_successfully_synced">The database has been synchronized</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>

@@ -93,6 +93,7 @@ fun NoteBackupPage(
 
     val uploadedDatabase = stringResource(id = R.string.database_is_successfully_backed)
     val loggedInAccount = stringResource(id = R.string.already_logged_in)
+    val synchronizedDatabase = stringResource(id = R.string.database_is_successfully_synced)
 
     val context = LocalContext.current
 
@@ -133,7 +134,28 @@ fun NoteBackupPage(
     }
 
     fun syncDatabaseFromDrive() {
+        val credential = GoogleAccountCredential.usingOAuth2(
+            context,
+            setOf(DriveScopes.DRIVE_FILE)
+        ).apply {
+            selectedAccount = googleSignInAccountState.value?.account
+        }
 
+        scope.launch {
+            viewModel.syncDB(credential)
+                .onSuccess {
+                    snackBarHostState.showSnackbar(
+                        message = synchronizedDatabase,
+                        withDismissAction = true
+                    )
+                }
+                .onFailure {
+                    snackBarHostState.showSnackbar(
+                        message = it.message ?: "",
+                        withDismissAction = true
+                    )
+                }
+        }
     }
 
     val signInWithGoogleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -246,7 +268,9 @@ fun NoteBackupPage(
                         ActionImageButton(
                             imageVector = Icons.Filled.Login,
                             enabled = true,
-                            onClick = { handleSignIn() }
+                            onClick = {
+                                handleSignIn()
+                            }
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.CloudUpload,

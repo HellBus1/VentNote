@@ -25,18 +25,31 @@ class NoteBackupPageVM @Inject constructor(
 
     override val googleAccount: MutableLiveData<GoogleSignInAccount?> = MutableLiveData()
 
-    override suspend fun backupDB(credential: GoogleAccountCredential): Result<Unit> = withContext(
-        Dispatchers.IO) {
-        loader.postValue(true)
-        try {
-            repository.uploadDBtoDrive(credential).onEach {
+    override suspend fun backupDB(credential: GoogleAccountCredential): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            loader.postValue(true)
+            try {
+                repository.uploadDBtoDrive(credential).onEach {
+                    loader.postValue(false)
+                }.last()
+            } catch (e: Exception) {
                 loader.postValue(false)
-            }.last()
-        } catch (e: Exception) {
-            loader.postValue(false)
-            Result.failure(e)
-        }
+                Result.failure(e)
+            }
     }
+
+    override suspend fun syncDB(credential: GoogleAccountCredential): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            loader.postValue(true)
+            try {
+                repository.syncDBFromDrive(credential).onEach {
+                    loader.postValue(false)
+                }.last()
+            } catch (e: Exception) {
+                loader.postValue(false)
+                Result.failure(e)
+            }
+        }
 
     override fun logout(): Result<Unit> {
         loader.postValue(true)

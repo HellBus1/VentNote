@@ -66,4 +66,13 @@ class NoteRepository @Inject constructor(
             emit(Result.failure(e))
         }
     }
+
+    suspend fun syncDBFromDrive(credential: GoogleAccountCredential): Flow<Result<Unit>> = flow {
+        try {
+            googleAPIService.syncDBFromDrive(credential)
+            emit(Result.success(Unit))
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
 }

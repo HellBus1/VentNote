@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.data.local
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -13,6 +14,7 @@ class NoteLocalService @Inject constructor(
         dao.getNotes().map {
             Result.success(it)
         }.catch {
+            Log.e("service", it.message ?: "")
             emit(Result.failure(RuntimeException("Failed to get list of notes")))
         }
 

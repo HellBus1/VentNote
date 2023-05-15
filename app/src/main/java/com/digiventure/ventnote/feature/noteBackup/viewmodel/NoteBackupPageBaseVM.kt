@@ -17,5 +17,7 @@ interface NoteBackupPageBaseVM {
 
     suspend fun backupDB(credential: GoogleAccountCredential): Result<Unit>
 
+    suspend fun syncDB(credential: GoogleAccountCredential): Result<Unit>
+
     fun logout(): Result<Unit>
 }

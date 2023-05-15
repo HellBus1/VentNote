@@ -36,10 +36,14 @@ class NoteModule {
 
     @Provides
     fun databasePath(@ApplicationContext context: Context): DatabaseFiles {
-        return DatabaseFiles(
-            database = context.getDatabasePath("note_database").absolutePath,
-            databaseShm = context.getDatabasePath("note_database-shm").absolutePath,
-            databaseWal = context.getDatabasePath("note_database-wal").absolutePath
-        )
+        return try {
+            DatabaseFiles(
+                database = context.getDatabasePath("note_database").absolutePath,
+                databaseShm = context.getDatabasePath("note_database-shm").absolutePath,
+                databaseWal = context.getDatabasePath("note_database-wal").absolutePath
+            )
+        } catch (e: Exception) {
+            DatabaseFiles()
+        }
     }
 }
