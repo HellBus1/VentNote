@@ -312,4 +312,41 @@ class NoteRepositoryShould: BaseUnitTest() {
     /**
      * Test suite for sync db
      * */
+    @Test
+    fun syncDBtoDriveFromService() = runTest {
+        val resultFlow = repository.syncDBFromDrive(credential)
+
+        val collector = mock<FlowCollector<Result<Unit>>>()
+
+        // Collect the result flow
+        resultFlow.collect(collector)
+
+        // Verify the service was called once
+        verify(googleService, times(1)).syncDBFromDrive(credential)
+    }
+
+    @Test
+    fun emitVoidAfterSuccessfulSyncDB() = runTest {
+        whenever(googleService.syncDBFromDrive(credential)).thenReturn(Unit)
+
+        val resultFlow = repository.syncDBFromDrive(credential)
+
+        var result: Result<Unit>? = null
+        resultFlow.collect { result = it }
+
+        assertEquals(Result.success(Unit), result)
+    }
+
+    @Test
+    fun emitExceptionMessageWhenFailToSyncDB() = runTest {
+        val exception = Exception("Sync failed")
+        whenever(googleService.syncDBFromDrive(credential)).thenAnswer { throw exception }
+
+        val resultFlow = repository.syncDBFromDrive(credential)
+
+        var result: Result<Unit>? = null
+        resultFlow.collect { result = it }
+
+        assertEquals(Result.failure<Unit>(exception), result)
+    }
 }
