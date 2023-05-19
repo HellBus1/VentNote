@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.module
 
 import android.content.Context
+import com.digiventure.ventnote.data.google_api.GoogleAPIHelperLayer
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -23,5 +24,10 @@ class GoogleAPIModule {
             .build()
 
         return GoogleSignIn.getClient(context, signInOptions)
+    }
+
+    @Provides
+    fun googleApiHelperAbstract(): GoogleAPIHelperLayer {
+        return GoogleAPIHelperLayer()
     }
 }

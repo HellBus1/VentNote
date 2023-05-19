@@ -3,50 +3,24 @@ package com.digiventure.ventnote.data.google_api
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 import javax.inject.Inject
 
 
 class GoogleAPIService @Inject constructor(
-    private val basePath: DatabaseFiles
+    private val databaseFiles: List<FileInfo>,
+    private val googleAPIHelperLayer: GoogleAPIHelperLayer
 ) {
-    private val database = "note_database"
-    private val databaseShm = "note_database-shm"
-    private val databaseWal = "note_database-wal"
-
-    private val parentFolderName = "VentNoteDataBackup"
-
-    private val databaseFiles = listOf(
-        Pair(File(basePath.database), database),
-        Pair(File(basePath.databaseShm), databaseShm),
-        Pair(File(basePath.databaseWal), databaseWal)
-    )
-
-    suspend fun syncDBFromDrive(credential: GoogleAccountCredential) = withContext(Dispatchers.IO) {
+    suspend fun uploadDBtoDrive(credential: GoogleAccountCredential) = withContext(Dispatchers.IO) {
         try {
-            val googleApiHelper = GoogleApiHelper.getInstance(credential)
+            val googleApiHelper = googleAPIHelperLayer.getGoogleAPIHelperInstance(credential)
+            val backupFolderId = googleApiHelper.getOrCreateBackupFolderId("VentNoteDataBackup")
 
-            val backupFolderId = googleApiHelper.getOrCreateBackupFolderId(parentFolderName)
-
-            val files = googleApiHelper.getListOfFileInsideAFolder(backupFolderId)
-
-            if (files.files.isEmpty()) {
-                throw Exception("No file exists in VentNoteBackup")
-            } else {
-                if (databaseFiles.all { it.first.exists() }) {
-                    for ((file) in databaseFiles) {
-                        file.delete()
-                    }
-                }
-
-                files.files.forEach { file ->
-                    if (file.name.equals(database)) {
-                        googleApiHelper.downloadFile(file.id, basePath.database)
-                    } else if (file.name.equals(databaseShm)) {
-                        googleApiHelper.downloadFile(file.id, basePath.databaseShm)
-                    } else if (file.name.equals(databaseWal)) {
-                        googleApiHelper.downloadFile(file.id, basePath.databaseWal)
-                    }
+            databaseFiles.forEach { (file, name) ->
+                val existingFile = googleApiHelper.getExistingFileInDrive(backupFolderId, name)
+                if (existingFile != null && file.exists()) {
+                    googleApiHelper.updateDatabaseFileInDrive(existingFile, file)
+                } else if (file.exists()) {
+                    googleApiHelper.uploadDatabaseFileToDrive(backupFolderId, file, name)
                 }
             }
         } catch (e: Exception) {
@@ -54,22 +28,29 @@ class GoogleAPIService @Inject constructor(
         }
     }
 
-    suspend fun uploadDBtoDrive(credential: GoogleAccountCredential) = withContext(Dispatchers.IO) {
+    suspend fun syncDBFromDrive(credential: GoogleAccountCredential) = withContext(Dispatchers.IO) {
         try {
-            val googleApiHelper = GoogleApiHelper.getInstance(credential)
+            val googleApiHelper = googleAPIHelperLayer.getGoogleAPIHelperInstance(credential)
+            val backupFolderId = googleApiHelper.getOrCreateBackupFolderId("VentNoteDataBackup")
+            val files = googleApiHelper.getListOfFileInsideAFolder(backupFolderId)
 
-            val backupFolderId = googleApiHelper.getOrCreateBackupFolderId(parentFolderName)
-
-            if (!databaseFiles.all { it.first.exists() }) {
-                throw Exception("Room database file does not exist")
+            if (files.files.isEmpty()) {
+                throw Exception("No file exists in VentNoteBackup")
             }
 
-            for ((file, name) in databaseFiles) {
-                val existingFile = googleApiHelper.getExistingFileInDrive(backupFolderId, name)
-                if (existingFile != null) {
-                    googleApiHelper.updateDatabaseFileInDrive(existingFile, file)
-                } else {
-                    googleApiHelper.uploadDatabaseFileToDrive(backupFolderId, file, name)
+            val databaseFilesMap = databaseFiles.associateBy { it.name }
+
+            databaseFiles.forEach { fileInfo ->
+                if (fileInfo.file.exists()) {
+                    fileInfo.file.delete()
+                }
+            }
+
+            files.files.forEach { file ->
+                val fileInfoObj = databaseFilesMap[file.name]
+
+                if (fileInfoObj != null) {
+                    googleApiHelper.downloadFile(file.id, fileInfoObj.file.absolutePath)
                 }
             }
         } catch (e: Exception) {
