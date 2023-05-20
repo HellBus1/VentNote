@@ -56,6 +56,7 @@ class NoteBackupPageVM @Inject constructor(
         return try {
             googleSignInClient.signOut()
             googleAccount.postValue(null)
+            loader.postValue(false)
             Result.success(Unit)
         } catch (e: Exception) {
             loader.postValue(false)
