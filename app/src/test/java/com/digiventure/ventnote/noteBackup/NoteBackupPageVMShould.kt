@@ -3,7 +3,7 @@ package com.digiventure.ventnote.noteBackup
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
 import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.feature.noteBackup.viewmodel.NoteBackupPageVM
+import com.digiventure.ventnote.feature.note_backup.viewmodel.NoteBackupPageVM
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.tasks.Task
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential

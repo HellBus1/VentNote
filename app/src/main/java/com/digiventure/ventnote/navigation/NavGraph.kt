@@ -7,11 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.feature.noteBackup.NoteBackupPage
-import com.digiventure.ventnote.feature.noteCreation.NoteCreationPage
-import com.digiventure.ventnote.feature.noteDetail.NoteDetailPage
+import com.digiventure.ventnote.feature.note_backup.NoteBackupPage
+import com.digiventure.ventnote.feature.note_creation.NoteCreationPage
+import com.digiventure.ventnote.feature.note_detail.NoteDetailPage
 import com.digiventure.ventnote.feature.notes.NotesPage
-import com.digiventure.ventnote.feature.sharePreview.SharePreviewPage
+import com.digiventure.ventnote.feature.share_preview.SharePreviewPage
 
 @Composable
 fun NavGraph(navHostController: NavHostController) {

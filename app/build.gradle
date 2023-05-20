@@ -69,15 +69,15 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
 
-    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation 'androidx.activity:activity-compose:1.7.1'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
 
     implementation 'androidx.compose.material3:material3:1.1.0-rc01'
 
     // Lifecycle Livedata
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0-beta01'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
 
     // Room
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
@@ -118,6 +118,9 @@ dependencies {
 
     // Coil Load Image Url
     implementation("io.coil-kt:coil-compose:2.3.0")
+
+    // Datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)

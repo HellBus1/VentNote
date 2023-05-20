@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.feature.noteDetail.viewmodel
+package com.digiventure.ventnote.feature.note_detail.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.MutableLiveData

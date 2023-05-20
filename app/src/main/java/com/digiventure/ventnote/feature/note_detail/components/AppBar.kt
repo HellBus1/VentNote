@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.feature.noteDetail.components
+package com.digiventure.ventnote.feature.note_detail.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons

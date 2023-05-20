@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.module
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.room.Room
 import com.digiventure.ventnote.data.google_api.FileInfo
 import com.digiventure.ventnote.data.local.NoteDAO
@@ -12,15 +11,18 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.io.File
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NoteModule {
+    @Singleton
     @Provides
     fun dao(database: NoteDatabase): NoteDAO {
         return database.dao()
     }
 
+    @Singleton
     @Provides
     fun noteDatabase(@ApplicationContext context: Context): NoteDatabase {
             return Room.databaseBuilder(
@@ -30,11 +32,7 @@ class NoteModule {
             ).fallbackToDestructiveMigration().build()
         }
 
-    @Provides
-    fun sharedPreference(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("note_shared_preference", Context.MODE_PRIVATE)
-    }
-
+    @Singleton
     @Provides
     fun databasePath(@ApplicationContext context: Context): List<FileInfo> {
         return try {

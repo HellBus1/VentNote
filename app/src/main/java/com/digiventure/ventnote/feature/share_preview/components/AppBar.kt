@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.feature.sharePreview.components
+package com.digiventure.ventnote.feature.share_preview.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons

@@ -12,10 +12,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class GoogleAPIModule {
+    @Singleton
     @Provides
     fun googleAccountClient(@ApplicationContext context: Context): GoogleSignInClient {
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -26,6 +28,7 @@ class GoogleAPIModule {
         return GoogleSignIn.getClient(context, signInOptions)
     }
 
+    @Singleton
     @Provides
     fun googleApiHelperAbstract(): GoogleAPIHelperLayer {
         return GoogleAPIHelperLayer()

@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.feature.noteBackup.components
+package com.digiventure.ventnote.feature.note_backup.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding

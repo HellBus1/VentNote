@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.feature.noteBackup
+package com.digiventure.ventnote.feature.note_backup
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -42,7 +42,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,11 +54,11 @@ import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.feature.noteBackup.components.ActionImageButton
-import com.digiventure.ventnote.feature.noteBackup.components.NoteBackupAppBar
-import com.digiventure.ventnote.feature.noteBackup.viewmodel.NoteBackupPageBaseVM
-import com.digiventure.ventnote.feature.noteBackup.viewmodel.NoteBackupPageMockVM
-import com.digiventure.ventnote.feature.noteBackup.viewmodel.NoteBackupPageVM
+import com.digiventure.ventnote.feature.note_backup.components.ActionImageButton
+import com.digiventure.ventnote.feature.note_backup.components.NoteBackupAppBar
+import com.digiventure.ventnote.feature.note_backup.viewmodel.NoteBackupPageBaseVM
+import com.digiventure.ventnote.feature.note_backup.viewmodel.NoteBackupPageMockVM
+import com.digiventure.ventnote.feature.note_backup.viewmodel.NoteBackupPageVM
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
@@ -67,6 +66,12 @@ import com.google.android.gms.tasks.Task
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.services.drive.DriveScopes
 import kotlinx.coroutines.launch
+
+enum class GoogleActionButtonType {
+    BACKUP,
+    SYNC,
+    LOGOUT
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +81,14 @@ fun NoteBackupPage(
 ) {
     val googleSignInAccountState = viewModel.googleAccount.observeAsState()
     val loadingState = viewModel.loader.observeAsState()
+    val maxAttempts = viewModel.maxAttempts.observeAsState()
+    val savedDay = viewModel.savedDay.observeAsState()
 
     val appBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val rememberedScrollBehavior = remember { scrollBehavior }
 
-    val backupStateType = remember { mutableStateOf("backup") }
+    val backupStateType = remember { mutableStateOf(GoogleActionButtonType.BACKUP) }
 
     val backupConfirmationDialogState = remember { mutableStateOf(false) }
     val helpDialogState = remember { mutableStateOf(false) }
@@ -94,8 +101,13 @@ fun NoteBackupPage(
     val uploadedDatabase = stringResource(id = R.string.database_is_successfully_backed)
     val loggedInAccount = stringResource(id = R.string.already_logged_in)
     val synchronizedDatabase = stringResource(id = R.string.database_is_successfully_synced)
+    val dailySynchronizedAttempts = stringResource(id = R.string.remaining_sync_attempt)
 
     val context = LocalContext.current
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.setSavedDay(savedDay.value ?: 0)
+    }
 
     LaunchedEffect(key1 = googleSignInAccountState.value) {
         if (googleSignInAccountState.value == null) {
@@ -106,6 +118,15 @@ fun NoteBackupPage(
     LaunchedEffect(key1 = loadingState.value) {
         // Showing loading dialog whenever loading state is true
         loadingDialog.value = (loadingState.value == true)
+    }
+
+    fun isGoogleActionButtonEnabled(type: GoogleActionButtonType): Boolean {
+        val accountStateNotNull = googleSignInAccountState.value != null
+        return when (type) {
+            GoogleActionButtonType.BACKUP -> accountStateNotNull && (maxAttempts.value ?: 0) > 0
+            GoogleActionButtonType.SYNC -> accountStateNotNull && (maxAttempts.value ?: 0) > 0
+            else -> accountStateNotNull
+        }
     }
 
     fun backupDatabaseToDrive() {
@@ -119,6 +140,7 @@ fun NoteBackupPage(
         scope.launch {
             viewModel.backupDB(credential)
                 .onSuccess {
+                    viewModel.setMaxSyncAttempt(maxAttempts.value?.minus(1) ?: 4)
                     snackBarHostState.showSnackbar(
                         message = uploadedDatabase,
                         withDismissAction = true
@@ -144,6 +166,7 @@ fun NoteBackupPage(
         scope.launch {
             viewModel.syncDB(credential)
                 .onSuccess {
+                    viewModel.setMaxSyncAttempt(maxAttempts.value?.minus(1) ?: 4)
                     snackBarHostState.showSnackbar(
                         message = synchronizedDatabase,
                         withDismissAction = true
@@ -158,7 +181,8 @@ fun NoteBackupPage(
         }
     }
 
-    val signInWithGoogleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    val signInWithGoogleLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             val intent = it.data
 
@@ -181,7 +205,7 @@ fun NoteBackupPage(
 
     fun handleSignIn() {
         if (googleSignInAccountState.value == null) {
-            signInWithGoogleLauncher.launch(viewModel.signInClient.signInIntent)
+            signInWithGoogleLauncher.launch(viewModel.signInClient?.signInIntent)
         } else {
             scope.launch {
                 snackBarHostState.showSnackbar(
@@ -244,12 +268,26 @@ fun NoteBackupPage(
                         Text(text = "Not signed-in",
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
                             modifier = Modifier
                                 .padding(16.dp)
                                 .fillMaxWidth()
                         )
                     }
+                }
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(2.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    Text("${maxAttempts.value} $dailySynchronizedAttempts",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth())
                 }
 
                 Card(
@@ -274,23 +312,23 @@ fun NoteBackupPage(
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.CloudUpload,
-                            enabled = googleSignInAccountState.value != null,
+                            enabled = isGoogleActionButtonEnabled(GoogleActionButtonType.BACKUP),
                             onClick = {
                                 backupConfirmationDialogState.value = true
-                                backupStateType.value = "backup"
+                                backupStateType.value = GoogleActionButtonType.BACKUP
                             }
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.CloudDownload,
-                            enabled = googleSignInAccountState.value != null,
+                            enabled = isGoogleActionButtonEnabled(GoogleActionButtonType.SYNC),
                             onClick = {
                                 backupConfirmationDialogState.value = true
-                                backupStateType.value = "sync"
+                                backupStateType.value = GoogleActionButtonType.SYNC
                             }
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.Logout,
-                            enabled = googleSignInAccountState.value != null,
+                            enabled = isGoogleActionButtonEnabled(GoogleActionButtonType.LOGOUT),
                             onClick = { viewModel.logout() }
                         )
                     }
@@ -305,12 +343,12 @@ fun NoteBackupPage(
     TextDialog(
         title = stringResource(R.string.information),
         description = stringResource(R.string.backup_note_confirmation_text,
-            if (backupStateType.value == "backup") "backup" else "sync"),
+            if (backupStateType.value == GoogleActionButtonType.BACKUP) "backup" else "sync"),
         isOpened = backupConfirmationDialogState.value,
         onDismissCallback = { backupConfirmationDialogState.value = false },
         onConfirmCallback = {
             backupConfirmationDialogState.value = false
-            if (backupStateType.value == "backup") {
+            if (backupStateType.value == GoogleActionButtonType.BACKUP) {
                 backupDatabaseToDrive()
             } else {
                 syncDatabaseFromDrive()

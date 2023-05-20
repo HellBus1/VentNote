@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.feature.sharePreview
+package com.digiventure.ventnote.feature.share_preview
 
 import android.content.Context
 import android.content.Intent
@@ -44,7 +44,7 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.bottomSheet.RegularBottomSheet
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.feature.sharePreview.components.SharePreviewAppBar
+import com.digiventure.ventnote.feature.share_preview.components.SharePreviewAppBar
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
