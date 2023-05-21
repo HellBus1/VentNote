@@ -106,7 +106,7 @@ fun NoteBackupPage(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.setSavedDay(savedDay.value ?: 0)
+        viewModel.setSavedDay(savedDay.value ?: 0, System.currentTimeMillis())
     }
 
     LaunchedEffect(key1 = googleSignInAccountState.value) {

@@ -1,8 +1,10 @@
-package com.digiventure.ventnote.noteBackup
+package com.digiventure.ventnote.note_backup
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
+import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.data.NoteRepository
+import com.digiventure.ventnote.data.data_store.DataStoreHelper
 import com.digiventure.ventnote.feature.note_backup.viewmodel.NoteBackupPageVM
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.tasks.Task
@@ -11,9 +13,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -22,6 +26,7 @@ class NoteBackupPageVMShould: BaseUnitTest() {
     private val repository: NoteRepository = mock()
     private val googleSignInClient: GoogleSignInClient = mock()
     private val googleCredential: GoogleAccountCredential = mock()
+    private val dataStoreHelper: DataStoreHelper = mock()
 
     private lateinit var viewModel: NoteBackupPageVM
 
@@ -35,9 +40,14 @@ class NoteBackupPageVMShould: BaseUnitTest() {
     private val expectedLogout = Result.success(Unit)
     private val exceptionLogout = Exception("Failed to Logout")
 
+    private val intKey = "maxSyncAttemptKey"
+    private val savedDayKey = "savedDay"
+    private val intValue = 4
+    private val longValue = 1000L
+
     @Before
     fun setup() {
-        viewModel = NoteBackupPageVM(repository, googleSignInClient)
+        viewModel = NoteBackupPageVM(repository, googleSignInClient, dataStoreHelper)
     }
 
     /**
@@ -239,5 +249,103 @@ class NoteBackupPageVMShould: BaseUnitTest() {
 
     private fun mockFailedLogoutCase() = runBlocking {
         whenever(googleSignInClient.signOut()).thenAnswer { throw exceptionLogout }
+    }
+
+    /**
+     * Test suite for SetMaxSyncAttempt
+     * */
+    @Test
+    fun verifySetMaxSyncAttemptCallSetIntDataFromDataStoreHelper() = runTest {
+        val expectedResult = Result.success(Unit)
+
+        whenever(dataStoreHelper.setIntData(intKey, intValue)).thenAnswer { }
+
+        val result = viewModel.setMaxSyncAttempt(intValue)
+
+        assertEquals(expectedResult, result)
+        verify(dataStoreHelper, times(1)).setIntData(intKey, intValue)
+    }
+
+    @Test
+    fun assertSetMaxSyncAttemptError() = runTest {
+        val exception = Exception("Failed to set int")
+
+        whenever(dataStoreHelper.setIntData(intKey, intValue)).thenAnswer { throw exception }
+
+        val result = viewModel.setMaxSyncAttempt(intValue)
+
+        assertEquals(Result.failure<Unit>(exception), result)
+    }
+
+    /**
+     * Test suite for setSavedDay
+     * */
+    @Test
+    fun setSavedDayWillCallDataStoreHelperWhenElapsedTimeIsEmpty() = runTest {
+        val previousDay = 0L
+
+        val result = viewModel.setSavedDay(previousDay, longValue)
+
+        assertTrue(result.isSuccess)
+        verify(dataStoreHelper, times(1)).setLongData(savedDayKey, longValue)
+        verify(dataStoreHelper, times(1)).setIntData(intKey, intValue)
+    }
+
+    @Test
+    fun setSavedDayWillCallDataStoreHelperWhenElapsedTimeIsMoreThanOneHour() = runTest {
+        val previousDay = System.currentTimeMillis() - 2 * 60 * 60 * 1000
+
+        val result = viewModel.setSavedDay(previousDay, longValue)
+
+        assertTrue(result.isSuccess)
+        verify(dataStoreHelper, times(1)).setLongData(savedDayKey, longValue)
+        verify(dataStoreHelper, times(1)).setIntData(intKey, intValue)
+    }
+
+    @Test
+    fun setSavedDayNotCallDataStoreHelperWhenElapsedTimeIsLessThanOneHour() = runTest {
+        val previousDay = System.currentTimeMillis() - 30 * 60 * 1000
+
+        val result = viewModel.setSavedDay(previousDay, longValue)
+
+        assertTrue(result.isSuccess)
+        verify(dataStoreHelper, never()).setLongData(savedDayKey, longValue)
+        verify(dataStoreHelper, never()).setIntData(intKey, intValue)
+    }
+
+    @Test
+    fun setSavedDayReturnsFailureWhenAnExceptionOccursDuringDataStoreUpdate() = runTest {
+        val previousDay = 0L
+
+        whenever(dataStoreHelper.setLongData(savedDayKey, longValue)).thenAnswer {
+            throw Exception("Data store update failed")
+        }
+
+        val result = viewModel.setSavedDay(previousDay, longValue)
+
+        assertTrue(result.isFailure)
+        verify(dataStoreHelper, times(1)).setLongData(savedDayKey, longValue)
+        verify(dataStoreHelper, never()).setIntData(intKey, intValue)
+    }
+
+    @Test
+    fun savedDayEmitsExpectedValueFromDataStoreHelper() = runTest {
+        val expectedSavedDay = 123456789L
+        whenever(dataStoreHelper.getLongData(savedDayKey)).thenReturn(flowOf(expectedSavedDay))
+
+        val savedDay = viewModel.savedDay.getValueForTest()
+
+        assertEquals(savedDay, expectedSavedDay)
+    }
+
+    @Test
+    fun maxAttemptsEmitsExpectedValueFromDataStoreHelper() = runTest {
+        val expectedMaxAttempts = 4
+        whenever(dataStoreHelper.getIntData(intKey)).thenReturn(flowOf(expectedMaxAttempts))
+
+        val maxAttempt = viewModel.maxAttempts.getValueForTest()
+
+        assertEquals(maxAttempt, expectedMaxAttempts)
+
     }
 }

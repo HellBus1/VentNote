@@ -14,7 +14,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
@@ -30,7 +29,7 @@ class NoteBackupPageVM @Inject constructor(
 ): ViewModel(), NoteBackupPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
 
-    override val signInClient: GoogleSignInClient?
+    override val signInClient: GoogleSignInClient
         get() = googleSignInClient
 
     override val googleAccount: MutableLiveData<GoogleSignInAccount?> = MutableLiveData()
@@ -78,19 +77,17 @@ class NoteBackupPageVM @Inject constructor(
         }
     }
 
-    override suspend fun setSavedDay(previousDay: Long): Result<Unit> {
+    override suspend fun setSavedDay(previousDay: Long, currentTime: Long): Result<Unit> {
         val elapsedTime = abs(System.currentTimeMillis() - previousDay)
         val oneHourInMillis = 60 * 60 * 1000
 
         return if (previousDay == 0L || (elapsedTime >= oneHourInMillis)) {
-            val longDataResult = dataStoreHelper.setLongData(savedDayKey, System.currentTimeMillis()).single()
-            val intDataResult1 = dataStoreHelper.setIntData(maxSyncAttemptKey, 4).single()
-
-            if (longDataResult.isSuccess && intDataResult1.isSuccess) {
+            try {
+                dataStoreHelper.setLongData(savedDayKey, currentTime)
+                dataStoreHelper.setIntData(maxSyncAttemptKey, 4)
                 Result.success(Unit)
-            } else {
-                val errors = listOfNotNull(longDataResult.exceptionOrNull(), intDataResult1.exceptionOrNull())
-                Result.failure(errors.firstOrNull() ?: Exception("Unknown error occurred"))
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         } else {
             Result.success(Unit)
@@ -98,6 +95,11 @@ class NoteBackupPageVM @Inject constructor(
     }
 
     override suspend fun setMaxSyncAttempt(value: Int): Result<Unit> {
-        return dataStoreHelper.setIntData(maxSyncAttemptKey, value).last()
+        return try {
+            dataStoreHelper.setIntData(maxSyncAttemptKey, value)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

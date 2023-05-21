@@ -25,7 +25,7 @@ class NoteBackupPageMockVM: ViewModel(), NoteBackupPageBaseVM {
 
     override suspend fun syncDB(credential: GoogleAccountCredential): Result<Unit> = Result.success(Unit)
 
-    override suspend fun setSavedDay(previousDay: Long): Result<Unit> = Result.success(Unit)
+    override suspend fun setSavedDay(previousDay: Long, currentTime: Long): Result<Unit> = Result.success(Unit)
 
     override suspend fun setMaxSyncAttempt(value: Int): Result<Unit> = Result.success(Unit)
 

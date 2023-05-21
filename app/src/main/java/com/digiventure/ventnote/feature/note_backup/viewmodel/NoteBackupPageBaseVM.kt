@@ -24,7 +24,7 @@ interface NoteBackupPageBaseVM {
 
     suspend fun syncDB(credential: GoogleAccountCredential): Result<Unit>
 
-    suspend fun setSavedDay(previousDay: Long): Result<Unit>
+    suspend fun setSavedDay(previousDay: Long, currentTime: Long): Result<Unit>
 
     suspend fun setMaxSyncAttempt(value: Int): Result<Unit>
 

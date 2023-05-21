@@ -7,27 +7,31 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DataStoreHelper @Inject constructor(private val dataStore: DataStore<Preferences>) {
-    suspend fun setLongData(key: String, value: Long): Flow<Result<Unit>> = flow {
-        withContext(Dispatchers.IO) {
-            val dataStoreKey = longPreferencesKey(key)
-            try {
-                dataStore.edit {
-                    it[dataStoreKey] = value
-                }
-                emit(Result.success(Unit))
-            } catch (e: Exception) {
-                throw e
+    suspend fun setIntData(key: String, value: Int) = withContext(Dispatchers.IO) {
+        val dataStoreKey = intPreferencesKey(key)
+        try {
+            dataStore.edit {
+                it[dataStoreKey] = value
             }
+        } catch (e: Exception) {
+            throw e
         }
-    }.catch {
-        emit(Result.failure(it))
+    }
+
+    suspend fun setLongData(key: String, value: Long) = withContext(Dispatchers.IO) {
+        val dataStoreKey = longPreferencesKey(key)
+        try {
+            dataStore.edit {
+                it[dataStoreKey] = value
+            }
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     fun getLongData(key: String): Flow<Long> {
@@ -35,22 +39,6 @@ class DataStoreHelper @Inject constructor(private val dataStore: DataStore<Prefe
         return dataStore.data.map {
             it[dataStoreKey] ?: 0
         }
-    }
-
-    suspend fun setIntData(key: String, value: Int): Flow<Result<Unit>> = flow {
-        withContext(Dispatchers.IO) {
-            val dataStoreKey = intPreferencesKey(key)
-            try {
-                dataStore.edit {
-                    it[dataStoreKey] = value
-                }
-                emit(Result.success(Unit))
-            } catch (e: Exception) {
-                throw e
-            }
-        }
-    }.catch {
-        emit(Result.failure(it))
     }
 
     fun getIntData(key: String): Flow<Int> {

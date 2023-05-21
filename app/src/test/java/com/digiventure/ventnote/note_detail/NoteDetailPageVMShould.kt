@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.noteDetail
+package com.digiventure.ventnote.note_detail
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
