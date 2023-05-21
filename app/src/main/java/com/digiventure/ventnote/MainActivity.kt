@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.navigation.NavGraph
@@ -59,34 +60,9 @@ class MainActivity : ComponentActivity() {
                             isDialogShowed = false
                             appUpdateManager.completeUpdate()
                         },
-                        title = "Success",
-                        description = "The app is successfully updated, press confirm to restart"
+                        title = stringResource(id = R.string.success),
+                        description = stringResource(id = R.string.update_success_text)
                     )
-                }
-            }
-        }
-    }
-
-    @Deprecated("Deprecated in Java", ReplaceWith(
-        "super.onActivityResult(requestCode, resultCode, data)",
-        "androidx.activity.ComponentActivity"
-    ))
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_UPDATE_CODE) {
-            when (resultCode) {
-                Activity.RESULT_OK -> {
-                    //  TODO: handle user's approval
-                }
-                Activity.RESULT_CANCELED -> {
-                    //  if you want to request the update again just call checkUpdate()
-                    //  TODO: handle user's rejection
-                }
-                ActivityResult.RESULT_IN_APP_UPDATE_FAILED -> {
-                    //  if you want to request the update again just call checkUpdate()
-                    //  TODO: handle update failure
                 }
             }
         }
@@ -119,13 +95,11 @@ class MainActivity : ComponentActivity() {
         appUpdateInfoTask.addOnSuccessListener {
             when (it.updateAvailability()) {
                 UpdateAvailability.UPDATE_AVAILABLE -> {
-                    val updateTypes = arrayOf(AppUpdateType.FLEXIBLE, IMMEDIATE)
-                    run loop@{
-                        updateTypes.forEach { type ->
-                            if (it.isUpdateTypeAllowed(type)) {
-                                appUpdateManager.startUpdateFlowForResult(it, type, this, REQUEST_UPDATE_CODE)
-                                return@loop
-                            }
+                    val updateTypes = arrayOf(AppUpdateType.FLEXIBLE, AppUpdateType.IMMEDIATE)
+                    for (type in updateTypes) {
+                        if (it.isUpdateTypeAllowed(type)) {
+                            appUpdateManager.startUpdateFlowForResult(it, type, this, REQUEST_UPDATE_CODE)
+                            break
                         }
                     }
                 }
