@@ -37,11 +37,21 @@
     <string name="share_note">Share Note</string>
     <string name="share_note_as_text">Share Note as Text</string>
     <string name="share_note_as_image">Share Note as Image</string>
+    <string name="login_to_drive">Log in to Drive</string>
+    <string name="backup_to_drive">Backup to Drive</string>
+    <string name="sync_from_drive">Sync from Drive</string>
+    <string name="logout_from_drive">Logout from Drive</string>
+
+    <!-- Image -->
+    <string name="profile_image">Profile Image</string>
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>
     <string name="title_textField_input">Insert title</string>
     <string name="body_textField_input">Insert note</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="not_signed_in">Not signed in</string>
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>

@@ -18,7 +18,8 @@ import com.digiventure.ventnote.ui.theme.PurpleGrey40
 fun ActionImageButton(
     imageVector: ImageVector,
     onClick: () -> Unit,
-    enabled: Boolean
+    enabled: Boolean,
+    contentDescription: String
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -31,7 +32,7 @@ fun ActionImageButton(
         ) {
             Icon(
                 imageVector = imageVector,
-                contentDescription = "",
+                contentDescription = contentDescription,
                 tint = Color.White
             )
         }

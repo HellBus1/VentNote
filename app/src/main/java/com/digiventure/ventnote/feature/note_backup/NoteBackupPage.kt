@@ -263,18 +263,18 @@ fun NoteBackupPage(
                         ) {
                             AsyncImage(
                                 model = accountState.photoUrl.toString().ifEmpty { "https://picsum.photos/200" },
-                                contentDescription = null,
+                                contentDescription = stringResource(id = R.string.profile_image),
                                 modifier = Modifier
                                     .size(64.dp)
                                     .clip(CircleShape)
                             )
-                            Text(text = accountState.displayName ?: "name", fontSize = 16.sp,
+                            Text(text = accountState.displayName ?: stringResource(id = R.string.name), fontSize = 16.sp,
                                 modifier = Modifier.padding(top = 8.dp))
-                            Text(text = accountState.email ?: "email", fontSize = 16.sp,
+                            Text(text = accountState.email ?: stringResource(id = R.string.email), fontSize = 16.sp,
                                 modifier = Modifier.padding(top = 8.dp))
                         }
                     } else {
-                        Text(text = "Not signed-in",
+                        Text(text = stringResource(id = R.string.not_signed_in),
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
                             modifier = Modifier
@@ -317,7 +317,8 @@ fun NoteBackupPage(
                             enabled = true,
                             onClick = {
                                 handleSignIn()
-                            }
+                            },
+                            contentDescription = stringResource(id = R.string.login_to_drive)
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.CloudUpload,
@@ -325,7 +326,8 @@ fun NoteBackupPage(
                             onClick = {
                                 backupConfirmationDialogState.value = true
                                 backupStateType.value = GoogleActionButtonType.BACKUP
-                            }
+                            },
+                            contentDescription = stringResource(id = R.string.backup_to_drive)
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.CloudDownload,
@@ -333,12 +335,14 @@ fun NoteBackupPage(
                             onClick = {
                                 backupConfirmationDialogState.value = true
                                 backupStateType.value = GoogleActionButtonType.SYNC
-                            }
+                            },
+                            contentDescription = stringResource(id = R.string.sync_from_drive)
                         )
                         ActionImageButton(
                             imageVector = Icons.Filled.Logout,
                             enabled = isGoogleActionButtonEnabled(GoogleActionButtonType.LOGOUT),
-                            onClick = { viewModel.logout() }
+                            onClick = { viewModel.logout() },
+                            contentDescription = stringResource(id = R.string.logout_from_drive)
                         )
                     }
                 }
