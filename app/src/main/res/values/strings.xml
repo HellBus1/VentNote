@@ -22,7 +22,9 @@
     <string name="cancel_title">Are you sure</string>
     <string name="cancel_confirmation_text">The text change will not be saved</string>
     <string name="information">Information</string>
-    <string name="share_note_information">If you press \'copy\' or \'share as text\', the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
+    <string name="share_note_information">If you press \"copy\" or \"share as text\", the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
+    <string name="backup_note_confirmation_text">Are you sure to %1$s your notes?</string>
+    <string name="backup_note_information">There are four buttons, listed from left to right: \n\n"Log In" (to log in to your account), \n\n"Backup" (to backup your notes to Google Drive), \n\n"Sync" (to sync your notes with your backed up notes, if they exist), and \n\n"Logout" (to log out from your account). \n\nPlease note that you must log in first in order to use the rest of the features. \n\nThere are maximum synchronization attempts every hour (4 times) for backing up or syncing notes from Google Drive.</string>
 
     <!--  Button and clickable  -->
     <string name="confirm">Confirm</string>
@@ -34,22 +36,34 @@
     <string name="add">Add</string>
     <string name="share_note">Share Note</string>
     <string name="share_note_as_text">Share Note as Text</string>
-    <string name="share_note_as_image">Share Note as Image</string>
+    <string name="login_to_drive">Log in to Drive</string>
+    <string name="backup_to_drive">Backup to Drive</string>
+    <string name="sync_from_drive">Sync from Drive</string>
+    <string name="logout_from_drive">Logout from Drive</string>
+
+    <!-- Image -->
+    <string name="profile_image">Profile Image</string>
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>
     <string name="title_textField_input">Insert title</string>
     <string name="body_textField_input">Insert note</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="not_signed_in">Not signed in</string>
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
+    <string name="remaining_sync_attempt">Remaining sync attempts</string>
 
     <!--  Nav Drawer Tile  -->
     <string name="rate_app">Rate App</string>
 
     <!--  SnackBar alert message  -->
-    <string name="note_successfully_deleted">Note successfully deleted</string>
-    <string name="copied_to_clipboard">Text copied to clipboard</string>
+    <string name="note_is_successfully_deleted">Note is successfully deleted</string>
+    <string name="database_is_successfully_backed">The database has been successfully backed up</string>
+    <string name="already_logged_in">Already logged in</string>
+    <string name="database_is_successfully_synced">The database has been synchronized</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>

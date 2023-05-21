@@ -11,7 +11,7 @@ fun RegularBottomSheet(
     isOpened: Boolean,
     bottomSheetState: SheetState,
     onDismissRequest: () -> Unit,
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
     if (isOpened) {
         ModalBottomSheet(

@@ -39,8 +39,6 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
-const val TAG : String = "NotesPage"
-
 @Composable
 fun NotesPage(
     navHostController: NavHostController,
@@ -82,7 +80,7 @@ fun NotesPage(
         loadingDialog.value = (loadingState.value == true)
     }
 
-    val deletedMessage = stringResource(id = R.string.note_successfully_deleted)
+    val deletedMessage = stringResource(id = R.string.note_is_successfully_deleted)
 
     fun deleteNoteList() {
         scope.launch {
@@ -153,6 +151,9 @@ fun NotesPage(
                         },
                         deleteCallback = {
                             deleteDialog.value = true
+                        },
+                        uploadCallback = {
+                            navHostController.navigate(Route.NoteBackupPage.routeName)
                         }
                     )
                 },

@@ -15,6 +15,10 @@ android {
     namespace 'com.digiventure.ventnote'
     compileSdk 33
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     defaultConfig {
         applicationId "com.digiventure.ventnote"
         minSdk 21
@@ -30,13 +34,16 @@ android {
 
     buildTypes {
         release {
+            buildConfigField "boolean", "GDRIVE_SYNC_ENABLED", "true"
+
             minifyEnabled true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            buildConfigField "boolean", "GDRIVE_SYNC_ENABLED", "true"
+
             minifyEnabled false
-//            debuggable true
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -54,27 +61,35 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.0'
     }
+    configurations {
+        all{
+            exclude group: 'commons-logging', module: 'commons-logging'
+            exclude group: 'org.apache.httpcomponents'
+        }
+    }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
             excludes += 'META-INF/*'
+            excludes += 'org/apache/http/version.properties'
+            excludes += 'org/apache/http/client/version.properties'
         }
     }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
 
-    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation 'androidx.activity:activity-compose:1.7.1'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
 
-    implementation 'androidx.compose.material3:material3:1.1.0-rc01'
+    implementation 'androidx.compose.material3:material3:1.2.0-alpha01'
 
     // Lifecycle Livedata
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0-beta01'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
 
     // Room
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
@@ -82,13 +97,13 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
 
     // Compose Navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0-alpha05"
+    implementation "androidx.navigation:navigation-compose:2.6.0-rc01"
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     // Livedata
-    implementation 'androidx.compose.runtime:runtime-livedata:1.4.0-beta01'
+    implementation 'androidx.compose.runtime:runtime-livedata:1.5.0-alpha04'
 
     // Unit test
     testImplementation 'junit:junit:4.13.2'
@@ -99,9 +114,27 @@ dependencies {
     kapt 'com.google.dagger:hilt-android-compiler:2.45'
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0-alpha01'
 
-    implementation 'com.google.code.gson:gson:2.9.0'
+    // Material Icon Extension
+    implementation "androidx.compose.material:material-icons-extended:1.4.3"
 
-    implementation "androidx.compose.material:material-icons-extended:1.4.2"
+    // GSON Json Handler
+    implementation ('com.google.http-client:google-http-client-gson:1.26.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+    // So, make sure you also include that repository in your project's build.gradle file.
+    implementation("com.google.android.play:app-update:2.0.1")
+    // For Kotlin users also import the Kotlin extensions library for Play In-App Update:
+    implementation("com.google.android.play:app-update-ktx:2.0.1")
+
+    // Google Play API
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+
+    // Coil Load Image Url
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
+    // Datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)
@@ -127,25 +160,20 @@ dependencies {
     // For unit testing coroutines
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
 
-    // MockK
-    androidTestImplementation "io.mockk:mockk-android:1.13.4"
-    androidTestImplementation "io.mockk:mockk-agent:1.13.4"
-
-    // So, make sure you also include that repository in your project's build.gradle file.
-    implementation("com.google.android.play:app-update:2.0.1")
-    // For Kotlin users also import the Kotlin extensions library for Play In-App Update:
-    implementation("com.google.android.play:app-update-ktx:2.0.1")
+    // Google drive dependencies and Guava fix
+    implementation "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+    implementation 'com.google.api-client:google-api-client-android:1.26.0'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev136-1.25.0'
 
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:31.2.3')
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation 'com.google.firebase:firebase-analytics'
-
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
+    implementation 'com.google.firebase:firebase-crashlytics:18.3.7'
     implementation 'com.google.firebase:firebase-appindexing:20.0.0'
-    implementation 'com.google.firebase:firebase-perf:20.3.0'
-    implementation 'com.google.firebase:firebase-perf-ktx:20.3.1'
+    implementation 'com.google.firebase:firebase-perf:20.3.2'
+    implementation 'com.google.firebase:firebase-perf-ktx:20.3.2'
 }
 
 kapt {
