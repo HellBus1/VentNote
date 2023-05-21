@@ -39,8 +39,6 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
-const val TAG : String = "NotesPage"
-
 @Composable
 fun NotesPage(
     navHostController: NavHostController,

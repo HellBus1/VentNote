@@ -15,16 +15,6 @@ class GoogleApiHelper constructor(
 ) {
     private var driveInstance: Drive? = null
 
-    companion object {
-        private var instance: GoogleApiHelper? = null
-
-        fun getInstance(credential: GoogleAccountCredential): GoogleApiHelper {
-            return instance ?: synchronized(this) {
-                instance ?: GoogleApiHelper(credential).also { instance = it }
-            }
-        }
-    }
-
     private fun getDriveInstance(): Drive {
         return driveInstance ?: synchronized(this) {
             driveInstance ?: createDriveInstance().also { driveInstance = it }

@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
     private var isDialogShowed = false
 
     companion object {
-        const val TAG : String = "MainActivity"
         const val REQUEST_UPDATE_CODE = 1
     }
 
