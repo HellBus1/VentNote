@@ -65,7 +65,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.services.drive.DriveScopes
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class GoogleActionButtonType {
     BACKUP,
@@ -106,7 +108,10 @@ fun NoteBackupPage(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.setSavedDay(savedDay.value ?: 0, System.currentTimeMillis())
+        val savedDayValue = savedDay.value
+        if (savedDayValue != null) {
+            viewModel.setSavedDay(savedDayValue, System.currentTimeMillis())
+        }
     }
 
     LaunchedEffect(key1 = googleSignInAccountState.value) {
@@ -138,20 +143,22 @@ fun NoteBackupPage(
         }
 
         scope.launch {
-            viewModel.backupDB(credential)
-                .onSuccess {
-                    viewModel.setMaxSyncAttempt(maxAttempts.value?.minus(1) ?: 4)
-                    snackBarHostState.showSnackbar(
-                        message = uploadedDatabase,
-                        withDismissAction = true
-                    )
-                }
-                .onFailure {
-                    snackBarHostState.showSnackbar(
-                        message = it.message ?: "",
-                        withDismissAction = true
-                    )
-                }
+            withContext(Dispatchers.IO) {
+                viewModel.backupDB(credential)
+                    .onSuccess {
+                        viewModel.setMaxSyncAttempt(maxAttempts.value?.minus(1) ?: 0)
+                        snackBarHostState.showSnackbar(
+                            message = uploadedDatabase,
+                            withDismissAction = true
+                        )
+                    }
+                    .onFailure {
+                        snackBarHostState.showSnackbar(
+                            message = it.message ?: "",
+                            withDismissAction = true
+                        )
+                    }
+            }
         }
     }
 
@@ -164,20 +171,22 @@ fun NoteBackupPage(
         }
 
         scope.launch {
-            viewModel.syncDB(credential)
-                .onSuccess {
-                    viewModel.setMaxSyncAttempt(maxAttempts.value?.minus(1) ?: 4)
-                    snackBarHostState.showSnackbar(
-                        message = synchronizedDatabase,
-                        withDismissAction = true
-                    )
-                }
-                .onFailure {
-                    snackBarHostState.showSnackbar(
-                        message = it.message ?: "",
-                        withDismissAction = true
-                    )
-                }
+            withContext(Dispatchers.IO) {
+                viewModel.syncDB(credential)
+                    .onSuccess {
+                        viewModel.setMaxSyncAttempt(maxAttempts.value?.minus(1) ?: 0)
+                        snackBarHostState.showSnackbar(
+                            message = synchronizedDatabase,
+                            withDismissAction = true
+                        )
+                    }
+                    .onFailure {
+                        snackBarHostState.showSnackbar(
+                            message = it.message ?: "",
+                            withDismissAction = true
+                        )
+                    }
+            }
         }
     }
 
@@ -282,7 +291,7 @@ fun NoteBackupPage(
                         .fillMaxWidth()
                         .padding(top = 16.dp)
                 ) {
-                    Text("${maxAttempts.value} $dailySynchronizedAttempts",
+                    Text("${maxAttempts.value ?: 0} $dailySynchronizedAttempts",
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -337,7 +346,7 @@ fun NoteBackupPage(
         }
     }
 
-    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
+    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { },
         modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
 
     TextDialog(
