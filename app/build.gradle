@@ -171,8 +171,6 @@ dependencies {
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics:18.3.7'
-    implementation 'com.google.firebase:firebase-appindexing:20.0.0'
-    implementation 'com.google.firebase:firebase-perf:20.3.2'
     implementation 'com.google.firebase:firebase-perf-ktx:20.3.2'
 }
 

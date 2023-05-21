@@ -25,6 +25,8 @@
     <string name="share_note_information">If you press \"copy\" or \"share as text\", the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
     <string name="backup_note_confirmation_text">Are you sure to %1$s your notes?</string>
     <string name="backup_note_information">There are four buttons, listed from left to right: \n\n"Log In" (to log in to your account), \n\n"Backup" (to backup your notes to Google Drive), \n\n"Sync" (to sync your notes with your backed up notes, if they exist), and \n\n"Logout" (to log out from your account). \n\nPlease note that you must log in first in order to use the rest of the features. \n\nThere are maximum synchronization attempts every hour (4 times) for backing up or syncing notes from Google Drive.</string>
+    <string name="success">Success</string>
+    <string name="update_success_text">The app is successfully updated, press confirm to restart</string>
 
     <!--  Button and clickable  -->
     <string name="confirm">Confirm</string>
