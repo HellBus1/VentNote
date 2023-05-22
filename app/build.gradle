@@ -34,15 +34,11 @@ android {
 
     buildTypes {
         release {
-            buildConfigField "boolean", "GDRIVE_SYNC_ENABLED", "true"
-
             minifyEnabled true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField "boolean", "GDRIVE_SYNC_ENABLED", "true"
-
             minifyEnabled false
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -60,12 +56,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.0'
-    }
-    configurations {
-        all {
-            exclude module: 'commons-logging'
-            exclude module: 'httpclient'
-        }
     }
     packagingOptions {
         resources {
@@ -107,6 +97,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 
+    implementation 'com.google.code.gson:gson:2.10.1'
+
     // Hilt
     implementation 'com.google.dagger:hilt-android:2.45'
     kapt 'com.google.dagger:hilt-android-compiler:2.45'
@@ -114,9 +106,6 @@ dependencies {
 
     // Material Icon Extension
     implementation "androidx.compose.material:material-icons-extended:1.4.3"
-
-    // GSON Json Handler
-    implementation ('com.google.http-client:google-http-client-gson:1.26.0')
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation("com.google.android.play:app-update:2.0.1")
@@ -155,11 +144,6 @@ dependencies {
 
     // For unit testing coroutines
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
-
-    // Google drive dependencies and Guava fix
-    implementation "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
-    implementation 'com.google.api-client:google-api-client-android:1.26.0'
-    implementation 'com.google.apis:google-api-services-drive:v3-rev136-1.25.0'
 
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:32.0.0')

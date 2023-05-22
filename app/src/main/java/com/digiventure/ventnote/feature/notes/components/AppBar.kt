@@ -19,7 +19,6 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.digiventure.ventnote.BuildConfig
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
@@ -38,7 +37,6 @@ fun NotesAppBar(
     closeMarkingCallback: () -> Unit,
     searchCallback: () -> Unit,
     deleteCallback: () -> Unit,
-    uploadCallback: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
@@ -151,13 +149,6 @@ fun NotesAppBar(
                 deleteCallback = {
                     deleteCallback()
                 })
-
-            if (BuildConfig.GDRIVE_SYNC_ENABLED) {
-                TopNavBarIcon(Icons.Filled.CloudUpload, stringResource(R.string.search_nav_icon),
-                    modifier = Modifier.semantics {  }) {
-                    uploadCallback()
-                }
-            }
         },
         modifier = Modifier.semantics {
             testTag = TestTags.TOP_APPBAR

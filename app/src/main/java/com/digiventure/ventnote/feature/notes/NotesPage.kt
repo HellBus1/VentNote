@@ -151,9 +151,6 @@ fun NotesPage(
                         },
                         deleteCallback = {
                             deleteDialog.value = true
-                        },
-                        uploadCallback = {
-                            navHostController.navigate(Route.NoteBackupPage.routeName)
                         }
                     )
                 },

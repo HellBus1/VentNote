@@ -2,11 +2,8 @@ package com.digiventure.ventnote
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.data.google_api.GoogleAPIService
 import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -22,10 +19,8 @@ import org.mockito.kotlin.whenever
 
 class NoteRepositoryShould: BaseUnitTest() {
     private val service: NoteLocalService = mock()
-    private val googleService: GoogleAPIService = mock()
     private val noteList = mock<List<NoteModel>>()
     private val note = mock<NoteModel>()
-    private val credential = mock<GoogleAccountCredential>()
 
     private val id = 1
 
@@ -39,7 +34,7 @@ class NoteRepositoryShould: BaseUnitTest() {
 
     @Before
     fun setup() {
-        repository = NoteRepository(service, googleService)
+        repository = NoteRepository(service)
     }
 
     /**
@@ -266,87 +261,5 @@ class NoteRepositoryShould: BaseUnitTest() {
                 flowOf(Result.failure(insertException))
             )
         }
-    }
-
-    /**
-     * Test suite for upload db
-     * */
-    @Test
-    fun uploadDBtoDriveFromService() = runTest {
-        val resultFlow = repository.uploadDBtoDrive(credential)
-
-        val collector = mock<FlowCollector<Result<Unit>>>()
-
-        // Collect the result flow
-        resultFlow.collect(collector)
-
-        // Verify the service was called once
-        verify(googleService, times(1)).uploadDBtoDrive(credential)
-    }
-
-    @Test
-    fun emitVoidAfterSuccessfulUploadDB() = runTest {
-        whenever(googleService.uploadDBtoDrive(credential)).thenReturn(Unit)
-
-        val resultFlow = repository.uploadDBtoDrive(credential)
-
-        var result: Result<Unit>? = null
-        resultFlow.collect { result = it }
-
-        assertEquals(Result.success(Unit), result)
-    }
-
-    @Test
-    fun emitExceptionMessageWhenFailToUploadDB() = runTest {
-        val exception = Exception("Upload failed")
-        whenever(googleService.uploadDBtoDrive(credential)).thenAnswer { throw exception }
-
-        val resultFlow = repository.uploadDBtoDrive(credential)
-
-        var result: Result<Unit>? = null
-        resultFlow.collect { result = it }
-
-        assertEquals(Result.failure<Unit>(exception), result)
-    }
-
-    /**
-     * Test suite for sync db
-     * */
-    @Test
-    fun syncDBtoDriveFromService() = runTest {
-        val resultFlow = repository.syncDBFromDrive(credential)
-
-        val collector = mock<FlowCollector<Result<Unit>>>()
-
-        // Collect the result flow
-        resultFlow.collect(collector)
-
-        // Verify the service was called once
-        verify(googleService, times(1)).syncDBFromDrive(credential)
-    }
-
-    @Test
-    fun emitVoidAfterSuccessfulSyncDB() = runTest {
-        whenever(googleService.syncDBFromDrive(credential)).thenReturn(Unit)
-
-        val resultFlow = repository.syncDBFromDrive(credential)
-
-        var result: Result<Unit>? = null
-        resultFlow.collect { result = it }
-
-        assertEquals(Result.success(Unit), result)
-    }
-
-    @Test
-    fun emitExceptionMessageWhenFailToSyncDB() = runTest {
-        val exception = Exception("Sync failed")
-        whenever(googleService.syncDBFromDrive(credential)).thenAnswer { throw exception }
-
-        val resultFlow = repository.syncDBFromDrive(credential)
-
-        var result: Result<Unit>? = null
-        resultFlow.collect { result = it }
-
-        assertEquals(Result.failure<Unit>(exception), result)
     }
 }
