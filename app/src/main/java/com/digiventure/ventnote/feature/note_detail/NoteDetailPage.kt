@@ -234,7 +234,7 @@ fun NoteDetailPage(
                             viewModel.titleText.value = it
                         },
                         textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        singleLine = true,
+                        singleLine = false,
                         readOnly = !isEditingState,
                         modifier = Modifier
                             .border(
@@ -244,7 +244,7 @@ fun NoteDetailPage(
                             )
                             .fillMaxWidth()
                             .semantics { contentDescription = titleTextField },
-                        placeholder = { Text(titleInput, fontSize = 18.sp) }
+                        placeholder = { Text(titleInput, fontSize = 18.sp, fontWeight = FontWeight.Medium) }
                     )
                     TextField(
                         value = viewModel.descriptionText.value,
@@ -255,12 +255,14 @@ fun NoteDetailPage(
                         singleLine = false,
                         readOnly = !isEditingState,
                         shape = RectangleShape,
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent,
-                            disabledTextColor = Color.Transparent,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()

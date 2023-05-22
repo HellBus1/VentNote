@@ -54,4 +54,7 @@
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>
     <string name="body_textField">body textField</string>
+
+    <!--  App Widget  -->
+    <string name="note_widget_description">Note widget</string>
 </resources>

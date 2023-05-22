@@ -118,8 +118,8 @@ dependencies {
     // Coil Load Image Url
     implementation("io.coil-kt:coil-compose:2.3.0")
 
-    // Datastore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    // Glance for widget
+    implementation "androidx.glance:glance-appwidget:1.0.0-alpha05"
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)
