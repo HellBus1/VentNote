@@ -9,10 +9,13 @@ interface NoteDAO {
     fun getNotes(): Flow<List<NoteModel>>
 
     @Query("SELECT * FROM note_table")
-    fun getNoteDetail(): List<NoteModel>
+    fun getPlainNotes(): List<NoteModel>
 
     @Query("SELECT * FROM note_table WHERE id = :id")
     fun getNoteDetail(id: Int): Flow<NoteModel>
+
+    @Query("SELECT * FROM note_table WHERE id = :id")
+    fun getPlainNoteDetail(id: Int): NoteModel
 
     @Update
     fun updateNote(vararg notes: NoteModel): Int
