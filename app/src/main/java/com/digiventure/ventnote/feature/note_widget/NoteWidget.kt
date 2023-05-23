@@ -32,6 +32,7 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.wrapContentHeight
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.digiventure.ventnote.R
@@ -93,59 +94,51 @@ class NoteWidget : GlanceAppWidget() {
                         color = ColorProvider(Purple40)
                     ),
                     modifier = GlanceModifier
-                        .cornerRadius(8.dp)
                         .clickable(actionRunCallback<RefreshNoteListCallback>()),
                 )
             }
 
-            if (noteList.isEmpty()) {
-                Column(modifier = GlanceModifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = LocalContext.current.getString(R.string.empty_notes))
-                }
-            } else {
-                LazyColumn(modifier = GlanceModifier.wrapContentHeight().fillMaxSize()) {
-                    items(noteList) {
-                        Box(modifier = GlanceModifier.padding(top = 16.dp).fillMaxWidth()) {
-                            Row(modifier = GlanceModifier.fillMaxWidth()) {
-                                Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-                                    Row(
-                                        modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            it.title,
-                                            style = TextStyle(
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 14.sp,
-                                            ),
-                                            modifier = GlanceModifier.defaultWeight()
-                                        )
-                                        Text(text = LocalContext.current.getString(R.string.detail),
-                                            style = TextStyle(
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 14.sp,
-                                                color = ColorProvider(Purple40)
-                                            ),
-                                            modifier = GlanceModifier.clickable(
-                                                actionRunCallback<NoteListItemCallback>(actionParametersOf(
-                                                    key1 to false,
-                                                    key2 to it.id
-                                                ))
-                                            )
-                                        )
-                                    }
-                                    Text(text = it.note,
-                                        maxLines = 2,
+            LazyColumn(modifier = GlanceModifier.wrapContentHeight().fillMaxSize()) {
+                items(noteList) {
+                    Box(modifier = GlanceModifier.padding(top = 16.dp).fillMaxWidth()) {
+                        Row(modifier = GlanceModifier.fillMaxWidth()) {
+                            Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
+                                Row(
+                                    modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        it.title,
                                         style = TextStyle(
-                                            fontWeight = FontWeight.Normal,
-                                            fontSize = 12.sp
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 14.sp,
+                                            color = ColorProvider(Color.Black)
                                         ),
-                                        modifier = GlanceModifier.padding(top = 2.dp)
+                                        modifier = GlanceModifier.defaultWeight()
+                                    )
+                                    Text(text = LocalContext.current.getString(R.string.detail),
+                                        style = TextStyle(
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 14.sp,
+                                            color = ColorProvider(Purple40)
+                                        ),
+                                        modifier = GlanceModifier.clickable(
+                                            actionRunCallback<NoteListItemCallback>(actionParametersOf(
+                                                key1 to false,
+                                                key2 to it.id
+                                            ))
+                                        )
                                     )
                                 }
+                                Text(text = it.note,
+                                    maxLines = 2,
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 12.sp,
+                                        color = ColorProvider(Color.Black)
+                                    ),
+                                    modifier = GlanceModifier.padding(top = 2.dp)
+                                )
                             }
                         }
                     }
@@ -162,7 +155,7 @@ class NoteWidget : GlanceAppWidget() {
     ) {
         Column(modifier = GlanceModifier.fillMaxSize()) {
             Row(
-                modifier = GlanceModifier.fillMaxWidth().padding(bottom = 24.dp),
+                modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(modifier = GlanceModifier.defaultWeight()) {}
@@ -173,7 +166,6 @@ class NoteWidget : GlanceAppWidget() {
                         fontSize = 16.sp, color = ColorProvider(Purple40)
                     ),
                     modifier = GlanceModifier
-                        .cornerRadius(8.dp)
                         .clickable(actionRunCallback<NoteListItemCallback>(actionParametersOf(
                             key1 to true,
                             key2 to -1
@@ -181,19 +173,29 @@ class NoteWidget : GlanceAppWidget() {
                 )
             }
 
-            Column {
-                Text(note.title,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp
-                    )
-                )
-                Text(note.note,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp
-                    )
-                )
+            LazyColumn(modifier = GlanceModifier.defaultWeight().fillMaxSize()) {
+                items(2) {
+                    if (it == 0) {
+                        Text(note.title,
+                            style = TextStyle(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = ColorProvider(Color.Black)
+                            ),
+                            modifier = GlanceModifier.padding(top = 8.dp)
+                        )
+                    } else {
+                        Text(note.note,
+                            style = TextStyle(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 14.sp,
+                                color = ColorProvider(Color.Black),
+                                textAlign = TextAlign.Start
+                            ),
+                            modifier = GlanceModifier.padding(top = 8.dp)
+                        )
+                    }
+                }
             }
         }
     }
