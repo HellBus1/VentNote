@@ -15,10 +15,6 @@ android {
     namespace 'com.digiventure.ventnote'
     compileSdk 33
 
-    lint {
-        baseline = file("lint-baseline.xml")
-    }
-
     defaultConfig {
         applicationId "com.digiventure.ventnote"
         minSdk 21
