@@ -36,6 +36,9 @@
     <string name="add">Add</string>
     <string name="share_note">Share Note</string>
     <string name="share_note_as_text">Share Note as Text</string>
+    <string name="back">Back</string>
+    <string name="refresh">Refresh</string>
+    <string name="detail">Detail</string>
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>
@@ -44,6 +47,7 @@
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
+    <string name="empty_notes">Notes are empty</string>
 
     <!--  Nav Drawer Tile  -->
     <string name="rate_app">Rate App</string>
@@ -54,4 +58,7 @@
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>
     <string name="body_textField">body textField</string>
+
+    <!--  App Widget  -->
+    <string name="note_widget_description">Note widget</string>
 </resources>

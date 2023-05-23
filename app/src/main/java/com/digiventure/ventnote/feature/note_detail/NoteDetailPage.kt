@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.note_detail
 
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.view.ViewTreeObserver
 import androidx.activity.compose.BackHandler
@@ -33,6 +34,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.note_detail.components.NoteDetailAppBar
@@ -53,6 +55,8 @@ fun NoteDetailPage(
     viewModel: NoteDetailPageBaseVM = hiltViewModel<NoteDetailPageVM>(),
     id: String
 ) {
+    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     // String resource
     val titleTextField = "${stringResource(R.string.title_textField)}-$TAG"
     val bodyTextField = "${stringResource(R.string.body_textField)}-$TAG"
@@ -234,7 +238,7 @@ fun NoteDetailPage(
                             viewModel.titleText.value = it
                         },
                         textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        singleLine = true,
+                        singleLine = false,
                         readOnly = !isEditingState,
                         modifier = Modifier
                             .border(
@@ -244,7 +248,7 @@ fun NoteDetailPage(
                             )
                             .fillMaxWidth()
                             .semantics { contentDescription = titleTextField },
-                        placeholder = { Text(titleInput, fontSize = 18.sp) }
+                        placeholder = { Text(titleInput, fontSize = 18.sp, fontWeight = FontWeight.Medium) }
                     )
                     TextField(
                         value = viewModel.descriptionText.value,
@@ -255,12 +259,14 @@ fun NoteDetailPage(
                         singleLine = false,
                         readOnly = !isEditingState,
                         shape = RectangleShape,
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent,
-                            disabledTextColor = Color.Transparent,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
