@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.note_creation
 
+import android.content.pm.ActivityInfo
 import android.view.ViewTreeObserver
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -47,6 +48,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.note_creation.components.NoteCreationAppBar
@@ -64,6 +66,8 @@ fun NoteCreationPage(
     navHostController: NavHostController,
     viewModel: NoteCreationPageBaseVM = hiltViewModel<NoteCreationPageVM>()
 ) {
+    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     // String resource
     val titleTextField = "${stringResource(R.string.title_textField)}-${TAG}"
     val bodyTextField = "${stringResource(R.string.body_textField)}-${TAG}"

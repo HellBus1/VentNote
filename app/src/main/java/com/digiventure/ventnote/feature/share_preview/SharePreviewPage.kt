@@ -2,6 +2,7 @@ package com.digiventure.ventnote.feature.share_preview
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.bottomSheet.RegularBottomSheet
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
@@ -53,6 +55,8 @@ fun SharePreviewPage(
     navHostController: NavHostController,
     note: NoteModel?
 ) {
+    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     val appBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val rememberedScrollBehavior = remember { scrollBehavior }
