@@ -36,5 +36,11 @@ jobs:
         distribution: 'adopt'
         cache: gradle
 
+    - name: Clean project
+      run: ./gradlew clean --stacktrace
+
+    - name: Lint Debug
+      run: ./gradlew lintDebug --stacktrace
+
     - name: Build debug APK
       run: ./gradlew build --stacktrace
