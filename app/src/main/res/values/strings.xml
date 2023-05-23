@@ -47,7 +47,6 @@
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
-    <string name="empty_notes">Notes are empty</string>
 
     <!--  Nav Drawer Tile  -->
     <string name="rate_app">Rate App</string>
