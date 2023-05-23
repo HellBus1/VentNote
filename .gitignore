@@ -1,5 +1,6 @@
 *.iml
 .gradle
+.idea
 /local.properties
 /.idea
 /.idea/compiler.xml
@@ -12,10 +13,15 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+/release
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+/schemas
+# For firebase connection
 google-services.json
-client_secret_507380588261-ntghd6ugqk1v2fg7c9tf2dp891e6nvqc.apps.googleusercontent.com.json
+# For google drive api connection
+client_secret.json
 /app/release
+lint-baseline.xml
