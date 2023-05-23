@@ -38,7 +38,7 @@ class NoteRepositoryShould: BaseUnitTest() {
     }
 
     /**
-     * Test suite for get noteDetail  from service
+     * Test suite for get noteDetail
      * */
     @Test
     fun getNoteDetailFromService() = runTest {
@@ -84,7 +84,7 @@ class NoteRepositoryShould: BaseUnitTest() {
     }
 
     /**
-     * Test suite for get notelist from service
+     * Test suite for get noteList
      * */
     @Test
     fun getNoteListFromService() = runTest {
@@ -130,7 +130,7 @@ class NoteRepositoryShould: BaseUnitTest() {
     }
 
     /**
-     * Test suite for delete notelist from service
+     * Test suite for delete noteList
      * */
     @Test
     fun deleteNoteListFromService() = runTest {
@@ -176,7 +176,7 @@ class NoteRepositoryShould: BaseUnitTest() {
     }
 
     /**
-     * Test suite for update notelist from service
+     * Test suite for update noteList
      * */
     @Test
     fun updateNoteListFromService() = runTest {
@@ -222,7 +222,7 @@ class NoteRepositoryShould: BaseUnitTest() {
     }
 
     /**
-     * Test suite for insert note from service
+     * Test suite for insert note
      * */
     @Test
     fun insertNoteFromService() = runTest {

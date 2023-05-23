@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
@@ -38,13 +41,13 @@ import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
-const val TAG : String = "NotesPage"
-
 @Composable
 fun NotesPage(
     navHostController: NavHostController,
     viewModel: NotesPageBaseVM = hiltViewModel<NotesPageVM>()
 ) {
+    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     val noteListState = viewModel.noteList.observeAsState()
     val loadingState = viewModel.loader.observeAsState()
 
@@ -81,7 +84,7 @@ fun NotesPage(
         loadingDialog.value = (loadingState.value == true)
     }
 
-    val deletedMessage = stringResource(id = R.string.note_successfully_deleted)
+    val deletedMessage = stringResource(id = R.string.note_is_successfully_deleted)
 
     fun deleteNoteList() {
         scope.launch {
@@ -157,7 +160,7 @@ fun NotesPage(
                 },
                 snackbarHost = { SnackbarHost(snackBarHostState) },
                 floatingActionButton = {
-                    FloatingActionButton(
+                    ExtendedFloatingActionButton(
                         onClick = {
                             viewModel.isMarking.value = false
                             viewModel.markedNoteList.clear()
@@ -165,11 +168,17 @@ fun NotesPage(
                         },
                         modifier = Modifier.semantics {
                             testTag = TestTags.ADD_NOTE_FAB
-                        }) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.fab),)
-                    }
+                        },
+                        text = {
+                            Text(stringResource(R.string.add), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.fab)
+                            )
+                        }
+                    )
                 },
                 content = { contentPadding ->
                     Box(modifier = Modifier.padding(contentPadding)) {

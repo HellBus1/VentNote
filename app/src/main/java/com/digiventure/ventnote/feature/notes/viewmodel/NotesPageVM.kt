@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesPageVM @Inject constructor(
-    private val repository: NoteRepository
+    private val repository: NoteRepository,
 ): ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
 

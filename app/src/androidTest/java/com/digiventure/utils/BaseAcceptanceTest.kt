@@ -6,7 +6,7 @@ import org.junit.Rule
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-abstract class BaseAcceptanceTest() {
+abstract class BaseAcceptanceTest {
     @get:Rule(order = 0)
     val composeTestRule = createComposeRule()
 }

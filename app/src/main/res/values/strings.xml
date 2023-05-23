@@ -21,12 +21,24 @@
     <string name="required_confirmation_text">%1$s is required</string>
     <string name="cancel_title">Are you sure</string>
     <string name="cancel_confirmation_text">The text change will not be saved</string>
+    <string name="information">Information</string>
+    <string name="share_note_information">If you press \"copy\" or \"share as text\", the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
+    <string name="success">Success</string>
+    <string name="update_success_text">The app is successfully updated, press confirm to restart</string>
 
     <!--  Button and clickable  -->
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
     <string name="select_all">Select All</string>
     <string name="unselect_all">Unselect All</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="add">Add</string>
+    <string name="share_note">Share Note</string>
+    <string name="share_note_as_text">Share Note as Text</string>
+    <string name="back">Back</string>
+    <string name="refresh">Refresh</string>
+    <string name="detail">Detail</string>
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>
@@ -35,14 +47,18 @@
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
+    <string name="empty_notes">Notes are empty</string>
 
     <!--  Nav Drawer Tile  -->
     <string name="rate_app">Rate App</string>
 
     <!--  SnackBar alert message  -->
-    <string name="note_successfully_deleted">Note successfully deleted</string>
+    <string name="note_is_successfully_deleted">Note is successfully deleted</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>
     <string name="body_textField">body textField</string>
+
+    <!--  App Widget  -->
+    <string name="note_widget_description">Note widget</string>
 </resources>
