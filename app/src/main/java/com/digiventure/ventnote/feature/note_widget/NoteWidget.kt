@@ -64,7 +64,6 @@ class NoteWidget : GlanceAppWidget() {
         Box(modifier = GlanceModifier
             .fillMaxSize()
             .padding(16.dp)
-            .cornerRadius(8.dp)
             .background(Color.White)) {
 
             if (!isDetailShowingValue && noteIdValue == -1) {
