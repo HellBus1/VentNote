@@ -15,14 +15,6 @@ android {
     namespace 'com.digiventure.ventnote'
     compileSdk 33
 
-    lint {
-        baseline = file("lint-baseline.xml")
-    }
-
-    lintOptions {
-        disable 'GradleDependency', 'UnusedResources'
-    }
-
     defaultConfig {
         applicationId "com.digiventure.ventnote"
         minSdk 21
@@ -128,6 +120,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.3.0")
 
     // Glance for widget
+    // noinspection GradleDependency
     implementation "androidx.glance:glance-appwidget:1.0.0-alpha05"
 
     // Instrumented test
