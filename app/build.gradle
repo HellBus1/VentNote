@@ -122,9 +122,6 @@ dependencies {
     // Accompanist - Status Bar
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
 
-    // Datastore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-
     // Instrumented test
     /// Espresso (for ui interaction purpose)
     androidTestImplementation 'androidx.test:runner:1.5.2'
