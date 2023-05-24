@@ -52,4 +52,14 @@ interface NotesPageBaseVM {
      * @param notes is vararg of note
      * */
     suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean>
+
+    /**
+     * Close marking event
+     * */
+    fun closeMarkingEvent()
+
+    /**
+     * Close search event
+     * */
+    fun closeSearchEvent()
 }

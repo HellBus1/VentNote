@@ -146,16 +146,17 @@ fun NotesPage(
                             viewModel.searchedTitleText.value = it
                         },
                         closeMarkingCallback = {
-                            // Close marking state and clear marked notes
-                            viewModel.isMarking.value = false
-                            viewModel.markedNoteList.clear()
+                            viewModel.closeMarkingEvent()
                         },
                         searchCallback = {
-                            viewModel.isSearching.value = !viewModel.isSearching.value
+                            viewModel.isSearching.value = true
                             viewModel.searchedTitleText.value = ""
                         },
                         deleteCallback = {
                             deleteDialog.value = true
+                        },
+                        closeSearchCallback = {
+                            viewModel.closeSearchEvent()
                         }
                     )
                 },
@@ -163,8 +164,9 @@ fun NotesPage(
                 floatingActionButton = {
                     ExtendedFloatingActionButton(
                         onClick = {
-                            viewModel.isMarking.value = false
-                            viewModel.markedNoteList.clear()
+                            viewModel.closeMarkingEvent()
+                            viewModel.closeSearchEvent()
+
                             navHostController.navigate(Route.NoteCreationPage.routeName)
                         },
                         modifier = Modifier.semantics {
@@ -205,6 +207,9 @@ fun NotesPage(
                                             if (viewModel.isMarking.value) {
                                                 viewModel.addToMarkedNoteList(it)
                                             } else {
+                                                viewModel.closeMarkingEvent()
+                                                viewModel.closeSearchEvent()
+
                                                 navHostController.navigate("${Route.NoteDetailPage.routeName}/${it.id}")
                                             }
                                         },

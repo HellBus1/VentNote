@@ -38,6 +38,7 @@ fun NotesAppBar(
     unSelectAllCallback: () -> Unit,
     onSearchValueChange: (String) -> Unit,
     closeMarkingCallback: () -> Unit,
+    closeSearchCallback: () -> Unit,
     searchCallback: () -> Unit,
     deleteCallback: () -> Unit,
 ) {
@@ -63,7 +64,7 @@ fun NotesAppBar(
                     )
                     Icon(Icons.Default.ArrowDropDown,
                         contentDescription = stringResource(R.string.dropdown_nav_icon),
-                        tint = MaterialTheme.colorScheme.onPrimary)
+                        tint = MaterialTheme.colorScheme.primary)
                 }
 
                 DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false },
@@ -71,7 +72,8 @@ fun NotesAppBar(
                     DropdownMenuItem(
                         text = { Text(
                             text = stringResource(R.string.select_all),
-                            fontSize = 16.sp)
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface)
                         },
                         onClick = {
                             selectAllCallback()
@@ -83,7 +85,8 @@ fun NotesAppBar(
                     DropdownMenuItem(
                         text =  { Text(
                             text = stringResource(R.string.unselect_all),
-                            fontSize = 16.sp)
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface)
                         },
                         onClick = {
                             unSelectAllCallback()
@@ -159,7 +162,11 @@ fun NotesAppBar(
                 },
                 deleteCallback = {
                     deleteCallback()
-                })
+                },
+                closeSearchCallback = {
+                    closeSearchCallback()
+                }
+            )
         },
         modifier = Modifier.semantics {
             testTag = TestTags.TOP_APPBAR
@@ -184,12 +191,19 @@ fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDraw
 }
 
 @Composable
-fun TrailingMenuIcons(isMarking: Boolean, markedItemsCount: Int, isSearching: Boolean, searchCallback: () -> Unit, deleteCallback: () -> Unit) {
+fun TrailingMenuIcons(
+    isMarking: Boolean,
+    markedItemsCount: Int,
+    isSearching: Boolean,
+    searchCallback: () -> Unit,
+    deleteCallback: () -> Unit,
+    closeSearchCallback: () -> Unit
+) {
     if (isMarking) {
         TopNavBarIcon(Icons.Filled.Delete, stringResource(R.string.delete_nav_icon),
             tint = if (markedItemsCount > 0)
-                MaterialTheme.colorScheme.onPrimary else
-                MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                MaterialTheme.colorScheme.primary else
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
             modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }
         ) {
             if (markedItemsCount > 0) deleteCallback()
@@ -197,7 +211,7 @@ fun TrailingMenuIcons(isMarking: Boolean, markedItemsCount: Int, isSearching: Bo
     } else if (isSearching) {
         TopNavBarIcon(Icons.Filled.Close, stringResource(R.string.delete_nav_icon),
             modifier = Modifier.semantics { testTag = TestTags.CLOSE_SEARCH_ICON_BUTTON }) {
-            searchCallback()
+            closeSearchCallback()
         }
     } else {
         TopNavBarIcon(Icons.Filled.Search, stringResource(R.string.search_nav_icon),
