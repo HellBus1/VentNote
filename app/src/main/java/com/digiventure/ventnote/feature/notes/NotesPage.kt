@@ -2,10 +2,12 @@ package com.digiventure.ventnote.feature.notes
 
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -13,7 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -110,7 +112,6 @@ fun NotesPage(
     }
 
     NavDrawer(
-        navHostController = navHostController,
         drawerState = drawerState,
         onError = {
             scope.launch {
@@ -145,16 +146,17 @@ fun NotesPage(
                             viewModel.searchedTitleText.value = it
                         },
                         closeMarkingCallback = {
-                            // Close marking state and clear marked notes
-                            viewModel.isMarking.value = false
-                            viewModel.markedNoteList.clear()
+                            viewModel.closeMarkingEvent()
                         },
                         searchCallback = {
-                            viewModel.isSearching.value = !viewModel.isSearching.value
+                            viewModel.isSearching.value = true
                             viewModel.searchedTitleText.value = ""
                         },
                         deleteCallback = {
                             deleteDialog.value = true
+                        },
+                        closeSearchCallback = {
+                            viewModel.closeSearchEvent()
                         }
                     )
                 },
@@ -162,8 +164,9 @@ fun NotesPage(
                 floatingActionButton = {
                     ExtendedFloatingActionButton(
                         onClick = {
-                            viewModel.isMarking.value = false
-                            viewModel.markedNoteList.clear()
+                            viewModel.closeMarkingEvent()
+                            viewModel.closeSearchEvent()
+
                             navHostController.navigate(Route.NoteCreationPage.routeName)
                         },
                         modifier = Modifier.semantics {
@@ -177,7 +180,9 @@ fun NotesPage(
                                 imageVector = Icons.Filled.Add,
                                 contentDescription = stringResource(R.string.fab)
                             )
-                        }
+                        },
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 content = { contentPadding ->
@@ -186,34 +191,39 @@ fun NotesPage(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .semantics { testTag = TestTags.NOTE_RV },
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
                             contentPadding = PaddingValues(
                                 top = 24.dp,
                                 bottom = 96.dp
                             )
                         ) {
                             items(items = filteredNoteListState.value) {
-                                NotesItem(
-                                    isMarking = viewModel.isMarking.value,
-                                    isMarked = it in viewModel.markedNoteList,
-                                    data = it,
-                                    onClick = {
-                                        if (viewModel.isMarking.value) {
+                                Box(Modifier.padding(start = 16.dp, end = 16.dp)) {
+                                    NotesItem(
+                                        isMarking = viewModel.isMarking.value,
+                                        isMarked = it in viewModel.markedNoteList,
+                                        data = it,
+                                        onClick = {
+                                            if (viewModel.isMarking.value) {
+                                                viewModel.addToMarkedNoteList(it)
+                                            } else {
+                                                viewModel.closeMarkingEvent()
+                                                viewModel.closeSearchEvent()
+
+                                                navHostController.navigate("${Route.NoteDetailPage.routeName}/${it.id}")
+                                            }
+                                        },
+                                        onLongClick = {
+                                            if (!viewModel.isMarking.value) {
+                                                viewModel.isMarking.value = true
+                                            }
                                             viewModel.addToMarkedNoteList(it)
-                                        } else {
-                                            navHostController.navigate("${Route.NoteDetailPage.routeName}/${it.id}")
+                                        },
+                                        onCheckClick = {
+                                            viewModel.addToMarkedNoteList(it)
                                         }
-                                    },
-                                    onLongClick = {
-                                        if (!viewModel.isMarking.value) {
-                                            viewModel.isMarking.value = true
-                                        }
-                                        viewModel.addToMarkedNoteList(it)
-                                    },
-                                    onCheckClick = {
-                                        viewModel.addToMarkedNoteList(it)
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }
@@ -242,48 +252,53 @@ fun NotesItem(
     onLongClick: () -> Unit,
     onCheckClick: () -> Unit)
 {
-    Box(modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .semantics { contentDescription = "Note item ${data.id}" }) {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(4.dp),
-            modifier = Modifier.combinedClickable(
-                onClick = { onClick() },
+    val shape = RoundedCornerShape(12.dp)
+
+    Box(
+        modifier = Modifier
+            .semantics { contentDescription = "Note item ${data.id}" }
+            .combinedClickable(
+                onClick = { if (isMarking) onCheckClick() else onClick()  },
                 onLongClick = { onLongClick() }
             )
-        ) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.primary)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()
+            .padding(start = if(isMarked) 8.dp else 0.dp)
+            .background(MaterialTheme.colorScheme.surface)) {
+
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.Start
             ) {
-                if (isMarking) {
-                    Checkbox(checked = isMarked, onCheckedChange = { onCheckClick() },
-                        modifier = Modifier.semantics { testTag = data.title })
-                }
-                
-                Column(modifier = Modifier.weight(2f)) {
-                    ItemText(text = data.title)
-                }
-                Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
-                    ItemText(text = DateUtil.convertDateString("EEE, MMM d", data.createdAt.toString()))
-                    ItemText(text = DateUtil.convertDateString("h:mm a", data.createdAt.toString()))
-                }
+                Text(
+                    text = data.title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = data.note,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 1.dp)
+                )
+                Text(
+                    text = DateUtil.convertDateString("EEEE, MMMM d h:mm a", data.createdAt.toString()),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
             }
         }
     }
-}
-
-@Composable
-fun ItemText(text: String, color: Color = Color.Black) {
-    Text(
-        text = text,
-        fontSize = 16.sp,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        color = color
-    )
 }
 
 @Preview

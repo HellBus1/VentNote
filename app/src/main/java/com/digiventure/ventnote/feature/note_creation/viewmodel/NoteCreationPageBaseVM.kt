@@ -11,7 +11,7 @@ interface NoteCreationPageBaseVM {
     val loader: MutableLiveData<Boolean>
 
     /**
-     * State for handling title & description textfield
+     * State for handling title & description TextField
      * */
     val titleText: MutableState<String>
     val descriptionText: MutableState<String>

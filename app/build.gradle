@@ -19,8 +19,8 @@ android {
         applicationId "com.digiventure.ventnote"
         minSdk 21
         targetSdk 33
-        versionCode 7
-        versionName "1.0.4"
+        versionCode 8
+        versionName "1.0.5"
 
         testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
         vectorDrawables {
@@ -119,9 +119,8 @@ dependencies {
     // Coil Load Image Url
     implementation("io.coil-kt:coil-compose:2.3.0")
 
-    // Glance for widget
-    // noinspection GradleDependency
-    implementation "androidx.glance:glance-appwidget:1.0.0-alpha05"
+    // Accompanist - Status Bar
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)

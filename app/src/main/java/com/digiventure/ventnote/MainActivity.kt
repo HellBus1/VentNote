@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
         appUpdateInfoTask.addOnSuccessListener {
             when (it.updateAvailability()) {
                 UpdateAvailability.UPDATE_AVAILABLE -> {
-                    val updateTypes = arrayOf(AppUpdateType.FLEXIBLE, AppUpdateType.IMMEDIATE)
+                    val updateTypes = arrayOf(AppUpdateType.FLEXIBLE, IMMEDIATE)
                     for (type in updateTypes) {
                         if (it.isUpdateTypeAllowed(type)) {
                             appUpdateManager.startUpdateFlowForResult(it, type, this, REQUEST_UPDATE_CODE)

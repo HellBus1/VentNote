@@ -16,7 +16,7 @@ interface NoteDetailPageBaseVM {
     var noteDetail: MutableLiveData<Result<NoteModel>>
 
     /**
-     * State for handling title & description textfield
+     * State for handling title & description TextField
      * */
     var titleText: MutableState<String>
     var descriptionText: MutableState<String>
@@ -28,7 +28,7 @@ interface NoteDetailPageBaseVM {
 
     /**
      * retrieve responsible note by it's id
-     * @param id is a note id passed from notelist,
+     * @param id is a note id passed from NoteList,
      * */
     suspend fun getNoteDetail(id: Int)
 
@@ -39,7 +39,7 @@ interface NoteDetailPageBaseVM {
     suspend fun updateNoteList(vararg notes: NoteModel): Result<Boolean>
 
     /**
-     * delete notelist
+     * delete NoteList
      * @param notes is a list of note
      */
     suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean>

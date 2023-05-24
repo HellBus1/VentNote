@@ -7,12 +7,15 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,13 +38,17 @@ fun NoteDetailAppBar(
     TopAppBar(
         title = {
             Text(
-                text = if(isEditing) "$descriptionTextLength" else "Note Detail",
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(start = 8.dp),
+                text = if(isEditing) "$descriptionTextLength" else stringResource(id = R.string.note_detail),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 4.dp),
+                style = TextStyle(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp
+                )
             )
         },
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
+        colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         navigationIcon = {
             if (isEditing) {
@@ -55,7 +62,7 @@ fun NoteDetailAppBar(
             }
         },
         actions = {
-            TopNavBarIcon(Icons.Filled.Share, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
+            TopNavBarIcon(Icons.Filled.Share, stringResource(R.string.share_nav_icon), Modifier.semantics {  }) {
                 onSharePressed()
             }
             TopNavBarIcon(Icons.Filled.MoreVert, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
