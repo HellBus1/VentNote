@@ -2,15 +2,21 @@
   <img src="assets/banner.png" width="100%"/>
 </div>
 
+<br />
+
 ## VentNote
 VentNote — Taking notes like a breeze.   
-Note management app built with jetpack compose
+Note management app built with jetpack compose and newest modern android architecture guide
+
+<br />
+
 <p>
   <img src="assets/screen_one.png" width="200"/>
   <img src="assets/screen_two.png" width="200"/>
   <img src="assets/screen_three.png" width="200"/>
   <img src="assets/screen_four.png" width="200"/>
   <img src="assets/screen_five.png" width="200"/>
+  <img src="assets/screen_six.png" width="200"/>
 </p>
 
 <br />
@@ -20,6 +26,11 @@ Note management app built with jetpack compose
 - [v] Create and Edit Notes
 - [v] Search and Find Notes
 - [v] Delete Notes
+- [v] Share Notes
+- [v] Dark Mode Theme
+- [v] In App Update
+- [-] Widget (Waiting for stable version)
+- [-] Google Drive Backup (Soon)
 
 <br />
 
@@ -59,9 +70,9 @@ GitHub provides a comprehensive contribution guide for public repositories, whic
 <br />
 
 ## 📑 Documentation
-I am working hard to write documentation in the form of an article series, which will soon be available on my Medium page. You can check it out here: https://medium.com/@syubbanfakhriya.
+You can access the technical documentation here [documentation page](https://futuristic-gateway-d0a.notion.site/Technical-Documentation-84352179b256469b8970acf91b6cb9a0). If you're interested in learning more about the journey and how to build this app, I invite you to regularly visit [my medium](https://medium.com/@syubbanfakhriya).
 
-<!-- ### Donating
-<a href="https://www.buymeacoffee.com/xeroKun"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=xeroKun&button_colour=6650a4&font_colour=FFFFFF&font_family=Lato&outline_colour=000000&coffee_colour=ffffff" /></a>
+<br />
 
-Each donation is greatly appreciated, thanks in advance! -->
+## 📑 Contact
+Please feel free to reach out to me via email, Twitter, or LinkedIn if you have anything to discuss. And if you like this project, don't forget to leave a clap to my medium or star to show your support.
