@@ -13,7 +13,7 @@ fun TopNavBarIcon(
     image: ImageVector,
     description: String,
     modifier: Modifier,
-    tint: Color = MaterialTheme.colorScheme.onPrimary,
+    tint: Color = MaterialTheme.colorScheme.primary,
     onClick: () -> Unit,
 ) {
     IconButton(onClick = { onClick() }, modifier = modifier) {

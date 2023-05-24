@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.digiventure.ventnote.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,8 +38,14 @@ fun LoadingDialog(
                                 .padding(end = 16.dp)
                                 .size(24.dp),
                             strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                        Text(text = "Loading", fontSize = 16.sp, fontWeight = FontWeight.Normal)
+                        Text(
+                            text = stringResource(id = R.string.loading),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

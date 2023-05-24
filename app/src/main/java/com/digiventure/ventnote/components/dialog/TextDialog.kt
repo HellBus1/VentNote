@@ -2,6 +2,7 @@ package com.digiventure.ventnote.components.dialog
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,10 +29,19 @@ fun TextDialog(
         AlertDialog(
             onDismissRequest = { onDismissCallback() },
             title = {
-                Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             },
             text = {
-                Text(text = description, fontSize = 16.sp)
+                Text(
+                    text = description,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             },
             confirmButton = {
                 if (onConfirmCallback != null) {
@@ -40,7 +50,11 @@ fun TextDialog(
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.semantics { testTag = TestTags.CONFIRM_BUTTON }
                     ) {
-                        Text(stringResource(R.string.confirm), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = stringResource(R.string.confirm),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             },
@@ -50,7 +64,11 @@ fun TextDialog(
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.semantics { testTag = TestTags.DISMISS_BUTTON }
                 ) {
-                    Text(stringResource(R.string.dismiss), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = stringResource(R.string.dismiss),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             },
             shape = RoundedCornerShape(8.dp),

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -26,9 +27,9 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -64,8 +65,6 @@ fun SharePreviewPage(
     val shareNoteDialogState = remember { mutableStateOf(false) }
 
     val snackBarHostState = remember { SnackbarHostState() }
-
-    val scope = rememberCoroutineScope()
 
     val date = DateUtil.convertDateString("EEE, MMM dd HH:mm yyyy",
         note?.createdAt?.toString() ?: Date().toString()
@@ -110,9 +109,14 @@ fun SharePreviewPage(
                         imageVector = Icons.Filled.Share,
                         contentDescription = stringResource(R.string.fab)
                     )
-                }
+                },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             )
-        }
+        },
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         Box(modifier = Modifier.padding(it)) {
             Column(
@@ -126,15 +130,21 @@ fun SharePreviewPage(
                     date,
                     fontWeight = FontWeight.Light,
                     fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 5.dp)
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    modifier = Modifier.padding(bottom = 10.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(text, fontSize = 18.sp)
+                Text(
+                    text,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
         }
     }
@@ -158,6 +168,7 @@ fun SharePreviewPage(
             Text(stringResource(R.string.share_note_as_text),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.clickable {
                     openBottomSheet.value = false
                     shareText(joinedText, context)

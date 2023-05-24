@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,6 +17,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,7 +61,9 @@ fun NotesAppBar(
                         size = 16.sp,
                         modifier = Modifier.padding(start = 8.dp)
                     )
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.dropdown_nav_icon), tint = MaterialTheme.colorScheme.onPrimary)
+                    Icon(Icons.Default.ArrowDropDown,
+                        contentDescription = stringResource(R.string.dropdown_nav_icon),
+                        tint = MaterialTheme.colorScheme.onPrimary)
                 }
 
                 DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false },
@@ -93,21 +98,23 @@ fun NotesAppBar(
                     onValueChange = {
                         onSearchValueChange(it)
                     },
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
                     ),
                     textStyle = LocalTextStyle.current.copy(
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = MaterialTheme.colorScheme.primary,
                         fontSize = 16.sp,
                         lineHeight = 0.sp
                     ),
                     singleLine = true,
                     modifier = Modifier
                         .padding(bottom = 0.dp)
-                        .semantics { testTag = TestTags.TOP_APPBAR_TEXTFIELD },
+                        .semantics { testTag = TestTags.TOP_APPBAR_TEXT_FIELD },
                     placeholder = {
                         NavText(
                             text = stringResource(R.string.search_textField),
@@ -118,15 +125,19 @@ fun NotesAppBar(
             } else {
                 Text(
                     text = stringResource(id = R.string.title),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp
+                    ),
                     modifier = Modifier
-                        .padding(start = 8.dp)
+                        .padding(start = 4.dp)
                         .semantics { testTag = TestTags.TOP_APPBAR_TITLE },
                 )
             }
         },
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
+        colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         navigationIcon = {
             LeadingIcon(
@@ -176,7 +187,9 @@ fun LeadingIcon(isMarking: Boolean, closeMarkingCallback: () -> Unit, toggleDraw
 fun TrailingMenuIcons(isMarking: Boolean, markedItemsCount: Int, isSearching: Boolean, searchCallback: () -> Unit, deleteCallback: () -> Unit) {
     if (isMarking) {
         TopNavBarIcon(Icons.Filled.Delete, stringResource(R.string.delete_nav_icon),
-            tint = if (markedItemsCount > 0) MaterialTheme.colorScheme.onPrimary else Color.Gray,
+            tint = if (markedItemsCount > 0)
+                MaterialTheme.colorScheme.onPrimary else
+                MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
             modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }
         ) {
             if (markedItemsCount > 0) deleteCallback()
@@ -199,7 +212,7 @@ fun NavText(text: String, size: TextUnit, modifier: Modifier) {
     Text(
         text = text,
         fontSize = size,
-        color = MaterialTheme.colorScheme.onPrimary,
+        color = MaterialTheme.colorScheme.primary,
         modifier = modifier
     )
 }

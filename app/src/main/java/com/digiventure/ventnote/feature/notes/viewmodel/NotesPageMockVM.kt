@@ -11,7 +11,16 @@ import com.digiventure.ventnote.data.local.NoteModel
 class NotesPageMockVM: ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
 
-    override val noteList: LiveData<Result<List<NoteModel>>> = liveData {}
+    override val noteList: LiveData<Result<List<NoteModel>>> = liveData {
+        Result.success(
+            listOf(
+                NoteModel("", ""),
+                NoteModel("", ""),
+                NoteModel("", ""),
+                NoteModel("", ""),
+            )
+        )
+    }
 
     override val isSearching = mutableStateOf(false)
     override val searchedTitleText = mutableStateOf("")
