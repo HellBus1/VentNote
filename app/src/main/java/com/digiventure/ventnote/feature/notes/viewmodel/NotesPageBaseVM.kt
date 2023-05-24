@@ -13,13 +13,13 @@ interface NotesPageBaseVM {
     val loader: MutableLiveData<Boolean>
 
     /**
-     *
+     * Handle NoteList state
      * */
     val noteList: LiveData<Result<List<NoteModel>>>
 
     /**
      * 1. Toggle search field
-     * 2. Searchfield value
+     * 2. SearchField value
      */
     val isSearching: MutableState<Boolean>
     val searchedTitleText: MutableState<String>
@@ -38,12 +38,12 @@ interface NotesPageBaseVM {
     fun markAllNote(notes: List<NoteModel>)
 
     /**
-     * Unmark all note
+     * Un-mark all note
      * */
     fun unMarkAllNote()
 
     /**
-     * Mark or unmark a note
+     * Mark or Un-mark a note
      * */
     fun addToMarkedNoteList(note: NoteModel)
 
@@ -52,4 +52,14 @@ interface NotesPageBaseVM {
      * @param notes is vararg of note
      * */
     suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean>
+
+    /**
+     * Close marking event
+     * */
+    fun closeMarkingEvent()
+
+    /**
+     * Close search event
+     * */
+    fun closeSearchEvent()
 }

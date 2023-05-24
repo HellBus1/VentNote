@@ -2,7 +2,6 @@ package com.digiventure.ventnote.feature.note_creation
 
 import android.content.pm.ActivityInfo
 import android.view.ViewTreeObserver
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -55,7 +54,6 @@ import com.digiventure.ventnote.feature.note_creation.components.NoteCreationApp
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageBaseVM
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageMockVM
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageVM
-import com.digiventure.ventnote.ui.theme.PurpleGrey80
 import kotlinx.coroutines.launch
 
 const val TAG : String = "NoteCreationPage"
@@ -159,7 +157,9 @@ fun NoteCreationPage(
                         imageVector = Icons.Filled.Check,
                         contentDescription = stringResource(R.string.fab)
                     )
-                }
+                },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             )
         },
         content = { contentPadding ->
@@ -171,36 +171,55 @@ fun NoteCreationPage(
                         .verticalScroll(rememberScrollState())
                         .padding(bottom = keyboardHeight.value)
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         value = viewModel.titleText.value,
                         onValueChange = {
                             viewModel.titleText.value = it
                         },
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                        textStyle = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
                         singleLine = false,
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                        ),
                         modifier = Modifier
-                            .border(
-                                width = 3.dp,
-                                color = PurpleGrey80,
-                                shape = RectangleShape
-                            )
                             .fillMaxWidth()
                             .semantics { contentDescription = titleTextField },
-                        placeholder = { Text(titleInput, fontSize = 18.sp, fontWeight = FontWeight.Medium) }
+                        placeholder = {
+                            Text(
+                                text = titleInput,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     )
                     TextField(
                         value = viewModel.descriptionText.value,
                         onValueChange = {
                             viewModel.descriptionText.value = it
                         },
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal),
+                        textStyle = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
                         singleLine = false,
                         shape = RectangleShape,
                         colors = TextFieldDefaults.colors(
-                            disabledTextColor = Color.Transparent,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
+                            disabledTextColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent,
@@ -209,14 +228,21 @@ fun NoteCreationPage(
                             .fillMaxWidth()
                             .fillMaxSize()
                             .semantics { contentDescription = bodyTextField },
-                        placeholder = { Text(bodyInput, fontSize = 18.sp) }
+                        placeholder = {
+                            Text(
+                                text = bodyInput,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     )
                 }
             }
         },
         modifier = Modifier
             .semantics { testTag = TestTags.NOTE_CREATION_PAGE }
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface
     )
 
     val missingFieldName = if (viewModel.titleText.value.isEmpty()) {

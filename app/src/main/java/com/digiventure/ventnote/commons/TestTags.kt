@@ -15,7 +15,7 @@ object TestTags {
     const val CLOSE_SELECT_ICON_BUTTON = "close_select_icon_button"
     const val MENU_ICON_BUTTON = "menu_icon_button"
     const val TOP_APPBAR_TITLE = "top_appbar_title"
-    const val TOP_APPBAR_TEXTFIELD = "top_appbar_textfield"
+    const val TOP_APPBAR_TEXT_FIELD = "top_appbar_text_field"
     const val SELECTED_COUNT = "selected_count"
     const val DROPDOWN_SELECT = "dropdown_select"
     const val SELECT_ALL_OPTION = "select_all_option"

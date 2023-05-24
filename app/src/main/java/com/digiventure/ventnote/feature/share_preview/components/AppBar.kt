@@ -9,7 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 
@@ -23,13 +26,17 @@ fun SharePreviewAppBar(
     TopAppBar(
         title = {
             Text(
-                text = "Share Preview",
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(id = R.string.share_preview),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 4.dp),
+                style = TextStyle(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp
+                )
             )
         },
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         navigationIcon = {
             TopNavBarIcon(Icons.Filled.ArrowBack, stringResource(R.string.back_nav_icon), Modifier.semantics {  }) {

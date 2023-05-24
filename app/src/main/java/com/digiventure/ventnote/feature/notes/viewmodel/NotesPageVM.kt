@@ -58,7 +58,8 @@ class NotesPageVM @Inject constructor(
         }
     }
 
-    override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = withContext(Dispatchers.IO) {
+    override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> =
+        withContext(Dispatchers.IO) {
         loader.postValue(true)
         try {
             val items: List<NoteModel> = if (notes.isEmpty()) { markedNoteList } else { notes.toList() }
@@ -69,6 +70,16 @@ class NotesPageVM @Inject constructor(
             loader.postValue(false)
             Result.failure(e)
         }
+    }
+
+    override fun closeMarkingEvent() {
+        isMarking.value = false
+        markedNoteList.clear()
+    }
+
+    override fun closeSearchEvent() {
+        isSearching.value = false
+        searchedTitleText.value = ""
     }
 }
 

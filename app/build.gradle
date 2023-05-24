@@ -119,6 +119,9 @@ dependencies {
     // Coil Load Image Url
     implementation("io.coil-kt:coil-compose:2.3.0")
 
+    // Accompanist - Status Bar
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
+
     // Instrumented test
     /// Espresso (for ui interaction purpose)
     androidTestImplementation 'androidx.test:runner:1.5.2'
