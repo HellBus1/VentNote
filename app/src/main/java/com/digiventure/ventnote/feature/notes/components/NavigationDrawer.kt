@@ -158,7 +158,7 @@ fun NavDrawerItem(
     Row(modifier = Modifier
         .fillMaxWidth()
         .clickable { onClick() }
-        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp, top = 8.dp)
+        .padding(start = 16.dp, end = 16.dp, bottom = 12.dp, top = 8.dp)
         .semantics { testTag = testTagName },
         verticalAlignment = Alignment.CenterVertically
     ) {
