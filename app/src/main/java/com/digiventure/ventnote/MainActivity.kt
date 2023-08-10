@@ -109,21 +109,23 @@ class MainActivity : ComponentActivity() {
         super.onResume()
 
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-                    showDialogForCompleteUpdate()
-                }
-            } else {
-                if (appUpdateInfo.updateAvailability() ==
-                    UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
-                ) {
-                    // If an in-app update is already running, resume the update.
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        IMMEDIATE,
-                        this,
-                        REQUEST_UPDATE_CODE
-                    )
+            if (appUpdateInfo != null) { // Check if appUpdateInfo is not null
+                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                    if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                        showDialogForCompleteUpdate()
+                    }
+                } else {
+                    if (appUpdateInfo.updateAvailability() ==
+                        UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+                    ) {
+                        // If an in-app update is already running, resume the update.
+                        appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            IMMEDIATE,
+                            this,
+                            REQUEST_UPDATE_CODE
+                        )
+                    }
                 }
             }
         }
