@@ -81,7 +81,7 @@ fun NotesAppBar(
                         },
                         modifier = Modifier.semantics { testTag = TestTags.SELECT_ALL_OPTION }
                     )
-                    Divider()
+                    HorizontalDivider()
                     DropdownMenuItem(
                         text =  { Text(
                             text = stringResource(R.string.unselect_all),
