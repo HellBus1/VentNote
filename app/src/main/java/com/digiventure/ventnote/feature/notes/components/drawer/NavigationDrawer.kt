@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.feature.notes.components
+package com.digiventure.ventnote.feature.notes.components.drawer
 
 import android.content.Intent
 import android.net.Uri
