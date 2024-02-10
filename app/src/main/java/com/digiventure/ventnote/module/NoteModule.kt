@@ -27,6 +27,6 @@ class NoteModule {
                 context,
                 NoteDatabase::class.java,
                 "note_database"
-            ).fallbackToDestructiveMigration().build()
+            ).build()
         }
 }

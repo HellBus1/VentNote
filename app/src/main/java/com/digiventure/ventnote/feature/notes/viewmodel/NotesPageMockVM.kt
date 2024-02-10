@@ -36,7 +36,13 @@ class NotesPageMockVM: ViewModel(), NotesPageBaseVM {
 
     override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = Result.success(true)
 
-    override fun closeMarkingEvent() {}
+    override fun closeMarkingEvent() {
+        isMarking.value = false
+        markedNoteList.clear()
+    }
 
-    override fun closeSearchEvent() {}
+    override fun closeSearchEvent() {
+        isSearching.value = false
+        searchedTitleText.value = ""
+    }
 }

@@ -166,22 +166,22 @@ class NoteLocalServiceShould: BaseUnitTest() {
     fun updateNoteFromDAO() = runTest {
         service.updateNoteList(note).first()
 
-        verify(dao, times(1)).updateNote(note)
+        verify(dao, times(1)).updateWithTimestamp(note)
     }
 
     @Test
     fun emitsFlowOfBooleanThatUpdatedCountSameAsRequestedCount() = runTest {
-        runBlocking { whenever(dao.updateNote(note)).thenReturn(1) }
+        runBlocking { whenever(dao.updateWithTimestamp(note)).thenReturn(1) }
         assertEquals(Result.success(true), service.updateNoteList(note).first())
 
-        runBlocking { whenever(dao.updateNote(note)).thenReturn(0) }
+        runBlocking { whenever(dao.updateWithTimestamp(note)).thenReturn(0) }
         assertEquals(Result.success(false), service.updateNoteList(note).first())
     }
 
     @Test
     fun emitsErrorWhenUpdateFails() = runTest {
         runBlocking {
-            whenever(dao.updateNote(note)).thenThrow(updateException)
+            whenever(dao.updateWithTimestamp(note)).thenThrow(updateException)
         }
 
         assertEquals(
@@ -197,21 +197,21 @@ class NoteLocalServiceShould: BaseUnitTest() {
     fun insertNoteFromDAO() = runTest {
         service.insertNote(note).first()
 
-        verify(dao, times(1)).insertNote(note)
+        verify(dao, times(1)).insertWithTimestamp(note)
     }
 
     @Test
     fun emitsFlowOfBooleanThatReturnedIdIsNegativeOrNot() = runTest {
-        runBlocking { whenever(dao.insertNote(note)).thenReturn(1) }
+        runBlocking { whenever(dao.insertWithTimestamp(note)).thenReturn(1) }
         assertEquals(Result.success(true), service.insertNote(note).first())
 
-        runBlocking { whenever(dao.insertNote(note)).thenReturn(-1) }
+        runBlocking { whenever(dao.insertWithTimestamp(note)).thenReturn(-1) }
         assertEquals(Result.success(false), service.insertNote(note).first())
     }
 
     @Test
     fun emitsErrorWhenInsertionFails() = runTest {
-        runBlocking { whenever(dao.insertNote(note)).thenThrow(insertException) }
+        runBlocking { whenever(dao.insertWithTimestamp(note)).thenThrow(insertException) }
 
         assertEquals(
             insertException.message,

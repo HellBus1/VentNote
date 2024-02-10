@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.data.local
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -31,9 +32,9 @@ class NoteLocalService @Inject constructor(
             emit(Result.failure(RuntimeException("Failed to get note detail")))
         }
 
-    suspend fun updateNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
+    suspend fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
         flow {
-            val result = (dao.updateNote(*notes) == notes.size)
+            val result = dao.updateWithTimestamp(note) >= 1
             emit(Result.success(result))
         }.catch {
             emit(Result.failure(RuntimeException("Failed to update list of notes")))
@@ -41,9 +42,10 @@ class NoteLocalService @Inject constructor(
 
     suspend fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
         flow {
-            val result = dao.insertNote(note) != -1L
+            val result = dao.insertWithTimestamp(note) != -1L
             emit(Result.success(result))
         }.catch {
+            Log.e("error", it.message.toString())
             emit(Result.failure(RuntimeException("Failed to insert list of notes")))
         }
 }

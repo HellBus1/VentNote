@@ -1,7 +1,13 @@
 package com.digiventure.ventnote.data.local
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface NoteDAO {
@@ -18,11 +24,24 @@ interface NoteDAO {
     fun getPlainNoteDetail(id: Int): NoteModel
 
     @Update
-    fun updateNote(vararg notes: NoteModel): Int
+    fun updateNote(note: NoteModel): Int
+
+    fun updateWithTimestamp(note: NoteModel): Int {
+        return updateNote(note.apply{
+            updatedAt = Date(System.currentTimeMillis())
+        })
+    }
 
     @Delete
     fun deleteNotes(vararg notes: NoteModel): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertNote(note: NoteModel): Long
+
+    fun insertWithTimestamp(note: NoteModel): Long {
+        return insertNote(note.apply{
+            createdAt = Date(System.currentTimeMillis())
+            updatedAt = Date(System.currentTimeMillis())
+        })
+    }
 }

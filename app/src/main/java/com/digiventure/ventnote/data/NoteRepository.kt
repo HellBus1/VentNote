@@ -36,8 +36,8 @@ class NoteRepository @Inject constructor(
             }
         }
 
-    suspend fun updateNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
-        service.updateNoteList(*notes).map {
+    suspend fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
+        service.updateNoteList(note).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: false)
             } else {
