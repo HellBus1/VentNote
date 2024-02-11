@@ -1,14 +1,34 @@
 package com.digiventure.ventnote.feature.notes
 
 import android.content.pm.ActivityInfo
-import androidx.compose.foundation.layout.*
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -27,14 +47,16 @@ import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
 import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
-import com.digiventure.ventnote.feature.notes.components.navbar.NotesAppBar
 import com.digiventure.ventnote.feature.notes.components.item.NotesItem
+import com.digiventure.ventnote.feature.notes.components.navbar.NotesAppBar
+import com.digiventure.ventnote.feature.notes.components.sheets.FilterSheet
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageMockVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesPage(
     navHostController: NavHostController,
@@ -52,6 +74,12 @@ fun NotesPage(
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
     val loadingDialog = remember { mutableStateOf(false) }
     val deleteDialog = remember { mutableStateOf(false) }
+
+    val openBottomSheet = rememberSaveable { mutableStateOf(false) }
+    val skipPartiallyExpanded = remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded.value
+    )
 
     LaunchedEffect(key1 = noteListState.value) {
         // Showing error snackBar on error
@@ -144,13 +172,14 @@ fun NotesPage(
                             viewModel.isSearching.value = true
                             viewModel.searchedTitleText.value = ""
                         },
-                        moreCallback = {
-
+                        sortCallback = {
+                            openBottomSheet.value = true
                         },
                         deleteCallback = {
                             deleteDialog.value = true
                         },
                         closeSearchCallback = {
+                            Log.d("pressed", "close pressed")
                             viewModel.closeSearchEvent()
                         }
                     )
@@ -235,6 +264,11 @@ fun NotesPage(
         onDismissCallback = { deleteDialog.value = false },
         onConfirmCallback = { deleteNoteList() },
         modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
+
+
+    FilterSheet(openBottomSheet, bottomSheetState, onDismiss = { openBottomSheet.value = false } ) {
+        sortBy, orderBy ->
+    }
 }
 
 @Preview

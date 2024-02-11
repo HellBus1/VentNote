@@ -12,7 +12,7 @@ object TestTags {
     const val DELETE_ICON_BUTTON = "delete_icon_button"
     const val CLOSE_SEARCH_ICON_BUTTON = "close_search_icon_button"
     const val SEARCH_ICON_BUTTON = "search_icon_button"
-    const val MORE_ICON_BUTTON = "more_icon_button"
+    const val SORT_ICON_BUTTON = "sort_icon_button"
     const val CLOSE_SELECT_ICON_BUTTON = "close_select_icon_button"
     const val MENU_ICON_BUTTON = "menu_icon_button"
     const val TOP_APPBAR_TITLE = "top_appbar_title"
