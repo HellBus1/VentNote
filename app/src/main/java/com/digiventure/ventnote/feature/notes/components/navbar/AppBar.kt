@@ -4,8 +4,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +54,7 @@ fun NotesAppBar(
     closeMarkingCallback: () -> Unit,
     closeSearchCallback: () -> Unit,
     searchCallback: () -> Unit,
-    moreCallback: () -> Unit,
+    sortCallback: () -> Unit,
     deleteCallback: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -107,7 +121,7 @@ fun NotesAppBar(
                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
                     unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
                 ),
-                textStyle = LocalTextStyle.current.copy(
+                textStyle = TextStyle(
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 16.sp,
                     lineHeight = 0.sp
@@ -147,8 +161,8 @@ fun NotesAppBar(
                 searchCallback()
                 focusManager.clearFocus()
             },
-            moreCallback = {
-                moreCallback()
+            sortCallback = {
+                sortCallback()
             },
             deleteCallback = {
                 deleteCallback()
@@ -186,14 +200,15 @@ fun TrailingMenuIcons(
     markedItemsCount: Int,
     isSearching: Boolean,
     searchCallback: () -> Unit,
-    moreCallback: () -> Unit,
+    sortCallback: () -> Unit,
     deleteCallback: () -> Unit,
     closeSearchCallback: () -> Unit
 ) {
     if (isMarking) {
         TopNavBarIcon(Icons.Filled.Delete,
             stringResource(R.string.delete_nav_icon),
-            tint = if (markedItemsCount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
+            tint = if (markedItemsCount > 0) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.primary.copy(
                 alpha = 0.6f
             ),
             modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }) {
@@ -212,10 +227,10 @@ fun TrailingMenuIcons(
             searchCallback()
         }
 
-        TopNavBarIcon(image = Icons.Filled.MoreVert,
-            stringResource(R.string.more_nav_icon),
-            modifier = Modifier.semantics { testTag = TestTags.MORE_ICON_BUTTON }) {
-            moreCallback()
+        TopNavBarIcon(image = Icons.AutoMirrored.Filled.Sort,
+            stringResource(R.string.sort_nav_icon),
+            modifier = Modifier.semantics { testTag = TestTags.SORT_ICON_BUTTON }) {
+            sortCallback()
         }
     }
 }
