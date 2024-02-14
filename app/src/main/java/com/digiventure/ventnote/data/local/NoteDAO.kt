@@ -11,11 +11,14 @@ import java.util.Date
 
 @Dao
 interface NoteDAO {
-    @Query("SELECT * FROM note_table")
-    fun getNotes(): Flow<List<NoteModel>>
-
-    @Query("SELECT * FROM note_table")
-    fun getPlainNotes(): List<NoteModel>
+    @Query("SELECT * FROM note_table ORDER BY " +
+            "        CASE WHEN :sortBy = 'title' AND :orderBy = 'ASC' THEN title END ASC, " +
+            "        CASE WHEN :sortBy = 'title' AND :orderBy = 'DESC' THEN title END DESC, " +
+            "        CASE WHEN :sortBy = 'created_at' AND :orderBy = 'ASC' THEN created_at END ASC, " +
+            "        CASE WHEN :sortBy = 'created_at' AND :orderBy = 'DESC' THEN created_at END DESC, " +
+            "        CASE WHEN :sortBy = 'updated_at' AND :orderBy = 'ASC' THEN updated_at END ASC," +
+            "        CASE WHEN :sortBy = 'updated_at' AND :orderBy = 'DESC' THEN updated_at END DESC")
+    fun getNotes(sortBy: String, orderBy: String): Flow<List<NoteModel>>
 
     @Query("SELECT * FROM note_table WHERE id = :id")
     fun getNoteDetail(id: Int): Flow<NoteModel>

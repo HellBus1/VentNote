@@ -9,8 +9,8 @@ import javax.inject.Inject
 class NoteRepository @Inject constructor(
     private val service: NoteLocalService
 ) {
-    suspend fun getNoteList(): Flow<Result<List<NoteModel>>> =
-        service.getNoteList().map {
+    suspend fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> =
+        service.getNoteList(sortBy, order).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: listOf())
             } else {

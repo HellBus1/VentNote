@@ -8,8 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.local.NoteModel
 
-class NotesPageMockVM: ViewModel(), NotesPageBaseVM {
+class NotesPageMockVM(
+) : ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
+    override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData()
+
+    override fun sortAndOrder(sortBy: String, orderBy: String) {
+
+    }
 
     override val noteList: LiveData<Result<List<NoteModel>>> = liveData {
         Result.success(

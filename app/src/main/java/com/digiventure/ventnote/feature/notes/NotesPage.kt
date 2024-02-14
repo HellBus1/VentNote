@@ -267,7 +267,7 @@ fun NotesPage(
 
 
     FilterSheet(openBottomSheet, bottomSheetState, onDismiss = { openBottomSheet.value = false } ) {
-        sortBy, orderBy ->
+        sortBy, orderBy -> viewModel.sortAndOrder(sortBy, orderBy)
     }
 }
 

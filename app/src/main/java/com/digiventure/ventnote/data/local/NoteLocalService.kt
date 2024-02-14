@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.data.local
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -10,12 +9,13 @@ import javax.inject.Inject
 class NoteLocalService @Inject constructor(
     private val dao: NoteDAO
 ) {
-    suspend fun getNoteList(): Flow<Result<List<NoteModel>>> =
-        dao.getNotes().map {
+    suspend fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> {
+        return dao.getNotes(sortBy, order).map {
             Result.success(it)
         }.catch {
             emit(Result.failure(RuntimeException("Failed to get list of notes")))
         }
+    }
 
     suspend fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
         flow {
@@ -45,7 +45,6 @@ class NoteLocalService @Inject constructor(
             val result = dao.insertWithTimestamp(note) != -1L
             emit(Result.success(result))
         }.catch {
-            Log.e("error", it.message.toString())
             emit(Result.failure(RuntimeException("Failed to insert list of notes")))
         }
 }

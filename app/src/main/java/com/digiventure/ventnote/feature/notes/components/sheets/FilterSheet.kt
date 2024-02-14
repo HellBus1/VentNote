@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.components.bottomSheet.RegularBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,22 +43,38 @@ fun FilterSheet(
     onDismiss: () -> Unit,
     onFilter: (sortBy: String, orderBy: String) -> Unit
 ) {
-    val sortByOptions = listOf(
-        stringResource(id = R.string.sort_created_date),
-        stringResource(id = R.string.sort_title),
-        stringResource(id = R.string.sort_modified_date)
-    )
+    val createdDate = stringResource(id = R.string.sort_created_date)
+    val title = stringResource(id = R.string.sort_title)
+    val modifiedDate = stringResource(id = R.string.sort_modified_date)
+    val sortByOptions = listOf(title, createdDate, modifiedDate)
 
-    val orderByOptions = listOf(
-        stringResource(id = R.string.order_ascending),
-        stringResource(id = R.string.order_descending)
-    )
+    val ascending = stringResource(id = R.string.order_ascending)
+    val descending = stringResource(id = R.string.order_descending)
+    val orderByOptions = listOf(ascending, descending)
 
-    val createdDateString = stringResource(id = R.string.sort_created_date)
-    val selectedSortBy = remember { mutableStateOf(createdDateString) }
+    val selectedSortBy = remember { mutableStateOf(createdDate) }
+    val selectedOrderBy = remember { mutableStateOf(descending) }
 
-    val descendingDateString = stringResource(id = R.string.order_descending)
-    val selectedOrderBy = remember { mutableStateOf(descendingDateString) }
+    fun convertSortBy(sortBy: String): String {
+        return when (sortBy) {
+            title -> Constants.TITLE
+            createdDate -> Constants.CREATED_AT
+            modifiedDate -> Constants.UPDATED_AT
+            else -> {
+                Constants.CREATED_AT
+            }
+        }
+    }
+
+    fun convertOrderBy(orderBy: String): String {
+        return when(orderBy) {
+            ascending -> Constants.ASCENDING
+            descending -> Constants.DESCENDING
+            else -> {
+                Constants.DESCENDING
+            }
+        }
+    }
 
     RegularBottomSheet(
         isOpened = openBottomSheet.value,
@@ -97,7 +114,13 @@ fun FilterSheet(
                     Text(text = stringResource(id = R.string.dismiss))
                 }
                 Button(
-                    onClick = { onFilter(selectedSortBy.value, selectedOrderBy.value) },
+                    onClick = {
+                        onFilter(
+                            convertSortBy(selectedSortBy.value),
+                            convertOrderBy(selectedOrderBy.value)
+                        )
+                        onDismiss()
+                    },
                     shape = RoundedCornerShape(20),
                     modifier = Modifier.weight(1f)
                 ) {

@@ -1,6 +1,7 @@
 package com.digiventure.ventnote
 
 import com.digiventure.utils.BaseUnitTest
+import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.data.local.NoteDAO
 import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
@@ -20,6 +21,8 @@ class NoteLocalServiceShould: BaseUnitTest() {
     private val dao: NoteDAO = mock()
     private val noteList = mock<List<NoteModel>>()
     private val note = mock<NoteModel>()
+    private val sortBy = Constants.CREATED_AT
+    private val orderBy = Constants.DESCENDING
 
     private val id = 1
 
@@ -89,16 +92,16 @@ class NoteLocalServiceShould: BaseUnitTest() {
     fun getNoteListFromDAO() = runTest {
         stubSuccessfulGetListNoteCase()
 
-        service.getNoteList().first()
+        service.getNoteList(sortBy, orderBy).first()
 
-        verify(dao, times(1)).getNotes()
+        verify(dao, times(1)).getNotes(sortBy, orderBy)
     }
 
     @Test
     fun emitsFlowOfNoteListAndEmitsThem() = runTest {
         stubSuccessfulGetListNoteCase()
 
-        assertEquals(Result.success(noteList), service.getNoteList().first())
+        assertEquals(Result.success(noteList), service.getNoteList(sortBy, orderBy).first())
     }
 
     @Test
@@ -106,7 +109,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
         stubErrorGetListNoteCase()
 
         try {
-            service.getNoteList().first()
+            service.getNoteList(sortBy, orderBy).first()
         } catch (e: RuntimeException) {
             assertEquals(listException.message, e.message)
         }
@@ -114,7 +117,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     private fun stubSuccessfulGetListNoteCase() {
         runBlocking {
-            whenever(dao.getNotes()).thenReturn(
+            whenever(dao.getNotes(sortBy, orderBy)).thenReturn(
                 flow {
                     emit(noteList)
                 }
@@ -124,7 +127,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     private fun stubErrorGetListNoteCase() {
         runBlocking {
-            whenever(dao.getNotes()).thenThrow(listException)
+            whenever(dao.getNotes(sortBy, orderBy)).thenThrow(listException)
         }
     }
 

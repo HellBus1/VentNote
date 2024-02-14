@@ -13,6 +13,16 @@ interface NotesPageBaseVM {
     val loader: MutableLiveData<Boolean>
 
     /**
+     * Handle sorting and order data
+     * */
+    val sortAndOrderData: MutableLiveData<Pair<String, String>>
+
+    /**
+     *  Handle sorting and order
+     * */
+    fun sortAndOrder(sortBy: String, orderBy: String)
+
+    /**
      * Handle NoteList state
      * */
     val noteList: LiveData<Result<List<NoteModel>>>

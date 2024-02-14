@@ -1,6 +1,7 @@
 package com.digiventure.ventnote
 
 import com.digiventure.utils.BaseUnitTest
+import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteLocalService
 import com.digiventure.ventnote.data.local.NoteModel
@@ -21,6 +22,8 @@ class NoteRepositoryShould: BaseUnitTest() {
     private val service: NoteLocalService = mock()
     private val noteList = mock<List<NoteModel>>()
     private val note = mock<NoteModel>()
+    private val sortBy = Constants.CREATED_AT
+    private val orderBy = Constants.DESCENDING
 
     private val id = 1
 
@@ -90,28 +93,28 @@ class NoteRepositoryShould: BaseUnitTest() {
     fun getNoteListFromService() = runTest {
         mockSuccessfulGetNoteListCase()
 
-        repository.getNoteList()
+        repository.getNoteList(sortBy, orderBy)
 
-        verify(service, times(1)).getNoteList()
+        verify(service, times(1)).getNoteList(sortBy, orderBy)
     }
 
     @Test
     fun emitsFlowOfNoteListFromService() = runTest {
         mockSuccessfulGetNoteListCase()
 
-        assertEquals(Result.success(noteList), repository.getNoteList().first())
+        assertEquals(Result.success(noteList), repository.getNoteList(sortBy, orderBy).first())
     }
 
     @Test
     fun propagateWhenGetNoteListError() = runTest {
         mockFailureGetNoteListCase()
 
-        assertEquals(exception, repository.getNoteList().first().exceptionOrNull())
+        assertEquals(exception, repository.getNoteList(sortBy, orderBy).first().exceptionOrNull())
     }
 
     private fun mockSuccessfulGetNoteListCase() {
         runBlocking {
-            whenever(service.getNoteList()).thenReturn(
+            whenever(service.getNoteList(sortBy, orderBy)).thenReturn(
                 flow {
                     emit(Result.success(noteList))
                 }
@@ -121,7 +124,7 @@ class NoteRepositoryShould: BaseUnitTest() {
 
     private fun mockFailureGetNoteListCase() {
         runBlocking {
-            whenever(service.getNoteList()).thenReturn(
+            whenever(service.getNoteList(sortBy, orderBy)).thenReturn(
                 flow {
                     emit(Result.failure(exception))
                 }
