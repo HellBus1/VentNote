@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -22,8 +23,11 @@ import org.mockito.kotlin.whenever
 
 class NotesPageVMShould: BaseUnitTest() {
     private val repository: NoteRepository = mock()
-    private val notes = mock<List<NoteModel>>()
-    private val note = mock<NoteModel>()
+    private val notes = listOf(
+        NoteModel(1, "title1", "description1"),
+        NoteModel(2, "title2", "description2")
+    )
+    private val note = NoteModel(1, "title1", "description1")
     private val sortBy = Constants.CREATED_AT
     private val orderBy = Constants.DESCENDING
 
@@ -41,23 +45,16 @@ class NotesPageVMShould: BaseUnitTest() {
     }
 
     @Test
-    fun sortAndOrderWithSortByTitleAndOrderByAscending() = runTest {
+    fun setSortAndOrderDataWithPairOfTitleAndDescending() = runTest {
         val sortBy = Constants.TITLE
         val orderBy = Constants.ASCENDING
 
-        runBlocking {
-            whenever(repository.getNoteList(sortBy, orderBy)).thenReturn(
-                flow {
-                    emit(expected)
-                }
-            )
-        }
-
         viewModel.sortAndOrder(sortBy, orderBy)
 
-//        verify(repository, times(1)).getNoteList(sortBy, orderBy)
         assertEquals(viewModel.sortAndOrderData.value, Pair(sortBy, orderBy))
     }
+
+    // TODO: Add test for when sortAndOrderData is change, the list is refetching
 
     @Test
     fun getNotesFromRepository() = runTest {
@@ -78,6 +75,13 @@ class NotesPageVMShould: BaseUnitTest() {
     @Test
     fun emitsErrorWhenReceiveError() = runTest {
         mockErrorCase()
+
+        assertEquals(exception, viewModel.noteList.getValueForTest()?.exceptionOrNull())
+    }
+
+    @Test
+    fun emitErrorWhenGetNoteListIsThrowingError() = runTest {
+        whenever(repository.getNoteList(sortBy, orderBy)).thenThrow(exception)
 
         assertEquals(exception, viewModel.noteList.getValueForTest()?.exceptionOrNull())
     }
@@ -177,6 +181,15 @@ class NotesPageVMShould: BaseUnitTest() {
     }
 
     @Test
+    fun emitErrorWhenDeletionIsThrowingError() = runTest {
+        whenever(repository.deleteNoteList(note)).thenThrow(exceptionDeletion)
+
+        val result = viewModel.deleteNoteList(note)
+
+        assertEquals(Result.failure<Boolean>(exceptionDeletion), result)
+    }
+
+    @Test
     fun showLoaderWhileDeletingNote() = runTest {
         mockSuccessfulDeletionCase()
 
@@ -242,6 +255,24 @@ class NotesPageVMShould: BaseUnitTest() {
         viewModel.unMarkAllNote()
 
         assertTrue(viewModel.markedNoteList.isEmpty())
+    }
+
+    @Test
+    fun verifyCloseMarkingEventIsSetIsMarkingToFalseAndClearMarkedNoteList() {
+        viewModel.markedNoteList.addAll(listOf(note, note, note))
+
+        viewModel.closeMarkingEvent()
+
+        assertFalse(viewModel.isMarking.value)
+        assertEquals(viewModel.markedNoteList.size, 0)
+    }
+
+    @Test
+    fun verifyCloseSearchEventIsSetIsSearchingToFalseAndEmptiedSearchedTitleText() {
+        viewModel.closeSearchEvent()
+
+        assertFalse(viewModel.isSearching.value)
+        assertEquals(viewModel.searchedTitleText.value, "")
     }
 
     private fun mockSuccessfulDeletionCase() {
