@@ -62,11 +62,10 @@ class NoteLocalServiceShould: BaseUnitTest() {
     fun emitsErrorResultWhenGetDetailsFails() = runTest {
         stubErrorGetDetailCase()
 
-        try {
-            dao.getNoteDetail(id).first()
-        } catch (e: RuntimeException) {
-            assertEquals(detailException.message, e.message)
-        }
+        val actualResult = service.getNoteDetail(id).first()
+        val actualException = actualResult.exceptionOrNull()
+
+        assertEquals(detailException.message, actualException?.message)
     }
 
     private fun stubSuccessfulGetDetailCase() {
@@ -81,7 +80,11 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     private fun stubErrorGetDetailCase() {
         runBlocking {
-            whenever(dao.getNoteDetail(id)).thenThrow(detailException)
+            whenever(dao.getNoteDetail(id)).thenReturn(
+                flow {
+                    throw detailException
+                }
+            )
         }
     }
 
@@ -108,11 +111,10 @@ class NoteLocalServiceShould: BaseUnitTest() {
     fun emitsErrorResultWhenGetNoteListFails() = runTest {
         stubErrorGetListNoteCase()
 
-        try {
-            service.getNoteList(sortBy, orderBy).first()
-        } catch (e: RuntimeException) {
-            assertEquals(listException.message, e.message)
-        }
+        val actualResult = service.getNoteList(sortBy, orderBy).first()
+        val actualException = actualResult.exceptionOrNull()
+
+        assertEquals(listException.message, actualException?.message)
     }
 
     private fun stubSuccessfulGetListNoteCase() {
@@ -127,7 +129,11 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     private fun stubErrorGetListNoteCase() {
         runBlocking {
-            whenever(dao.getNotes(sortBy, orderBy)).thenThrow(listException)
+            whenever(dao.getNotes(sortBy, orderBy)).thenReturn(
+                flow {
+                    throw listException
+                }
+            )
         }
     }
 

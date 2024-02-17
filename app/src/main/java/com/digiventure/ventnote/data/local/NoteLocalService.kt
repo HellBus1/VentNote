@@ -25,12 +25,13 @@ class NoteLocalService @Inject constructor(
             emit(Result.failure(RuntimeException("Failed to delete list of notes")))
         }
 
-    suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> =
-        dao.getNoteDetail(id).map {
+    suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> {
+        return dao.getNoteDetail(id).map {
             Result.success(it)
         }.catch {
             emit(Result.failure(RuntimeException("Failed to get note detail")))
         }
+    }
 
     suspend fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
         flow {

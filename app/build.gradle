@@ -107,7 +107,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     // Hilt
-    implementation 'com.google.dagger:hilt-android:2.48'
+    implementation 'com.google.dagger:hilt-android:2.50'
     kapt 'com.google.dagger:hilt-android-compiler:2.45'
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
 
@@ -120,13 +120,13 @@ dependencies {
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     // Google Play API
-    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 
     // Coil Load Image Url
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     // Accompanist - Status Bar
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.34.0"
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)
@@ -140,12 +140,12 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.1"
 
     /// Hilt test (for handling service locator when test)
-    androidTestImplementation "com.google.dagger:hilt-android-testing:2.44"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.50"
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.45"
 
     // For mocking purposes & make it visible in instrumented test
     testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
-    testImplementation 'org.mockito:mockito-inline:5.1.1'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
 
     androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
 
