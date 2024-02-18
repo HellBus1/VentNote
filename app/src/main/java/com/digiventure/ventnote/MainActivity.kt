@@ -3,7 +3,8 @@ package com.digiventure.ventnote
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
@@ -39,10 +40,12 @@ class MainActivity : ComponentActivity() {
         addUpdateStatusListener()
         checkUpdate()
 
+        enableEdgeToEdge()
+
         setContent {
             VentNoteTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.safeDrawingPadding(),
                     color = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.secondary
                 ) {

@@ -13,8 +13,8 @@ data class NoteModel(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "note") val note: String,
-    @ColumnInfo(name = "created_at") val createdAt: Date = Date(System.currentTimeMillis()),
-    @ColumnInfo(name = "updated_at") val updatedAt: Date = Date(System.currentTimeMillis()),
+    @ColumnInfo(name = "created_at") var createdAt: Date = Date(System.currentTimeMillis()),
+    @ColumnInfo(name = "updated_at") var updatedAt: Date = Date(System.currentTimeMillis()),
 ): Parcelable {
     constructor(title: String, note: String) : this(0, title, note)
 }

@@ -1,27 +1,39 @@
 package com.digiventure.ventnote.feature.notes
 
 import android.content.pm.ActivityInfo
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,20 +41,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.local.NoteModel
-import com.digiventure.ventnote.feature.notes.components.NavDrawer
-import com.digiventure.ventnote.feature.notes.components.NotesAppBar
+import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
+import com.digiventure.ventnote.feature.notes.components.item.NotesItem
+import com.digiventure.ventnote.feature.notes.components.navbar.NotesAppBar
+import com.digiventure.ventnote.feature.notes.components.sheets.FilterSheet
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageMockVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import com.digiventure.ventnote.navigation.Route
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesPage(
     navHostController: NavHostController,
@@ -60,6 +74,12 @@ fun NotesPage(
     val filteredNoteListState = remember { mutableStateOf<List<NoteModel>>(listOf()) }
     val loadingDialog = remember { mutableStateOf(false) }
     val deleteDialog = remember { mutableStateOf(false) }
+
+    val openBottomSheet = rememberSaveable { mutableStateOf(false) }
+    val skipPartiallyExpanded = remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded.value
+    )
 
     LaunchedEffect(key1 = noteListState.value) {
         // Showing error snackBar on error
@@ -152,10 +172,14 @@ fun NotesPage(
                             viewModel.isSearching.value = true
                             viewModel.searchedTitleText.value = ""
                         },
+                        sortCallback = {
+                            openBottomSheet.value = true
+                        },
                         deleteCallback = {
                             deleteDialog.value = true
                         },
                         closeSearchCallback = {
+                            Log.d("pressed", "close pressed")
                             viewModel.closeSearchEvent()
                         }
                     )
@@ -240,64 +264,10 @@ fun NotesPage(
         onDismissCallback = { deleteDialog.value = false },
         onConfirmCallback = { deleteNoteList() },
         modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
-}
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun NotesItem(
-    isMarking: Boolean,
-    isMarked: Boolean,
-    data: NoteModel,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    onCheckClick: () -> Unit)
-{
-    val shape = RoundedCornerShape(12.dp)
 
-    Box(
-        modifier = Modifier
-            .semantics { contentDescription = "Note item ${data.id}" }
-            .combinedClickable(
-                onClick = { if (isMarking) onCheckClick() else onClick()  },
-                onLongClick = { onLongClick() }
-            )
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.primary)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()
-            .padding(start = if(isMarked) 8.dp else 0.dp)
-            .background(MaterialTheme.colorScheme.surface)) {
-
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = data.title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = data.note,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 1.dp)
-                )
-                Text(
-                    text = DateUtil.convertDateString("EEEE, MMMM d h:mm a", data.createdAt.toString()),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-            }
-        }
+    FilterSheet(openBottomSheet, bottomSheetState, onDismiss = { openBottomSheet.value = false } ) {
+        sortBy, orderBy -> viewModel.sortAndOrder(sortBy, orderBy)
     }
 }
 

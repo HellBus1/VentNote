@@ -126,10 +126,10 @@ class NoteDetailPageVMShould: BaseUnitTest() {
      * Test suite for update note from repository
      * */
     @Test
-    fun updateNoteListFromRepository() = runTest {
+    fun updateNoteFromRepository() = runTest {
         mockSuccessfulUpdateCase()
 
-        viewModel.updateNoteList(note)
+        viewModel.updateNote(note)
 
         verify(repository, times(1)).updateNoteList(note)
     }
@@ -138,7 +138,7 @@ class NoteDetailPageVMShould: BaseUnitTest() {
     fun emitsBooleanOfUpdatingLengthFromRepository() = runTest {
         mockSuccessfulUpdateCase()
 
-        val result = viewModel.updateNoteList(note)
+        val result = viewModel.updateNote(note)
 
         assertEquals(expectedUpdating, result)
     }
@@ -147,7 +147,7 @@ class NoteDetailPageVMShould: BaseUnitTest() {
     fun emitsErrorWhenUpdatingError() = runTest {
         mockErrorUpdateCase()
 
-        val result = viewModel.updateNoteList(note)
+        val result = viewModel.updateNote(note)
 
         assertEquals(Result.failure<Boolean>(exceptionUpdating), result)
     }
@@ -157,7 +157,7 @@ class NoteDetailPageVMShould: BaseUnitTest() {
         mockSuccessfulUpdateCase()
 
         viewModel.loader.captureValues {
-            viewModel.updateNoteList(note)
+            viewModel.updateNote(note)
 
             assertEquals(true, values.first())
         }
@@ -168,7 +168,7 @@ class NoteDetailPageVMShould: BaseUnitTest() {
         mockSuccessfulUpdateCase()
 
         viewModel.loader.captureValues {
-            viewModel.updateNoteList(note)
+            viewModel.updateNote(note)
 
             assertEquals(false, values.last())
         }
@@ -179,7 +179,7 @@ class NoteDetailPageVMShould: BaseUnitTest() {
         mockErrorUpdateCase()
 
         viewModel.loader.captureValues {
-            viewModel.updateNoteList(note)
+            viewModel.updateNote(note)
 
             assertEquals(false, values.last())
         }

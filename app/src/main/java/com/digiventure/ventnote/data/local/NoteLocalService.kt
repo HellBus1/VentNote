@@ -9,12 +9,13 @@ import javax.inject.Inject
 class NoteLocalService @Inject constructor(
     private val dao: NoteDAO
 ) {
-    suspend fun getNoteList(): Flow<Result<List<NoteModel>>> =
-        dao.getNotes().map {
+    suspend fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> {
+        return dao.getNotes(sortBy, order).map {
             Result.success(it)
         }.catch {
             emit(Result.failure(RuntimeException("Failed to get list of notes")))
         }
+    }
 
     suspend fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
         flow {
@@ -24,16 +25,17 @@ class NoteLocalService @Inject constructor(
             emit(Result.failure(RuntimeException("Failed to delete list of notes")))
         }
 
-    suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> =
-        dao.getNoteDetail(id).map {
+    suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> {
+        return dao.getNoteDetail(id).map {
             Result.success(it)
         }.catch {
             emit(Result.failure(RuntimeException("Failed to get note detail")))
         }
+    }
 
-    suspend fun updateNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
+    suspend fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
         flow {
-            val result = (dao.updateNote(*notes) == notes.size)
+            val result = dao.updateWithTimestamp(note) >= 1
             emit(Result.success(result))
         }.catch {
             emit(Result.failure(RuntimeException("Failed to update list of notes")))
@@ -41,7 +43,7 @@ class NoteLocalService @Inject constructor(
 
     suspend fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
         flow {
-            val result = dao.insertNote(note) != -1L
+            val result = dao.insertWithTimestamp(note) != -1L
             emit(Result.success(result))
         }.catch {
             emit(Result.failure(RuntimeException("Failed to insert list of notes")))

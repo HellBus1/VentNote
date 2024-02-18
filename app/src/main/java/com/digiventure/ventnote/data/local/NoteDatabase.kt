@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import java.util.*
+import java.util.Date
 
 object DateConverters {
     @TypeConverter
@@ -18,7 +18,11 @@ object DateConverters {
     }
 }
 
-@Database(entities = [NoteModel::class], version = 1, exportSchema = false)
+@Database(
+    entities = [NoteModel::class],
+    version = 1,
+    exportSchema = true
+)
 @TypeConverters(DateConverters::class)
 abstract class NoteDatabase: RoomDatabase() {
     abstract fun dao(): NoteDAO

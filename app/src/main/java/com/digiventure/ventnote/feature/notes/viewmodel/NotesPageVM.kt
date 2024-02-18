@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
+import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.data.NoteRepository
 import com.digiventure.ventnote.data.local.NoteModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,18 +23,27 @@ class NotesPageVM @Inject constructor(
     private val repository: NoteRepository,
 ): ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
+    override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData(
+        Pair(Constants.CREATED_AT, Constants.DESCENDING)
+    )
 
-    override val noteList: LiveData<Result<List<NoteModel>>> = liveData {
-        loader.postValue(true)
-        try {
-            emitSource(repository.getNoteList()
-                .onEach {
-                    loader.postValue(false)
-                }
-                .asLiveData())
-        } catch (e: Exception) {
-            loader.postValue(false)
-            emit(Result.failure(e))
+    override fun sortAndOrder(sortBy: String, orderBy: String) {
+        sortAndOrderData.value = Pair(sortBy, orderBy)
+    }
+
+    override val noteList: LiveData<Result<List<NoteModel>>> = sortAndOrderData.switchMap {
+        liveData {
+            loader.postValue(true)
+            try {
+                emitSource(repository.getNoteList(it.first, it.second)
+                    .onEach {
+                        loader.postValue(false)
+                    }
+                    .asLiveData())
+            } catch (e: Exception) {
+                loader.postValue(false)
+                emit(Result.failure(e))
+            }
         }
     }
 
