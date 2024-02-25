@@ -77,8 +77,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
 
     implementation 'androidx.activity:activity-compose:1.8.2'
-    implementation "androidx.compose.ui:ui:1.6.1"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.6.1"
+    implementation "androidx.compose.ui:ui:1.6.2"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.6.2"
 
     implementation 'androidx.compose.material3:material3:1.2.0'
 
@@ -101,7 +101,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
 
     // Livedata
-    implementation 'androidx.compose.runtime:runtime-livedata:1.6.1'
+    implementation 'androidx.compose.runtime:runtime-livedata:1.6.2'
 
     // Unit test
     testImplementation 'junit:junit:4.13.2'
@@ -112,10 +112,10 @@ dependencies {
     // Hilt
     implementation 'com.google.dagger:hilt-android:2.50'
     kapt 'com.google.dagger:hilt-android-compiler:2.50'
-    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
 
     // Material Icon Extension
-    implementation "androidx.compose.material:material-icons-extended:1.6.1"
+    implementation "androidx.compose.material:material-icons-extended:1.6.2"
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation("com.google.android.play:app-update:2.1.0")
@@ -138,9 +138,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.1"
-    debugImplementation "androidx.compose.ui:ui-tooling:1.6.1"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.1"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.2"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.6.2"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.2"
 
     /// Hilt test (for handling service locator when test)
     androidTestImplementation "com.google.dagger:hilt-android-testing:2.50"
