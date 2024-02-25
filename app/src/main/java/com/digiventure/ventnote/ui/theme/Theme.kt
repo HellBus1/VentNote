@@ -4,17 +4,16 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.digiventure.ventnote.commons.ColorPalletName
 import com.digiventure.ventnote.commons.ColorSchemeName
-import com.digiventure.ventnote.ui.ColorSchemeChoice
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.data.NoteDataStore
+import com.digiventure.ventnote.ui.ColorSchemeChoice
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.flow.combine
 
 @Composable
 fun VentNoteTheme(
@@ -23,38 +22,47 @@ fun VentNoteTheme(
 ) {
     val dataStore = NoteDataStore(LocalContext.current)
 
-    val colorSchemeName = remember { mutableStateOf(
-        if (darkTheme) ColorSchemeName.DARK_MODE else ColorSchemeName.LIGHT_MODE
-    ) }
-    val colorPalletName = remember { mutableStateOf(ColorPalletName.PURPLE) }
-    val colorScheme by remember(colorSchemeName, colorPalletName) {
-        derivedStateOf {
-            ColorSchemeChoice.getColorScheme(colorPalletName.value, colorSchemeName.value)
-        }
+    val colorScheme = remember {
+        val scheme = if (darkTheme) ColorSchemeName.DARK_MODE else
+            ColorSchemeName.LIGHT_MODE
+        mutableStateOf(
+            ColorSchemeChoice.getColorScheme(
+                scheme,
+                ColorPalletName.PURPLE
+            )
+        )
     }
 
-    LaunchedEffect(colorSchemeName.value, colorPalletName.value) {
+    LaunchedEffect(Unit) {
         val colorSchemeFlow = dataStore.getStringData(Constants.COLOR_SCHEME)
         val colorPalletFlow = dataStore.getStringData(Constants.COLOR_PALLET)
 
-        colorSchemeFlow.collect {
-            colorSchemeName.value = it
+        val combinedFlow = combine(
+            colorSchemeFlow, colorPalletFlow
+        ) { scheme, pallet ->
+            val defaultScheme =
+                scheme.ifEmpty {
+                    if (darkTheme) ColorSchemeName.DARK_MODE
+                    else ColorSchemeName.LIGHT_MODE
+                }
+            val defaultPallet = pallet.ifEmpty { ColorPalletName.PURPLE }
+            Pair(defaultScheme, defaultPallet)
         }
 
-        colorPalletFlow.collect {
-            colorPalletName.value = it
+        combinedFlow.collect {
+            colorScheme.value = ColorSchemeChoice.getColorScheme(
+                it.first,
+                it.second
+            )
         }
     }
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setStatusBarColor(
-        darkIcons = !darkTheme,
-        color = colorScheme.surface
+        darkIcons = !darkTheme, color = colorScheme.value.surface
     )
 
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        colorScheme = colorScheme.value, typography = Typography, content = content
     )
 }

@@ -59,11 +59,17 @@
     <string name="order_descending">Descending</string>
 
     <!--  Nav Drawer Tile  -->
-    <string name="rate_app">Rate App</string>
+    <string name="about_us">about us</string>
+    <string name="preferences">preferences</string>
+    <string name="rate_app">Rate app</string>
     <string name="rate_app_description">Rate us on the Play Store!</string>
     <string name="more_apps">More apps</string>
     <string name="more_apps_description">Visit our developer page</string>
     <string name="app_version">Version</string>
+    <string name="theme_color">theme color</string>
+    <string name="theme_setting">theme setting</string>
+    <string name="dark_mode">dark mode</string>
+    <string name="light_mode">light mode</string>
 
     <!--  SnackBar alert message  -->
     <string name="note_is_successfully_deleted">Note is successfully deleted</string>

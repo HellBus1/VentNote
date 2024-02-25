@@ -67,7 +67,7 @@ fun FilterSheet(
     }
 
     fun convertOrderBy(orderBy: String): String {
-        return when(orderBy) {
+        return when (orderBy) {
             ascending -> Constants.ASCENDING
             descending -> Constants.DESCENDING
             else -> {
@@ -81,14 +81,17 @@ fun FilterSheet(
         bottomSheetState = bottomSheetState,
         onDismissRequest = { openBottomSheet.value = false }
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.sort_by),
-                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary)
+                style = TextStyle(
+                    fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
             )
             Box(modifier = Modifier.padding(8.dp))
             SortByList(sortByOptions = sortByOptions, selectedValue = selectedSortBy.value) {
@@ -97,8 +100,10 @@ fun FilterSheet(
             Box(modifier = Modifier.padding(16.dp))
             Text(
                 text = stringResource(id = R.string.order_by),
-                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary)
+                style = TextStyle(
+                    fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
             )
             Box(modifier = Modifier.padding(8.dp))
             OrderByList(orderByOptions = orderByOptions, selectedValue = selectedOrderBy.value) {
@@ -132,8 +137,10 @@ fun FilterSheet(
 }
 
 @Composable
-fun SortByList(sortByOptions: List<String>, selectedValue: String,
-               onPress: (sortByValue: String) -> Unit) {
+fun SortByList(
+    sortByOptions: List<String>, selectedValue: String,
+    onPress: (sortByValue: String) -> Unit
+) {
     Column(modifier = Modifier.selectableGroup()) {
         sortByOptions.forEach {
             ListItem(title = it, selectedValue = selectedValue) {
@@ -144,8 +151,10 @@ fun SortByList(sortByOptions: List<String>, selectedValue: String,
 }
 
 @Composable
-fun OrderByList(orderByOptions: List<String>, selectedValue: String,
-                onPress: (orderByValue: String) -> Unit) {
+fun OrderByList(
+    orderByOptions: List<String>, selectedValue: String,
+    onPress: (orderByValue: String) -> Unit
+) {
     Column(modifier = Modifier.selectableGroup()) {
         orderByOptions.forEach {
             ListItem(title = it, selectedValue = selectedValue) {
@@ -166,8 +175,10 @@ fun ListItem(title: String, selectedValue: String, onPress: () -> Unit) {
     ) {
         Text(
             text = title,
-            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.primary),
+            style = TextStyle(
+                fontSize = 16.sp, fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary
+            ),
             modifier = Modifier.weight(1f)
         )
         RadioButton(selected = (title == selectedValue), onClick = { onPress() })
@@ -192,7 +203,7 @@ fun FilterSheetPreview() {
 
     FilterSheet(
         openBottomSheet = openBottomSheet,
-        bottomSheetState =  bottomSheetState,
+        bottomSheetState = bottomSheetState,
         onDismiss = {}
     ) { _, _ ->
 

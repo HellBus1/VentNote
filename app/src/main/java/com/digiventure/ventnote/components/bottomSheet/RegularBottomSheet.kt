@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.components.bottomSheet
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ fun RegularBottomSheet(
         ModalBottomSheet(
             onDismissRequest = { onDismissRequest() },
             sheetState = bottomSheetState,
+            containerColor = MaterialTheme.colorScheme.background,
         ) {
             content()
         }
