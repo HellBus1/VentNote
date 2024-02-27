@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.Star
@@ -29,7 +31,12 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.BuildConfig
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.ColorPalletName
+import com.digiventure.ventnote.commons.ColorSchemeName
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.data.NoteDataStore
@@ -85,12 +93,26 @@ fun NavDrawer(
 
     val dataStore = NoteDataStore(LocalContext.current)
 
+    var currentScheme by remember { mutableStateOf("") }
+
+    LaunchedEffect(key1 = dataStore) {
+        dataStore.getStringData(Constants.COLOR_SCHEME).collect {
+            currentScheme = it
+        }
+    }
+
     val scope = rememberCoroutineScope()
 
     fun setColorPallet(colorPallet: String) {
-        Log.d("state", colorPallet)
         scope.launch {
             dataStore.setStringData(Constants.COLOR_PALLET, colorPallet)
+        }
+    }
+
+    fun setColorScheme(colorScheme: String) {
+        scope.launch {
+            Log.d("state", colorScheme)
+            dataStore.setStringData(Constants.COLOR_SCHEME, colorScheme)
         }
     }
 
@@ -131,6 +153,15 @@ fun NavDrawer(
                 testTagName = ""
             ) {
                 setColorPallet(it.second)
+            }
+
+            NavDrawerItemColorSchemeSwitch(
+                leftIcon = Icons.Filled.Bedtime,
+                title = stringResource(id = R.string.theme_setting),
+                currentScheme = currentScheme,
+                testTagName = "",
+            ) {
+                setColorScheme(it)
             }
         }
     }, content = { content() }, modifier = Modifier.semantics { testTag = TestTags.NAV_DRAWER })
@@ -279,8 +310,79 @@ fun NavDrawerColorPicker(
 }
 
 @Composable
-fun NavDrawerItemWithSwitch() {
+fun NavDrawerItemColorSchemeSwitch(
+    leftIcon: ImageVector,
+    title: String,
+    testTagName: String,
+    currentScheme: String,
+    onColorSchemePicked: (scheme: String) -> Unit
+) {
+    val lightModeString = stringResource(R.string.switch_to_light_mode)
+    val darkModeString = stringResource(R.string.switch_to_dark_mode)
+    val subtitle = if (currentScheme == ColorSchemeName.DARK_MODE)
+        lightModeString else darkModeString
 
+
+    fun onTileClicked() {
+        if (subtitle == darkModeString) {
+            onColorSchemePicked(ColorSchemeName.DARK_MODE)
+        } else {
+            onColorSchemePicked(ColorSchemeName.LIGHT_MODE)
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, bottom = 12.dp, top = 8.dp)
+            .semantics { testTag = testTagName }
+            .clickable {
+                onTileClicked()
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Box(modifier = Modifier.padding(8.dp)) {
+                Icon(
+                    leftIcon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(start = 12.dp, bottom = 1.dp)
+                .weight(1f)
+        ) {
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 2.dp)
+            )
+            Text(
+                text = subtitle,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        Icon(
+            Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.size(20.dp)
+        )
+    }
 }
 
 @Preview

@@ -68,8 +68,8 @@
     <string name="app_version">Version</string>
     <string name="theme_color">theme color</string>
     <string name="theme_setting">theme setting</string>
-    <string name="dark_mode">dark mode</string>
-    <string name="light_mode">light mode</string>
+    <string name="switch_to_dark_mode">switch to dark mode</string>
+    <string name="switch_to_light_mode">switch to light mode</string>
 
     <!--  SnackBar alert message  -->
     <string name="note_is_successfully_deleted">Note is successfully deleted</string>

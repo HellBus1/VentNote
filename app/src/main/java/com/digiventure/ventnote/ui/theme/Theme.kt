@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.digiventure.ventnote.commons.ColorPalletName
 import com.digiventure.ventnote.commons.ColorSchemeName
@@ -14,6 +15,7 @@ import com.digiventure.ventnote.data.NoteDataStore
 import com.digiventure.ventnote.ui.ColorSchemeChoice
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 @Composable
 fun VentNoteTheme(
@@ -21,6 +23,20 @@ fun VentNoteTheme(
     content: @Composable () -> Unit
 ) {
     val dataStore = NoteDataStore(LocalContext.current)
+
+    val scope = rememberCoroutineScope()
+
+    fun setColorPallet(colorPallet: String) {
+        scope.launch {
+            dataStore.setStringData(Constants.COLOR_PALLET, colorPallet)
+        }
+    }
+
+    fun setColorScheme(colorScheme: String) {
+        scope.launch {
+            dataStore.setStringData(Constants.COLOR_SCHEME, colorScheme)
+        }
+    }
 
     val colorScheme = remember {
         val scheme = if (darkTheme) ColorSchemeName.DARK_MODE else
@@ -46,6 +62,9 @@ fun VentNoteTheme(
                     else ColorSchemeName.LIGHT_MODE
                 }
             val defaultPallet = pallet.ifEmpty { ColorPalletName.PURPLE }
+            setColorScheme(defaultScheme)
+            setColorPallet(defaultPallet)
+
             Pair(defaultScheme, defaultPallet)
         }
 
@@ -59,7 +78,7 @@ fun VentNoteTheme(
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setStatusBarColor(
-        darkIcons = !darkTheme, color = colorScheme.value.surface
+        darkIcons = !darkTheme, color = colorScheme.value.primary
     )
 
     MaterialTheme(
