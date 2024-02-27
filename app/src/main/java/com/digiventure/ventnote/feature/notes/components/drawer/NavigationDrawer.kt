@@ -62,6 +62,8 @@ import com.digiventure.ventnote.commons.ColorSchemeName
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.data.NoteDataStore
+import com.digiventure.ventnote.ui.theme.CadmiumGreenLightPrimary
+import com.digiventure.ventnote.ui.theme.CobaltBlueLightPrimary
 import com.digiventure.ventnote.ui.theme.CrimsonLightPrimary
 import com.digiventure.ventnote.ui.theme.PurpleLightPrimary
 import kotlinx.coroutines.launch
@@ -95,7 +97,7 @@ fun NavDrawer(
 
     var currentScheme by remember { mutableStateOf("") }
 
-    LaunchedEffect(key1 = dataStore) {
+    LaunchedEffect(key1 = Unit) {
         dataStore.getStringData(Constants.COLOR_SCHEME).collect {
             currentScheme = it
         }
@@ -256,7 +258,9 @@ fun NavDrawerColorPicker(
 ) {
     val colorList = listOf(
         Pair(PurpleLightPrimary, ColorPalletName.PURPLE),
-        Pair(CrimsonLightPrimary, ColorPalletName.CRIMSON)
+        Pair(CrimsonLightPrimary, ColorPalletName.CRIMSON),
+        Pair(CadmiumGreenLightPrimary, ColorPalletName.CADMIUM_GREEN),
+        Pair(CobaltBlueLightPrimary, ColorPalletName.COBALT_BLUE)
     )
 
     Row(

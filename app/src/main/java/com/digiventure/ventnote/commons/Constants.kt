@@ -14,6 +14,8 @@ object Constants {
 object ColorPalletName {
     const val CRIMSON = "CRIMSON"
     const val PURPLE = "PURPLE"
+    const val CADMIUM_GREEN = "CADMIUM_GREEN"
+    const val COBALT_BLUE = "COBALT_BLUE"
 }
 
 object ColorSchemeName {
