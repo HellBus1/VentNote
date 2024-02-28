@@ -17,6 +17,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
+import com.digiventure.utils.BaseAcceptanceTest
 import com.digiventure.ventnote.commons.TestTags
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -26,7 +27,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class NotesFeature {
+class NotesFeature: BaseAcceptanceTest() {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
@@ -64,7 +65,7 @@ class NotesFeature {
         searchIconButton = composeTestRule.onNodeWithTag(TestTags.SEARCH_ICON_BUTTON)
         menuIconButton = composeTestRule.onNodeWithTag(TestTags.MENU_ICON_BUTTON)
         topAppBarTitle = composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR_TITLE)
-        topAppBarTextField = composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR_TEXTFIELD)
+//        topAppBarTextField = composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR_TEXTFIELD)
         closeSearchIconButton = composeTestRule.onNodeWithTag(TestTags.CLOSE_SEARCH_ICON_BUTTON)
         selectedCount = composeTestRule.onNodeWithTag(TestTags.SELECTED_COUNT)
         dropdownSelect = composeTestRule.onNodeWithTag(TestTags.DROPDOWN_SELECT)

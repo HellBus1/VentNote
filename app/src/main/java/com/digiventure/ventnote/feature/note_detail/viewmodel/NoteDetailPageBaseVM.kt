@@ -34,9 +34,9 @@ interface NoteDetailPageBaseVM {
 
     /**
      * update single note
-     * @param notes is a note model
+     * @param note is a note model
      * */
-    suspend fun updateNoteList(vararg notes: NoteModel): Result<Boolean>
+    suspend fun updateNote(note: NoteModel): Result<Boolean>
 
     /**
      * delete NoteList

@@ -13,18 +13,24 @@ plugins {
 
 android {
     namespace 'com.digiventure.ventnote'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.digiventure.ventnote"
         minSdk 21
-        targetSdk 33
-        versionCode 9
-        versionName "1.0.5"
+        targetSdk 34
+        versionCode 10
+        versionName "1.0.6"
 
         testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
         vectorDrawables {
             useSupportLibrary true
+        }
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
         }
     }
 
@@ -52,6 +58,7 @@ android {
 
     buildFeatures {
         compose true
+        buildConfig true
     }
 
     composeOptions {
@@ -67,32 +74,35 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
 
-    implementation 'androidx.activity:activity-compose:1.7.1'
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation 'androidx.activity:activity-compose:1.8.2'
+    implementation "androidx.compose.ui:ui:1.6.2"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.6.2"
 
-    implementation 'androidx.compose.material3:material3:1.2.0-alpha01'
+    implementation 'androidx.compose.material3:material3:1.2.0'
 
     // Lifecycle Livedata
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
 
     // Room
-    implementation "androidx.room:room-ktx:$rootProject.roomVersion"
-    kapt "androidx.room:room-compiler:$rootProject.roomVersion"
-    androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
+    implementation "androidx.room:room-ktx:2.6.1"
+    kapt "androidx.room:room-compiler:2.6.1"
+    androidTestImplementation "androidx.room:room-testing:2.6.1"
+
+    // Datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Compose Navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0-rc01"
+    implementation "androidx.navigation:navigation-compose:2.7.7"
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
 
     // Livedata
-    implementation 'androidx.compose.runtime:runtime-livedata:1.5.0-alpha04'
+    implementation 'androidx.compose.runtime:runtime-livedata:1.6.2'
 
     // Unit test
     testImplementation 'junit:junit:4.13.2'
@@ -101,12 +111,12 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     // Hilt
-    implementation 'com.google.dagger:hilt-android:2.45'
-    kapt 'com.google.dagger:hilt-android-compiler:2.45'
-    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0-alpha01'
+    implementation 'com.google.dagger:hilt-android:2.50'
+    kapt 'com.google.dagger:hilt-android-compiler:2.50'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
 
     // Material Icon Extension
-    implementation "androidx.compose.material:material-icons-extended:1.4.3"
+    implementation "androidx.compose.material:material-icons-extended:1.6.2"
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation("com.google.android.play:app-update:2.1.0")
@@ -114,13 +124,13 @@ dependencies {
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     // Google Play API
-    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 
     // Coil Load Image Url
-    implementation("io.coil-kt:coil-compose:2.3.0")
+    implementation('io.coil-kt:coil-compose:2.5.0')
 
     // Accompanist - Status Bar
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.34.0"
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)
@@ -129,30 +139,32 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.2"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.6.2"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.2"
 
     /// Hilt test (for handling service locator when test)
-    androidTestImplementation "com.google.dagger:hilt-android-testing:2.44"
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.45"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.50"
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.50'
 
     // For mocking purposes & make it visible in instrumented test
-    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
-    testImplementation 'org.mockito:mockito-inline:5.1.1'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:5.2.1'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
+
+    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
 
     testImplementation "androidx.arch.core:core-testing:2.2.0"
 
     // For unit testing coroutines
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0'
 
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation platform('com.google.firebase:firebase-bom:32.7.2')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-crashlytics:18.3.7'
-    implementation 'com.google.firebase:firebase-perf-ktx:20.3.2'
+    implementation 'com.google.firebase:firebase-crashlytics:18.6.2'
+    implementation 'com.google.firebase:firebase-perf-ktx:20.5.2'
 }
 
 kapt {

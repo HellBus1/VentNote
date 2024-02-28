@@ -9,6 +9,7 @@
     <string name="close_nav_icon">close nav icon</string>
     <string name="drawer_nav_icon">drawer nav icon</string>
     <string name="search_nav_icon">search nav icon</string>
+    <string name="sort_nav_icon">sort nav icon</string>
     <string name="delete_nav_icon">delete nav icon</string>
     <string name="dropdown_nav_icon">dropdown nav icon</string>
     <string name="back_nav_icon">back nav icon</string>
@@ -49,13 +50,26 @@
     <string name="add_new_note">Add New Note</string>
     <string name="share_preview">Share Preview</string>
     <string name="loading">Loading</string>
+    <string name="sort_by">Sort By</string>
+    <string name="sort_title">Title</string>
+    <string name="sort_modified_date">Modified Date</string>
+    <string name="sort_created_date">Created Date</string>
+    <string name="order_by">Order By</string>
+    <string name="order_ascending">Ascending</string>
+    <string name="order_descending">Descending</string>
 
     <!--  Nav Drawer Tile  -->
-    <string name="rate_app">Rate App</string>
+    <string name="about_us">about us</string>
+    <string name="preferences">preferences</string>
+    <string name="rate_app">Rate app</string>
     <string name="rate_app_description">Rate us on the Play Store!</string>
     <string name="more_apps">More apps</string>
     <string name="more_apps_description">Visit our developer page</string>
     <string name="app_version">Version</string>
+    <string name="theme_color">theme color</string>
+    <string name="theme_setting">theme setting</string>
+    <string name="switch_to_dark_mode">switch to dark mode</string>
+    <string name="switch_to_light_mode">switch to light mode</string>
 
     <!--  SnackBar alert message  -->
     <string name="note_is_successfully_deleted">Note is successfully deleted</string>
