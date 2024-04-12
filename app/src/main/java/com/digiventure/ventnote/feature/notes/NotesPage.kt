@@ -141,6 +141,9 @@ fun NotesPage(
                 )
             }
         },
+        onBackupPressed = {
+            navHostController.navigate(Route.BackupPage.routeName)
+        },
         content = {
             Scaffold(
                 topBar = {

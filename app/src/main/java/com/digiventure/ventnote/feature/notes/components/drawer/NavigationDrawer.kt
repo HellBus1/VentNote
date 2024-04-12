@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.Star
@@ -71,7 +72,10 @@ import java.util.Locale
 
 @Composable
 fun NavDrawer(
-    drawerState: DrawerState, content: @Composable () -> Unit, onError: (String) -> Unit
+    drawerState: DrawerState,
+    content: @Composable () -> Unit,
+    onError: (String) -> Unit,
+    onBackupPressed: () -> Unit
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -165,6 +169,15 @@ fun NavDrawer(
             ) {
                 setColorScheme(it)
             }
+
+            SectionTitle(title = stringResource(id = R.string.settings))
+
+            NavDrawerItem(
+                leftIcon = Icons.Filled.CloudUpload,
+                title = stringResource(id = R.string.backup),
+                subtitle = stringResource(id = R.string.backup_description),
+                testTagName = "",
+                onClick = { onBackupPressed() })
         }
     }, content = { content() }, modifier = Modifier.semantics { testTag = TestTags.NAV_DRAWER })
 }
@@ -393,6 +406,6 @@ fun NavDrawerItemColorSchemeSwitch(
 @Composable
 fun DrawerPreview() {
     val drawerState = rememberDrawerState(DrawerValue.Open)
-    NavDrawer(drawerState = drawerState, content = { }, onError = {})
+    NavDrawer(drawerState = drawerState, content = { }, onError = {}, onBackupPressed = {})
 }
 

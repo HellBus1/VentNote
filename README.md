@@ -34,6 +34,13 @@ Note management app built with jetpack compose and newest modern android archite
 
 <br />
 
+## Supports Me
+Want to see more free, high-quality code and articles? Buy me a coffee and make it happen! 
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/syubban){:target="_blank"}
+
+<br />
+
 ## 🖨 Downloads
 [![Licence](https://img.shields.io/github/license/HellBus1/VentNote?style=for-the-badge&color=6650a4)](./LICENSE)
 [![GitHub release](https://img.shields.io/github/downloads/HellBus1/VentNote/total?color=6650a4&label=Downloads&logo=android&style=for-the-badge)](https://github.com/HellBus1/VentNote/releases) 
