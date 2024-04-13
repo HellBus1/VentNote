@@ -78,10 +78,10 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
 
     implementation 'androidx.activity:activity-compose:1.8.2'
-    implementation "androidx.compose.ui:ui:1.6.2"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.6.2"
+    implementation "androidx.compose.ui:ui:1.6.5"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.6.5"
 
-    implementation 'androidx.compose.material3:material3:1.2.0'
+    implementation 'androidx.compose.material3:material3:1.2.1'
 
     // Lifecycle Livedata
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
@@ -102,7 +102,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
 
     // Livedata
-    implementation 'androidx.compose.runtime:runtime-livedata:1.6.2'
+    implementation 'androidx.compose.runtime:runtime-livedata:1.6.5'
 
     // Unit test
     testImplementation 'junit:junit:4.13.2'
@@ -116,7 +116,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
 
     // Material Icon Extension
-    implementation "androidx.compose.material:material-icons-extended:1.6.2"
+    implementation "androidx.compose.material:material-icons-extended:1.6.5"
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation("com.google.android.play:app-update:2.1.0")
@@ -139,9 +139,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.2"
-    debugImplementation "androidx.compose.ui:ui-tooling:1.6.2"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.2"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.5"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.6.5"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.5"
 
     /// Hilt test (for handling service locator when test)
     androidTestImplementation "com.google.dagger:hilt-android-testing:2.50"
@@ -159,12 +159,15 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0'
 
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:32.7.2')
+    implementation platform('com.google.firebase:firebase-bom:32.8.1')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-crashlytics:18.6.2'
+    implementation 'com.google.firebase:firebase-crashlytics:18.6.4'
     implementation 'com.google.firebase:firebase-perf-ktx:20.5.2'
+
+    //Google sign in
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 }
 
 kapt {

@@ -39,6 +39,7 @@
     <string name="share_note">Share Note</string>
     <string name="share_note_as_text">Share Note as Text</string>
     <string name="sign_in_with_google">Sign in With Google</string>
+    <string name="sign_out">Sign Out</string>
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>
