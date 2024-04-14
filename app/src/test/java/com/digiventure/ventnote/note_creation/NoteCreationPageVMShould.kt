@@ -2,8 +2,8 @@ package com.digiventure.ventnote.note_creation
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
-import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteRepository
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageVM
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking

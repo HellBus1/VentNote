@@ -108,8 +108,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 
-    implementation 'com.google.code.gson:gson:2.10.1'
-
     // Hilt
     implementation 'com.google.dagger:hilt-android:2.50'
     kapt 'com.google.dagger:hilt-android-compiler:2.50'
@@ -168,6 +166,11 @@ dependencies {
 
     //Google sign in
     implementation 'com.google.android.gms:play-services-auth:21.0.0'
+
+    //Google Drive API
+    implementation 'com.google.http-client:google-http-client-gson:1.34.0'
+    implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0')
+    implementation('com.google.api-client:google-api-client-android:1.34.0')
 }
 
 kapt {

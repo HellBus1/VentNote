@@ -1,9 +1,11 @@
-package com.digiventure.ventnote.data.local
+package com.digiventure.ventnote.config
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.digiventure.ventnote.data.persistence.NoteDAO
+import com.digiventure.ventnote.data.persistence.NoteModel
 import java.util.Date
 
 object DateConverters {

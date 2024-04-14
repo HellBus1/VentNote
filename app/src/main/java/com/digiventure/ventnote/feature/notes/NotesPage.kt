@@ -45,7 +45,7 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
 import com.digiventure.ventnote.feature.notes.components.item.NotesItem
 import com.digiventure.ventnote.feature.notes.components.navbar.NotesAppBar

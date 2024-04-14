@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.data.local
+package com.digiventure.ventnote.data.persistence
 
 import androidx.room.Dao
 import androidx.room.Delete

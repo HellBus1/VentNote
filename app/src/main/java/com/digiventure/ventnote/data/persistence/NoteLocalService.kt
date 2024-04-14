@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.data.local
+package com.digiventure.ventnote.data.persistence
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

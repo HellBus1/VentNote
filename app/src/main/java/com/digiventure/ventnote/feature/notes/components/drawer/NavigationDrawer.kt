@@ -62,7 +62,7 @@ import com.digiventure.ventnote.commons.ColorPalletName
 import com.digiventure.ventnote.commons.ColorSchemeName
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
-import com.digiventure.ventnote.data.NoteDataStore
+import com.digiventure.ventnote.data.local.NoteDataStore
 import com.digiventure.ventnote.ui.theme.CadmiumGreenLightPrimary
 import com.digiventure.ventnote.ui.theme.CobaltBlueLightPrimary
 import com.digiventure.ventnote.ui.theme.CrimsonLightPrimary

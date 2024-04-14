@@ -6,7 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.backup.BackupPage
 import com.digiventure.ventnote.feature.note_creation.NoteCreationPage
 import com.digiventure.ventnote.feature.note_detail.NoteDetailPage

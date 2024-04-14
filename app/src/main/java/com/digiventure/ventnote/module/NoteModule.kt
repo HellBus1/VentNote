@@ -2,8 +2,9 @@ package com.digiventure.ventnote.module
 
 import android.content.Context
 import androidx.room.Room
-import com.digiventure.ventnote.data.local.NoteDAO
-import com.digiventure.ventnote.data.local.NoteDatabase
+import com.digiventure.ventnote.commons.Constants
+import com.digiventure.ventnote.config.NoteDatabase
+import com.digiventure.ventnote.data.persistence.NoteDAO
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +27,7 @@ class NoteModule {
             return Room.databaseBuilder(
                 context,
                 NoteDatabase::class.java,
-                "note_database"
+                Constants.DATABASE_NAME
             ).build()
         }
 }

@@ -4,8 +4,8 @@ import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
 import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteRepository
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf

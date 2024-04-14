@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.data
+package com.digiventure.ventnote.data.local
 
 import android.content.Context
 import androidx.datastore.core.DataStore

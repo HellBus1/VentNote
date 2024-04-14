@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,12 +29,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,20 +48,37 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.feature.backup.components.BackupPageAppBar
+import com.digiventure.ventnote.feature.backup.viewmodel.AuthBaseVM
+import com.digiventure.ventnote.feature.backup.viewmodel.AuthMockVM
 import com.digiventure.ventnote.feature.backup.viewmodel.AuthVM
+import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackupPage(
     navHostController: NavHostController,
-    viewModel: AuthVM = hiltViewModel<AuthVM>()
+    authViewModel: AuthBaseVM = hiltViewModel<AuthVM>(),
+    backupPageVM: BackupPageVM = hiltViewModel<BackupPageVM>()
 ) {
-    val authUiState = viewModel.uiState.value
+    val authUiState = authViewModel.uiState.value
 
     val appBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val rememberedScrollBehavior = remember { scrollBehavior }
+
+    val loadingDialog = remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = true) {
+        scope.launch {
+            backupPageVM.listOfBackupFiles()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -75,36 +98,59 @@ fun BackupPage(
                     Spacer(modifier = Modifier.padding(8.dp))
 
                     when (authUiState.authState) {
-                        AuthVM.AuthState.Loading -> CircularProgressIndicator()
-                        AuthVM.AuthState.SignedOut -> SignInButton(viewModel)
-                        AuthVM.AuthState.SignedIn -> SignedInButtons(viewModel)
+                        AuthVM.AuthState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                        AuthVM.AuthState.SignedOut -> SignInButton(authViewModel)
+                        AuthVM.AuthState.SignedIn -> SignedInButtons(authViewModel, backupPageVM)
                     }
 
+                    Spacer(modifier = Modifier.padding(6.dp))
+
                     HorizontalDivider(
-                        modifier = Modifier.padding(top = 12.dp),
                         thickness = 1.dp,
                         color = MaterialTheme.colorScheme.primary
                     )
+
+//                    backupPageVM.backupFileList.value.let {
+//                        if (it != null && it.isSuccess) {
+//                            val fileList = it.getOrNull()?.files
+//                            LazyColumn(
+//                                modifier = Modifier.fillMaxSize(),
+//                                verticalArrangement = Arrangement.spacedBy(16.dp),
+//                            ) {
+//                                items(items = fileList?.toList() ?: emptyList()) {
+//                                    Box {
+//                                        Text(text = it.id)
+//                                        Text(text = it.description)
+//                                        Text(text = it.name)
+//                                        Text(text = it.kind)
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
         },
         containerColor = MaterialTheme.colorScheme.surface
     )
+
+    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
+        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
 }
 
 @Composable
-private fun SignInButton(viewModel: AuthVM) {
+private fun SignInButton(authViewModel: AuthBaseVM) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
-            viewModel.checkAuthState()
+            authViewModel.checkAuthState()
         } else {
             Toast.makeText(context, "Auth Failed", Toast.LENGTH_LONG).show()
         }
     }
 
     Button(
-        onClick = { launcher.launch(viewModel.getSignInIntent()) },
+        onClick = { launcher.launch(authViewModel.getSignInIntent()) },
         shape = RoundedCornerShape(10.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -126,13 +172,21 @@ private fun SignInButton(viewModel: AuthVM) {
 }
 
 @Composable
-private fun SignedInButtons(viewModel: AuthVM) {
+private fun SignedInButtons(authViewModel: AuthBaseVM, backupPageVM: BackupPageVM) {
+    val scope = rememberCoroutineScope()
+
+    fun backupDatabase() {
+        scope.launch {
+            backupPageVM.backupDatabase()
+        }
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Button(
-            onClick = { viewModel.signOut() },
+            onClick = { authViewModel.signOut() },
             shape = RoundedCornerShape(10.dp)
         ) {
             Text(
@@ -143,7 +197,7 @@ private fun SignedInButtons(viewModel: AuthVM) {
         }
 
         Button(
-            onClick = { },
+            onClick = { backupDatabase() },
             shape = RoundedCornerShape(10.dp)
         ) {
             Icon(
@@ -158,5 +212,8 @@ private fun SignedInButtons(viewModel: AuthVM) {
 @Preview
 @Composable
 fun BackupPagePreview() {
-    BackupPage(navHostController = rememberNavController())
+    BackupPage(
+        navHostController = rememberNavController(),
+        authViewModel = AuthMockVM()
+    )
 }

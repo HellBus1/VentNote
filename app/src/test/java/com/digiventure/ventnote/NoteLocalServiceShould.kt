@@ -2,9 +2,9 @@ package com.digiventure.ventnote
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.data.local.NoteDAO
-import com.digiventure.ventnote.data.local.NoteLocalService
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteDAO
+import com.digiventure.ventnote.data.persistence.NoteLocalService
+import com.digiventure.ventnote.data.persistence.NoteModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking

@@ -1,7 +1,5 @@
-package com.digiventure.ventnote.data
+package com.digiventure.ventnote.data.persistence
 
-import com.digiventure.ventnote.data.local.NoteLocalService
-import com.digiventure.ventnote.data.local.NoteModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
