@@ -1,93 +1,90 @@
 package com.digiventure.ventnote.feature.backup.viewmodel
 
 import android.app.Application
-import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.config.DriveAPI
-import com.digiventure.ventnote.config.NoteDatabase
-import com.digiventure.ventnote.data.google_drive.GoogleDriveService
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.digiventure.ventnote.data.google_drive.GoogleDriveRepository
+import com.google.api.services.drive.model.File
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class BackupPageVM @Inject constructor(
     private val app: Application,
-    private val noteDatabase: NoteDatabase
+    private val repository: GoogleDriveRepository
 ): ViewModel() {
-    private val _eventFlow = MutableSharedFlow<FileSyncEvents>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _uiState = mutableStateOf(BackupPageState())
+    val uiState: State<BackupPageState> = _uiState
 
-    private var googleDriveService: GoogleDriveService? = null
-    private val mutex = Mutex()
+    private val _driveBackupFileList = MutableLiveData<List<File>>()
+    val driveBackupFileList: LiveData<List<File>> = _driveBackupFileList
 
-    val loader = MutableLiveData<Boolean>()
-
-    init {
-        initializeDriveAPI()
-    }
-
-    private fun initializeDriveAPI() {
-        val lastUser: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(app.applicationContext)
-        if (lastUser != null) {
-            val driveAPI = DriveAPI.getInstance(app.applicationContext, lastUser)
-            googleDriveService = GoogleDriveService(driveAPI)
-        }
-    }
-
-//    val backupFileList: LiveData<Result<FileList?>> = liveData {
-//        loader.postValue(true)
-//        try {
-//            val result = withContext(Dispatchers.IO) {
-//                googleDriveService?.queryFiles()
-//            }
-//            Log.d("hasil", result.toString())
-//            loader.postValue(false)
-//            emit(Result.success(result))
-//        } catch (e: Exception) {
-//            loader.postValue(false)
-//            emit(Result.failure(e))
-//        }
-//    }
-
-    suspend fun backupDatabase() = viewModelScope.launch {
-        googleDriveService?.uploadDatabaseFile(
-            app.getDatabasePath(Constants.DATABASE_NAME), getDatabaseNameWithDate()
-        )
-    }
-
-    suspend fun restore(fileId: String) = viewModelScope.launch {
-        val fileToPopulate = app.getDatabasePath(Constants.DATABASE_NAME)
-        googleDriveService?.readFile(
-            fileToPopulate, fileId
-        )
-    }
-
-    suspend fun listOfBackupFiles() = viewModelScope.launch {
+    fun backupDatabase() = viewModelScope.launch {
+        _uiState.value = BackupPageState(fileSyncState = FileSyncState.SyncStarted)
         try {
-            val files = googleDriveService?.queryFiles()
-            Log.d("hasil", files?.files.toString())
-        } catch (error: Error) {
-            Log.e("hasil", error.toString())
+            repository.uploadDatabaseFile(
+                app.getDatabasePath(Constants.DATABASE_NAME),
+                getDatabaseNameWithTimestamps()
+            ).onEach {
+                _uiState.value = BackupPageState(fileSyncState = FileSyncState.SyncFinished)
+            }.last()
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: Constants.EMPTY_STRING
+            _uiState.value = BackupPageState(fileSyncState = FileSyncState.SyncFailed(errorMessage))
         }
     }
 
-    sealed class FileSyncEvents {
-        object SyncStarted : FileSyncEvents()
-        object SyncFinished : FileSyncEvents()
-        object SyncFailed : FileSyncEvents()
+    fun backupFileList() = viewModelScope.launch {
+        try {
+            repository.getBackupFileList().collect { result ->
+                _uiState.value = BackupPageState(fileBackupListState = FileBackupListState.FileBackupListFinished)
+                if (result.isSuccess) {
+                    val files = result.getOrNull()
+                    _driveBackupFileList.value = files ?: emptyList()
+                } else {
+                    val errorMessage = result.exceptionOrNull()?.message ?: Constants.EMPTY_STRING
+                    _uiState.value = BackupPageState(
+                        fileBackupListState = FileBackupListState.FileBackupListFailed(
+                            errorMessage
+                        ))
+                }
+            }
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: Constants.EMPTY_STRING
+            _uiState.value = BackupPageState(
+                fileBackupListState = FileBackupListState.FileBackupListFailed(
+                    errorMessage
+                ))
+        }
     }
 
-    private fun getDatabaseNameWithDate(): String {
-        return Constants.DATABASE_NAME + "_" + Calendar.getInstance().time
+    sealed class FileSyncState {
+        object SyncStarted : FileSyncState()
+        object SyncFinished : FileSyncState()
+        data class SyncFailed(val errorMessage: String) : FileSyncState()
+    }
+
+    sealed class FileBackupListState {
+        object FileBackupListStarted : FileBackupListState()
+        object FileBackupListFinished : FileBackupListState()
+        data class FileBackupListFailed(val errorMessage: String) : FileBackupListState()
+    }
+
+    data class BackupPageState(
+        var fileBackupListState: FileBackupListState = FileBackupListState.FileBackupListStarted,
+        var fileSyncState: FileSyncState = FileSyncState.SyncFinished
+    )
+
+    private fun getDatabaseNameWithTimestamps(): String {
+        return Constants.DATABASE_NAME + "_" + Calendar.getInstance().timeInMillis
     }
 }

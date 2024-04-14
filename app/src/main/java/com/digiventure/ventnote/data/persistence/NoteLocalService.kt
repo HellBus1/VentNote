@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.data.persistence
 
+import com.digiventure.ventnote.commons.ErrorMessage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -13,7 +14,7 @@ class NoteLocalService @Inject constructor(
         return dao.getNotes(sortBy, order).map {
             Result.success(it)
         }.catch {
-            emit(Result.failure(RuntimeException("Failed to get list of notes")))
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_NOTE_LIST_ROOM)))
         }
     }
 
@@ -22,14 +23,14 @@ class NoteLocalService @Inject constructor(
             val result = (dao.deleteNotes(*notes) == notes.size)
             emit(Result.success(result))
         }.catch {
-            emit(Result.failure(RuntimeException("Failed to delete list of notes")))
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_DELETE_ROOM)))
         }
 
     suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> {
         return dao.getNoteDetail(id).map {
             Result.success(it)
         }.catch {
-            emit(Result.failure(RuntimeException("Failed to get note detail")))
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_NOTE_DETAIL_ROOM)))
         }
     }
 
@@ -38,7 +39,7 @@ class NoteLocalService @Inject constructor(
             val result = dao.updateWithTimestamp(note) >= 1
             emit(Result.success(result))
         }.catch {
-            emit(Result.failure(RuntimeException("Failed to update list of notes")))
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPDATE_NOTE_ROOM)))
         }
 
     suspend fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
@@ -46,6 +47,6 @@ class NoteLocalService @Inject constructor(
             val result = dao.insertWithTimestamp(note) != -1L
             emit(Result.success(result))
         }.catch {
-            emit(Result.failure(RuntimeException("Failed to insert list of notes")))
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_INSERT_NOTE_ROOM)))
         }
 }
