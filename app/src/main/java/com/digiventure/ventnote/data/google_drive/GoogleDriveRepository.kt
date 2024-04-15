@@ -19,6 +19,14 @@ class GoogleDriveRepository @Inject constructor(
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPLOAD_DATABASE)))
         }
 
+    suspend fun restoreDatabaseFile(databaseFile: File, fileId: String): Flow<Result<Boolean>> =
+        flow {
+            service.readFile(databaseFile, fileId)
+            emit(Result.success(true))
+        }.catch {
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPLOAD_DATABASE)))
+        }
+
     suspend fun getBackupFileList(): Flow<Result<List<DriveFile>>> =
         flow {
             val result = service.queryFiles()?.files?.toList() ?: emptyList()

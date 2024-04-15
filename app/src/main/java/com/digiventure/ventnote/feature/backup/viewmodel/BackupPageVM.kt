@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.feature.backup.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -29,30 +30,52 @@ class BackupPageVM @Inject constructor(
     val driveBackupFileList: LiveData<List<File>> = _driveBackupFileList
 
     fun backupDatabase() = viewModelScope.launch {
-        _uiState.value = BackupPageState(fileSyncState = FileSyncState.SyncStarted)
+        val currentState = _uiState.value.copy(fileSyncState = FileSyncState.SyncStarted)
+        _uiState.value = currentState
+
         try {
             repository.uploadDatabaseFile(
                 app.getDatabasePath(Constants.DATABASE_NAME),
                 getDatabaseNameWithTimestamps()
             ).onEach {
-                _uiState.value = BackupPageState(fileSyncState = FileSyncState.SyncFinished)
+                _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFinished)
+                getBackupFileList()
             }.last()
         } catch (e: Exception) {
             val errorMessage = e.message ?: Constants.EMPTY_STRING
-            _uiState.value = BackupPageState(fileSyncState = FileSyncState.SyncFailed(errorMessage))
+            _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFailed(errorMessage))
         }
     }
 
-    fun backupFileList() = viewModelScope.launch {
+    fun restoreDatabase(fileId: String) = viewModelScope.launch {
+        val currentState = _uiState.value.copy(fileSyncState = FileSyncState.SyncStarted)
+        _uiState.value = currentState
+
+        Log.d("hasil", fileId)
+        try {
+            repository.restoreDatabaseFile(app.getDatabasePath(Constants.DATABASE_NAME), fileId)
+                .onEach {
+                    _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFinished)
+                }.last()
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: Constants.EMPTY_STRING
+            _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFailed(errorMessage))
+        }
+    }
+
+    fun getBackupFileList() = viewModelScope.launch {
+        val currentState = _uiState.value.copy(fileBackupListState = FileBackupListState.FileBackupListStarted)
+        _uiState.value = currentState
+
         try {
             repository.getBackupFileList().collect { result ->
-                _uiState.value = BackupPageState(fileBackupListState = FileBackupListState.FileBackupListFinished)
+                _uiState.value = currentState.copy(fileBackupListState = FileBackupListState.FileBackupListFinished)
                 if (result.isSuccess) {
                     val files = result.getOrNull()
                     _driveBackupFileList.value = files ?: emptyList()
                 } else {
                     val errorMessage = result.exceptionOrNull()?.message ?: Constants.EMPTY_STRING
-                    _uiState.value = BackupPageState(
+                    _uiState.value = currentState.copy(
                         fileBackupListState = FileBackupListState.FileBackupListFailed(
                             errorMessage
                         ))
@@ -60,7 +83,7 @@ class BackupPageVM @Inject constructor(
             }
         } catch (e: Exception) {
             val errorMessage = e.message ?: Constants.EMPTY_STRING
-            _uiState.value = BackupPageState(
+            _uiState.value = currentState.copy(
                 fileBackupListState = FileBackupListState.FileBackupListFailed(
                     errorMessage
                 ))
@@ -80,7 +103,7 @@ class BackupPageVM @Inject constructor(
     }
 
     data class BackupPageState(
-        var fileBackupListState: FileBackupListState = FileBackupListState.FileBackupListStarted,
+        var fileBackupListState: FileBackupListState = FileBackupListState.FileBackupListFinished,
         var fileSyncState: FileSyncState = FileSyncState.SyncFinished
     )
 

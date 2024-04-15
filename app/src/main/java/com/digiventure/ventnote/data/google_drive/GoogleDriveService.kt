@@ -17,26 +17,43 @@ class GoogleDriveService @Inject constructor(
         private const val APP_DATA_FOLDER_SPACE = "appDataFolder"
     }
 
+    /**
+     * Uploads a database file to Google Drive.
+     * @param databaseFile The JavaFile representing the database file.
+     * @param fileName The name of the file to be uploaded.
+     */
     suspend fun uploadDatabaseFile(databaseFile: JavaFile, fileName: String) = withContext(Dispatchers.IO) {
         val metaData = getMetaData(fileName)
         metaData.parents = listOf(APP_DATA_FOLDER_SPACE)
         val bytes = databaseFile.inputStream().readBytes()
         val fileContent = ByteArrayContent(FILE_MIME_TYPE, bytes)
         drive?.files()?.create(metaData, fileContent)?.execute()
-        null
     }
 
+    /**
+     * Reads a file from Google Drive and writes it to the specified JavaFile.
+     * @param file The JavaFile to which the file content will be written.
+     * @param fileId The ID of the file to be read from Google Drive.
+     */
     suspend fun readFile(file: JavaFile, fileId: String) = withContext(Dispatchers.IO) {
-        drive?.files()?.get(fileId)?.executeAsInputStream()?.use {
+        drive?.files()?.get(fileId)?.executeMediaAsInputStream()?.use {
             it.copyTo(file.outputStream())
         }
-        null
     }
 
+    /**
+     * Queries files from Google Drive within the appDataFolder.
+     * @return Returns a FileList object containing the list of files, or null if an error occurs.
+     */
     suspend fun queryFiles(): FileList? = withContext(Dispatchers.IO) {
         drive?.files()?.list()?.setSpaces(APP_DATA_FOLDER_SPACE)?.execute()
     }
 
+    /**
+     * Creates and returns metadata for the given file name.
+     * @param fileName The name of the file.
+     * @return Returns a File object with metadata.
+     */
     private fun getMetaData(fileName: String): File {
         return File().setMimeType(FILE_MIME_TYPE).setName(fileName)
     }

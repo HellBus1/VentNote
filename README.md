@@ -27,10 +27,10 @@ Note management app built with jetpack compose and newest modern android archite
 - [v] Search and Find Notes
 - [v] Delete Notes
 - [v] Share Notes
-- [v] Dark Mode Theme
+- [v] Dark Mode & App Color Switch
 - [v] In App Update
 - [-] Widget (Waiting for stable version)
-- [-] Google Drive Backup (Soon)
+- [v] Google Drive Backup
 
 <br />
 

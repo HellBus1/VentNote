@@ -19,7 +19,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListOfBackupFile(backupPageVM: BackupPageVM) {
@@ -36,6 +39,14 @@ fun ListOfBackupFile(backupPageVM: BackupPageVM) {
     val driveBackupFileListState = backupPageVM.driveBackupFileList.observeAsState()
 
     val context = LocalContext.current
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = true) {
+        scope.launch {
+            backupPageVM.getBackupFileList()
+        }
+    }
 
     when (val state = backupPageUiState.fileBackupListState) {
         BackupPageVM.FileBackupListState.FileBackupListFinished -> {
@@ -64,7 +75,7 @@ fun ListOfBackupFile(backupPageVM: BackupPageVM) {
 
                             Row {
                                 Button(
-                                    onClick = {  },
+                                    onClick = { backupPageVM.restoreDatabase(it.id) },
                                     shape = RoundedCornerShape(10.dp),
                                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                                 ) {

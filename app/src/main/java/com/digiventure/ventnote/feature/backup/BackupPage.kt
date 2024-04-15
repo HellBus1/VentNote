@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,7 +38,6 @@ import com.digiventure.ventnote.feature.backup.viewmodel.AuthBaseVM
 import com.digiventure.ventnote.feature.backup.viewmodel.AuthMockVM
 import com.digiventure.ventnote.feature.backup.viewmodel.AuthVM
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,15 +54,7 @@ fun BackupPage(
 
     val loadingDialog = remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
-
     val context = LocalContext.current
-
-    LaunchedEffect(key1 = true) {
-        scope.launch {
-            backupPageVM.backupFileList()
-        }
-    }
 
     val fileSyncState = backupPageVM.uiState.value.fileSyncState
     LaunchedEffect(key1 = fileSyncState) {
