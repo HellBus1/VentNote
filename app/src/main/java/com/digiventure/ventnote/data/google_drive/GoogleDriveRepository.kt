@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.data.google_drive
 
 import com.digiventure.ventnote.commons.ErrorMessage
+import com.digiventure.ventnote.config.NoteDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -9,10 +10,12 @@ import javax.inject.Inject
 import com.google.api.services.drive.model.File as DriveFile
 
 class GoogleDriveRepository @Inject constructor(
-    private val service: GoogleDriveService
+    private val service: GoogleDriveService,
+    private val database: NoteDatabase
 ) {
     suspend fun uploadDatabaseFile(databaseFile: File, fileName: String): Flow<Result<Boolean>> =
         flow {
+            database.close()
             service.uploadDatabaseFile(databaseFile, fileName)
             emit(Result.success(true))
         }.catch {
@@ -21,6 +24,7 @@ class GoogleDriveRepository @Inject constructor(
 
     suspend fun restoreDatabaseFile(databaseFile: File, fileId: String): Flow<Result<Boolean>> =
         flow {
+            database.close()
             service.readFile(databaseFile, fileId)
             emit(Result.success(true))
         }.catch {

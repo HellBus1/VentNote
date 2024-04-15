@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.feature.backup.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -51,7 +50,6 @@ class BackupPageVM @Inject constructor(
         val currentState = _uiState.value.copy(fileSyncState = FileSyncState.SyncStarted)
         _uiState.value = currentState
 
-        Log.d("hasil", fileId)
         try {
             repository.restoreDatabaseFile(app.getDatabasePath(Constants.DATABASE_NAME), fileId)
                 .onEach {

@@ -27,7 +27,10 @@ class GoogleDriveService @Inject constructor(
         metaData.parents = listOf(APP_DATA_FOLDER_SPACE)
         val bytes = databaseFile.inputStream().readBytes()
         val fileContent = ByteArrayContent(FILE_MIME_TYPE, bytes)
-        drive?.files()?.create(metaData, fileContent)?.execute()
+        val file = drive?.files()?.create(metaData, fileContent)?.execute()
+        queryFiles()?.files?.forEach {
+            if (file?.id != it.id) deleteFile(it.id)
+        }
     }
 
     /**
@@ -39,6 +42,7 @@ class GoogleDriveService @Inject constructor(
         drive?.files()?.get(fileId)?.executeMediaAsInputStream()?.use {
             it.copyTo(file.outputStream())
         }
+        null
     }
 
     /**
@@ -47,6 +51,11 @@ class GoogleDriveService @Inject constructor(
      */
     suspend fun queryFiles(): FileList? = withContext(Dispatchers.IO) {
         drive?.files()?.list()?.setSpaces(APP_DATA_FOLDER_SPACE)?.execute()
+    }
+
+    private suspend fun deleteFile(fileId: String) = withContext(Dispatchers.IO) {
+        drive?.files()?.delete(fileId)?.execute()
+        fileId
     }
 
     /**
