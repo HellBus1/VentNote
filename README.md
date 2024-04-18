@@ -37,7 +37,7 @@ Note management app built with jetpack compose and newest modern android archite
 ## Supports Me
 Want to see more free, high-quality code and articles? Buy me a coffee and make it happen! 
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/syubban){:target="_blank"}
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/syubban)
 
 <br />
 
