@@ -8,8 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.persistence.NoteModel
 
-class NotesPageMockVM(
-) : ViewModel(), NotesPageBaseVM {
+class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
     override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData()
 
@@ -50,5 +49,9 @@ class NotesPageMockVM(
     override fun closeSearchEvent() {
         isSearching.value = false
         searchedTitleText.value = ""
+    }
+
+    override fun observeNotes() {
+        TODO("Not yet implemented")
     }
 }

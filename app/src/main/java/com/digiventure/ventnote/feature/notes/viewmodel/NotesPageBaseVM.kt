@@ -72,4 +72,6 @@ interface NotesPageBaseVM {
      * Close search event
      * */
     fun closeSearchEvent()
+
+    fun observeNotes()
 }

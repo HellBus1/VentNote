@@ -81,8 +81,12 @@ fun NotesPage(
         skipPartiallyExpanded = skipPartiallyExpanded.value
     )
 
+    LaunchedEffect(key1 = Unit) {
+        Log.d("hasil", "always kesini")
+        viewModel.observeNotes()
+    }
+
     LaunchedEffect(key1 = noteListState.value) {
-        // Showing error snackBar on error
         noteListState.value?.onFailure {
             scope.launch {
                 snackBarHostState.showSnackbar(
@@ -94,15 +98,12 @@ fun NotesPage(
     }
 
     LaunchedEffect(noteListState.value, viewModel.searchedTitleText.value) {
-        // Replace filteredNoteListState value with filtered noteList state
-        // every searchedTitleText changed
         filteredNoteListState.value = noteListState.value?.getOrNull()?.filter { note ->
             note.title.contains(viewModel.searchedTitleText.value, true)
         } ?: listOf()
     }
 
     LaunchedEffect(key1 = loadingState.value) {
-        // Showing loading dialog whenever loading state is true
         loadingDialog.value = (loadingState.value == true)
     }
 
