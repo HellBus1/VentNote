@@ -82,7 +82,6 @@ fun NotesPage(
     )
 
     LaunchedEffect(key1 = Unit) {
-        Log.d("hasil", "always kesini")
         viewModel.observeNotes()
     }
 

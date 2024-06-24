@@ -29,7 +29,7 @@ class BackupPageVM @Inject constructor(
     val driveBackupFileList: LiveData<List<File>> = _driveBackupFileList
 
     fun backupDatabase() = viewModelScope.launch {
-        val currentState = _uiState.value.copy(fileSyncState = FileSyncState.SyncStarted)
+        val currentState = _uiState.value.copy(fileBackupState = FileBackupState.SyncStarted)
         _uiState.value = currentState
 
         try {
@@ -37,27 +37,27 @@ class BackupPageVM @Inject constructor(
                 app.getDatabasePath(Constants.DATABASE_NAME),
                 getDatabaseNameWithTimestamps()
             ).onEach {
-                _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFinished)
+                _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
                 getBackupFileList()
             }.last()
         } catch (e: Exception) {
             val errorMessage = e.message ?: Constants.EMPTY_STRING
-            _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFailed(errorMessage))
+            _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFailed(errorMessage))
         }
     }
 
     fun restoreDatabase(fileId: String) = viewModelScope.launch {
-        val currentState = _uiState.value.copy(fileSyncState = FileSyncState.SyncStarted)
+        val currentState = _uiState.value.copy(fileRestoreState = FileRestoreState.SyncStarted)
         _uiState.value = currentState
 
         try {
             repository.restoreDatabaseFile(app.getDatabasePath(Constants.DATABASE_NAME), fileId)
                 .onEach {
-                    _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFinished)
+                    _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFinished)
                 }.last()
         } catch (e: Exception) {
             val errorMessage = e.message ?: Constants.EMPTY_STRING
-            _uiState.value = currentState.copy(fileSyncState = FileSyncState.SyncFailed(errorMessage))
+            _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFailed(errorMessage))
         }
     }
 
@@ -88,10 +88,18 @@ class BackupPageVM @Inject constructor(
         }
     }
 
-    sealed class FileSyncState {
-        object SyncStarted : FileSyncState()
-        object SyncFinished : FileSyncState()
-        data class SyncFailed(val errorMessage: String) : FileSyncState()
+    sealed class FileBackupState {
+        object SyncInitial : FileBackupState()
+        object SyncStarted : FileBackupState()
+        object SyncFinished : FileBackupState()
+        data class SyncFailed(val errorMessage: String) : FileBackupState()
+    }
+
+    sealed class FileRestoreState {
+        object SyncInitial : FileRestoreState()
+        object SyncStarted : FileRestoreState()
+        object SyncFinished : FileRestoreState()
+        data class SyncFailed(val errorMessage: String) : FileRestoreState()
     }
 
     sealed class FileBackupListState {
@@ -102,7 +110,8 @@ class BackupPageVM @Inject constructor(
 
     data class BackupPageState(
         var fileBackupListState: FileBackupListState = FileBackupListState.FileBackupListFinished,
-        var fileSyncState: FileSyncState = FileSyncState.SyncFinished
+        var fileBackupState: FileBackupState = FileBackupState.SyncInitial,
+        var fileRestoreState: FileRestoreState = FileRestoreState.SyncInitial
     )
 
     private fun getDatabaseNameWithTimestamps(): String {
