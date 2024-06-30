@@ -12,6 +12,7 @@ import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.last
@@ -42,6 +43,8 @@ class NotesPageVM @Inject constructor(
 
     override val isMarking = mutableStateOf(false)
     override val markedNoteList = mutableStateListOf<NoteModel>()
+
+    private var observeKeysJob: Job? = null
 
     override fun markAllNote(notes: List<NoteModel>) {
         markedNoteList.addAll(notes.minus((markedNoteList).toSet()))
@@ -84,7 +87,8 @@ class NotesPageVM @Inject constructor(
     }
 
     override fun observeNotes() {
-        viewModelScope.launch {
+        observeKeysJob?.cancel()
+        observeKeysJob = viewModelScope.launch {
             sortAndOrderData.asFlow().collectLatest {
                 loader.postValue(true)
                 try {

@@ -25,15 +25,17 @@ import com.digiventure.ventnote.R
 import com.digiventure.ventnote.feature.backup.viewmodel.AuthBaseVM
 
 @Composable
-fun SignInButton(authViewModel: AuthBaseVM) {
+fun SignInButton(authViewModel: AuthBaseVM, signInSuccessCallback: () -> Unit) {
     val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            authViewModel.checkAuthState()
-        } else {
-            Toast.makeText(context, "Auth Failed", Toast.LENGTH_LONG).show()
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                authViewModel.checkAuthState()
+                signInSuccessCallback()
+            } else {
+                Toast.makeText(context, "Auth Failed", Toast.LENGTH_LONG).show()
+            }
         }
-    }
 
     Button(
         onClick = { launcher.launch(authViewModel.getSignInIntent()) },

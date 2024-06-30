@@ -17,7 +17,7 @@ interface AuthBaseVM {
     /**
      * Sign out
      * */
-    fun signOut()
+    fun signOut(onCompleteSignOutCallback: () -> Unit)
     /**
      * To prompt google sign in page manually
      * */

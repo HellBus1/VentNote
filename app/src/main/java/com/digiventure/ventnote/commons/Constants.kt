@@ -32,7 +32,8 @@ object ErrorMessage {
     const val FAILED_UPDATE_NOTE_ROOM = "Failed to update list of notes"
     const val FAILED_INSERT_NOTE_ROOM = "Failed to insert list of notes"
 
-    const val FAILED_UPLOAD_DATABASE = "Failed to upload backup file"
-    const val FAILED_RESTORE_DATABASE = "Failed to restore backup file"
+    const val FAILED_UPLOAD_DATABASE_FILE = "Failed to upload backup file"
+    const val FAILED_RESTORE_DATABASE_FILE = "Failed to restore backup file"
     const val FAILED_GET_LIST_BACKUP_FILE = "Failed to get backup files"
+    const val FAILED_DELETE_DATABASE_FILE = "Failed to delete file"
 }

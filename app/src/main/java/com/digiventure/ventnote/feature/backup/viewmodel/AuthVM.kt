@@ -36,10 +36,11 @@ class AuthVM @Inject constructor(
         checkAuthState()
     }
 
-    override fun signOut() {
+    override fun signOut(onCompleteSignOutCallback: () -> Unit) {
         googleSignInClient.signOut()
             .addOnCompleteListener {
                 checkAuthState()
+                onCompleteSignOutCallback()
             }
     }
 

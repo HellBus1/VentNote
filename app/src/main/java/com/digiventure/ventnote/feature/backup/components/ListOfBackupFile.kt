@@ -2,17 +2,20 @@ package com.digiventure.ventnote.feature.backup.components
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -50,28 +53,43 @@ fun ListOfBackupFile(backupPageVM: BackupPageVM, successfullyRestoredCallback: (
 
     val loadingDialog = remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = true) {
+    val fileRestoreState = backupPageVM.uiState.value.fileRestoreState
+    val fileDeleteState = backupPageVM.uiState.value.fileDeleteState
+
+    LaunchedEffect(key1 = true, key2 = backupPageVM.uiState.value.fileDeleteState) {
         scope.launch {
             backupPageVM.getBackupFileList()
         }
     }
 
-    val fileRestoreState = backupPageVM.uiState.value.fileRestoreState
-    LaunchedEffect(key1 = fileRestoreState) {
-        when(fileRestoreState) {
-            is BackupPageVM.FileRestoreState.SyncFailed -> {
+    LaunchedEffect(
+        key1 = backupPageVM.uiState.value.fileRestoreState,
+        key2 = backupPageVM.uiState.value.fileDeleteState
+    ) {
+        when {
+            fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed ||
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> {
                 loadingDialog.value = false
-                val errorMessage = fileRestoreState.errorMessage
+                val errorMessage = when {
+                    fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed -> fileRestoreState.errorMessage
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> fileDeleteState.errorMessage
+                    else -> ""
+                }
                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
-            BackupPageVM.FileRestoreState.SyncFinished -> {
+
+            fileRestoreState is BackupPageVM.FileRestoreState.SyncFinished ||
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFinished -> {
                 loadingDialog.value = false
                 successfullyRestoredCallback()
             }
-            BackupPageVM.FileRestoreState.SyncStarted -> {
+
+            fileRestoreState is BackupPageVM.FileRestoreState.SyncStarted ||
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncStarted -> {
                 loadingDialog.value = true
             }
-            BackupPageVM.FileRestoreState.SyncInitial -> {}
+
+            else -> {}
         }
     }
 
@@ -89,7 +107,8 @@ fun ListOfBackupFile(backupPageVM: BackupPageVM, successfullyRestoredCallback: (
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = it.name ?: Constants.EMPTY_STRING,
+                            Text(
+                                text = it.name ?: Constants.EMPTY_STRING,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                                 fontWeight = FontWeight.Bold,
@@ -104,10 +123,28 @@ fun ListOfBackupFile(backupPageVM: BackupPageVM, successfullyRestoredCallback: (
                                 Button(
                                     onClick = { backupPageVM.restoreDatabase(it.id) },
                                     shape = RoundedCornerShape(10.dp),
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                    contentPadding = PaddingValues(
+                                        horizontal = 8.dp,
+                                        vertical = 4.dp
+                                    )
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.CloudDownload,
+                                        contentDescription = "",
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                    )
+                                }
+                                Box(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = { backupPageVM.deleteDatabase(it.id) },
+                                    shape = RoundedCornerShape(10.dp),
+                                    contentPadding = PaddingValues(
+                                        horizontal = 8.dp,
+                                        vertical = 4.dp
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Delete,
                                         contentDescription = "",
                                         tint = MaterialTheme.colorScheme.onPrimary,
                                     )
@@ -118,17 +155,22 @@ fun ListOfBackupFile(backupPageVM: BackupPageVM, successfullyRestoredCallback: (
                 }
             }
         }
+
         is BackupPageVM.FileBackupListState.FileBackupListFailed -> {
             val errorMessage = state.errorMessage
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
         }
+
         is BackupPageVM.FileBackupListState.FileBackupListStarted -> {
-            CircularProgressIndicator(modifier = Modifier
-                .size(24.dp)
-                .padding(top = 16.dp))
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(top = 16.dp)
+            )
         }
     }
 
-    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
+    LoadingDialog(isOpened = loadingDialog.value,
+        onDismissCallback = { loadingDialog.value = false },
         modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
 }

@@ -22,7 +22,11 @@ import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignedInButtons(authViewModel: AuthBaseVM, backupPageVM: BackupPageVM) {
+fun SignedInButtons(
+    authViewModel: AuthBaseVM,
+    backupPageVM: BackupPageVM,
+    signOutSuccessCallback: () -> Unit
+) {
     val scope = rememberCoroutineScope()
 
     fun backupDatabase() {
@@ -36,7 +40,11 @@ fun SignedInButtons(authViewModel: AuthBaseVM, backupPageVM: BackupPageVM) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Button(
-            onClick = { authViewModel.signOut() },
+            onClick = {
+                authViewModel.signOut(onCompleteSignOutCallback = {
+                    signOutSuccessCallback()
+                })
+            },
             shape = RoundedCornerShape(10.dp)
         ) {
             Text(

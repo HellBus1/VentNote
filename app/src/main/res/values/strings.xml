@@ -81,6 +81,7 @@
     <string name="note_is_successfully_deleted">Note is successfully deleted</string>
     <string name="successfully_backed_up">Note is successfully backed up</string>
     <string name="successfully_restored">Note is successfully restored</string>
+    <string name="successfully_updated">Note is successfully updated</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>

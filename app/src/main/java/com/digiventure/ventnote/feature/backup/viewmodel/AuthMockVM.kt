@@ -13,7 +13,7 @@ class AuthMockVM: ViewModel(), AuthBaseVM {
     override val eventFlow: SharedFlow<AuthVM.AuthState>
         get() = MutableSharedFlow()
 
-    override fun signOut() {
+    override fun signOut(onCompleteSignOutCallback: () -> Unit) {
 
     }
 

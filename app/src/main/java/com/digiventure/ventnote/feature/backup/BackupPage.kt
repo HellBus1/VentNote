@@ -66,7 +66,7 @@ fun BackupPage(
     val context = LocalContext.current
 
     val backedUpMessage = stringResource(id = R.string.successfully_backed_up)
-    val restoredMessage = stringResource(id = R.string.successfully_restored)
+    val restoredMessage = stringResource(id = R.string.successfully_updated)
 
     val fileBackupState = backupPageVM.uiState.value.fileBackupState
     LaunchedEffect(key1 = fileBackupState) {
@@ -111,8 +111,12 @@ fun BackupPage(
                     Spacer(modifier = Modifier.padding(8.dp))
                     when (authUiState.authState) {
                         AuthVM.AuthState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
-                        AuthVM.AuthState.SignedOut -> SignInButton(authViewModel)
-                        AuthVM.AuthState.SignedIn -> SignedInButtons(authViewModel, backupPageVM)
+                        AuthVM.AuthState.SignedOut -> SignInButton(authViewModel, signInSuccessCallback = {
+                            backupPageVM.getBackupFileList()
+                        })
+                        AuthVM.AuthState.SignedIn -> SignedInButtons(authViewModel, backupPageVM, signOutSuccessCallback = {
+                            backupPageVM.getBackupFileList()
+                        })
                     }
                     Spacer(modifier = Modifier.padding(6.dp))
                     HorizontalDivider(

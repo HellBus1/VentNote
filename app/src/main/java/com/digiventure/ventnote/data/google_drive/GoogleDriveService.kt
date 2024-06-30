@@ -15,7 +15,6 @@ import javax.inject.Inject
 import java.io.File as JavaFile
 
 class GoogleDriveService @Inject constructor(
-    private val drive: Drive?,
     private val proxy: DatabaseProxy,
     private val mutex: Mutex,
     private val scope: CoroutineScope,
@@ -31,7 +30,8 @@ class GoogleDriveService @Inject constructor(
      * @param databaseFile The JavaFile representing the database file.
      * @param fileName The name of the file to be uploaded.
      */
-    suspend fun uploadDatabaseFile(databaseFile: JavaFile, fileName: String) = withContext(dispatcher + scope.coroutineContext) {
+    suspend fun uploadDatabaseFile(databaseFile: JavaFile, fileName: String, drive: Drive?) =
+        withContext(dispatcher + scope.coroutineContext) {
         mutex.withLock {
             proxy.reset()
 
@@ -39,10 +39,7 @@ class GoogleDriveService @Inject constructor(
             metaData.parents = listOf(APP_DATA_FOLDER_SPACE)
             val bytes = databaseFile.inputStream().readBytes()
             val fileContent = ByteArrayContent(FILE_MIME_TYPE, bytes)
-            val file = drive?.files()?.create(metaData, fileContent)?.execute()
-            queryFiles()?.files?.forEach {
-                if (file?.id != it.id) deleteFile(it.id)
-            }
+            drive?.files()?.create(metaData, fileContent)?.execute()
         }
     }
 
@@ -51,7 +48,8 @@ class GoogleDriveService @Inject constructor(
      * @param file The JavaFile to which the file content will be written.
      * @param fileId The ID of the file to be read from Google Drive.
      */
-    suspend fun readFile(file: JavaFile, fileId: String) = withContext(dispatcher + scope.coroutineContext) {
+    suspend fun readFile(file: JavaFile, fileId: String, drive: Drive?) =
+        withContext(dispatcher + scope.coroutineContext) {
         mutex.withLock {
             proxy.reset()
 
@@ -66,11 +64,11 @@ class GoogleDriveService @Inject constructor(
      * Queries files from Google Drive within the appDataFolder.
      * @return Returns a FileList object containing the list of files, or null if an error occurs.
      */
-    suspend fun queryFiles(): FileList? = withContext(Dispatchers.IO) {
+    suspend fun queryFiles(drive: Drive?): FileList? = withContext(Dispatchers.IO) {
         drive?.files()?.list()?.setSpaces(APP_DATA_FOLDER_SPACE)?.execute()
     }
 
-    private suspend fun deleteFile(fileId: String) = withContext(Dispatchers.IO) {
+    suspend fun deleteFile(fileId: String, drive: Drive?) = withContext(Dispatchers.IO) {
         drive?.files()?.delete(fileId)?.execute()
         fileId
     }
