@@ -11,10 +11,12 @@ import androidx.lifecycle.viewModelScope
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.config.DriveAPI
 import com.digiventure.ventnote.data.google_drive.GoogleDriveRepository
+import com.digiventure.ventnote.data.persistence.NoteRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -26,7 +28,8 @@ import javax.inject.Inject
 @HiltViewModel
 class BackupPageVM @Inject constructor(
     private val app: Application,
-    private val repository: GoogleDriveRepository
+    private val repository: GoogleDriveRepository,
+    private val databaseRepository: NoteRepository
 ): ViewModel() {
     private val _uiState = mutableStateOf(BackupPageState())
     val uiState: State<BackupPageState> = _uiState
@@ -41,14 +44,17 @@ class BackupPageVM @Inject constructor(
         val drive = getDriveInstance()
 
         try {
-            repository.uploadDatabaseFile(
-                app.getDatabasePath(Constants.DATABASE_NAME),
-                getDatabaseNameWithTimestamps(),
-                drive
-            ).onEach {
-                _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
-                getBackupFileList()
-            }.last()
+            databaseRepository.getNoteList(Constants.UPDATED_AT, Constants.DESCENDING)
+                .collect {
+                    repository.uploadDatabaseFile(
+                        it.getOrDefault(listOf()),
+                        getDatabaseNameWithTimestamps(),
+                        drive
+                    ).onEach {
+                        _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
+                        getBackupFileList()
+                    }.last()
+                }
         } catch (e: Exception) {
             val errorMessage = e.message ?: Constants.EMPTY_STRING
             _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFailed(errorMessage))
@@ -62,7 +68,7 @@ class BackupPageVM @Inject constructor(
         val drive = getDriveInstance()
 
         try {
-            repository.restoreDatabaseFile(app.getDatabasePath(Constants.DATABASE_NAME), fileId, drive)
+            repository.restoreDatabaseFile(fileId, drive)
                 .onEach {
                     _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFinished)
                 }.last()
@@ -162,6 +168,7 @@ class BackupPageVM @Inject constructor(
     private fun getDatabaseNameWithTimestamps(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault())
         val timestamp = dateFormat.format(Calendar.getInstance().time)
-        return Constants.DATABASE_NAME + "_" + timestamp
+        val jsonFormat = ".json"
+        return Constants.DATABASE_NAME + "_" + timestamp + jsonFormat
     }
 }

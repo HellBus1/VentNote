@@ -2,10 +2,8 @@ package com.digiventure.ventnote.module.proxy
 
 import android.app.Application
 import com.digiventure.ventnote.config.NoteDatabase
+import com.digiventure.ventnote.data.persistence.NoteDAO
 
-interface Resettable {
-    fun reset()
-}
 
 interface Provider<T> {
     fun getObject() : T
@@ -13,18 +11,20 @@ interface Provider<T> {
 
 class DatabaseProxy(
     private val application: Application
-): Provider<NoteDatabase>, Resettable {
+) : Provider<NoteDatabase> {
 
-    private var database: NoteDatabase = NoteDatabase.getInstance(application)
-
-    @Synchronized
-    override fun getObject(): NoteDatabase = database
+    @Volatile
+    private var database: NoteDatabase? = null
 
     @Synchronized
-    override fun reset() {
-        if (database.isOpen) {
-            database.close()
+    override fun getObject(): NoteDatabase {
+        if (database == null) {
             database = NoteDatabase.getInstance(application)
         }
+        return database!!
+    }
+
+    fun dao(): NoteDAO {
+        return getObject().dao()
     }
 }

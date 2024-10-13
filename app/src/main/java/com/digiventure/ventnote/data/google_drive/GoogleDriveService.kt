@@ -1,27 +1,25 @@
 package com.digiventure.ventnote.data.google_drive
 
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.google.api.client.http.ByteArrayContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import java.io.File as JavaFile
 
 class GoogleDriveService @Inject constructor(
-    private val proxy: DatabaseProxy,
-    private val mutex: Mutex,
     private val scope: CoroutineScope,
+    private val proxy: DatabaseProxy,
     private val dispatcher: ExecutorCoroutineDispatcher,
 ) {
     companion object {
-        private const val FILE_MIME_TYPE = "application/x-sqlite3"
+        private const val FILE_MIME_TYPE = "application/json"
         private const val APP_DATA_FOLDER_SPACE = "appDataFolder"
     }
 
@@ -30,17 +28,17 @@ class GoogleDriveService @Inject constructor(
      * @param databaseFile The JavaFile representing the database file.
      * @param fileName The name of the file to be uploaded.
      */
-    suspend fun uploadDatabaseFile(databaseFile: JavaFile, fileName: String, drive: Drive?) =
+    // TODO:
+    //  1. Pass the list of data instead of database file
+    //  2. Write the data into the json file, then upload
+    //  3. Delete local json file
+    suspend fun uploadDatabaseFile(notes: List<NoteModel>, fileName: String, drive: Drive?) =
         withContext(dispatcher + scope.coroutineContext) {
-        mutex.withLock {
-            proxy.reset()
-
             val metaData = getMetaData(fileName)
             metaData.parents = listOf(APP_DATA_FOLDER_SPACE)
-            val bytes = databaseFile.inputStream().readBytes()
-            val fileContent = ByteArrayContent(FILE_MIME_TYPE, bytes)
+            val jsonString = Gson().toJson(notes)
+            val fileContent = ByteArrayContent(FILE_MIME_TYPE, jsonString.toByteArray())
             drive?.files()?.create(metaData, fileContent)?.execute()
-        }
     }
 
     /**
@@ -48,16 +46,18 @@ class GoogleDriveService @Inject constructor(
      * @param file The JavaFile to which the file content will be written.
      * @param fileId The ID of the file to be read from Google Drive.
      */
-    suspend fun readFile(file: JavaFile, fileId: String, drive: Drive?) =
+    // TODO:
+    //  1. Parse json file to database model
+    //  2. Insert all data into database
+    suspend fun readFile(fileId: String, drive: Drive?) =
         withContext(dispatcher + scope.coroutineContext) {
-        mutex.withLock {
-            proxy.reset()
-
-            drive?.files()?.get(fileId)?.executeMediaAsInputStream()?.use {
-                file.delete()
-                it.copyTo(file.outputStream())
+            val jsonString = drive?.files()?.get(fileId)?.executeMediaAsInputStream()?.use {
+                it.bufferedReader().use { reader ->
+                    reader.readText()
+                }
             }
-        }
+            val notes = Gson().fromJson(jsonString, Array<NoteModel>::class.java).toList()
+            proxy.dao().upsertNotesWithTimestamp(notes)
     }
 
     /**

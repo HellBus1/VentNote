@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
@@ -41,10 +42,24 @@ interface NoteDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertNote(note: NoteModel): Long
 
+    @Transaction
     fun insertWithTimestamp(note: NoteModel): Long {
         return insertNote(note.apply{
             createdAt = Date(System.currentTimeMillis())
             updatedAt = Date(System.currentTimeMillis())
         })
+    }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsertNotes(notes: List<NoteModel>)
+
+    @Transaction
+    fun upsertNotesWithTimestamp(notes: List<NoteModel>) {
+        val currentTimestamp = Date(System.currentTimeMillis())
+        notes.forEach { note ->
+            note.createdAt = currentTimestamp
+            note.updatedAt = currentTimestamp
+        }
+        upsertNotes(notes)
     }
 }

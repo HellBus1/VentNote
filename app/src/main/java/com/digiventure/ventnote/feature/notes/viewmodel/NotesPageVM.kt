@@ -27,7 +27,7 @@ class NotesPageVM @Inject constructor(
 ): ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
     override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData(
-        Pair(Constants.CREATED_AT, Constants.DESCENDING)
+        Pair(Constants.UPDATED_AT, Constants.DESCENDING)
     )
 
     override val noteList: LiveData<Result<List<NoteModel>>>
@@ -43,8 +43,6 @@ class NotesPageVM @Inject constructor(
 
     override val isMarking = mutableStateOf(false)
     override val markedNoteList = mutableStateListOf<NoteModel>()
-
-    private var observeKeysJob: Job? = null
 
     override fun markAllNote(notes: List<NoteModel>) {
         markedNoteList.addAll(notes.minus((markedNoteList).toSet()))
@@ -69,6 +67,7 @@ class NotesPageVM @Inject constructor(
             val items: List<NoteModel> = if (notes.isEmpty()) { markedNoteList } else { notes.toList() }
             repository.deleteNoteList(*items.toTypedArray()).onEach {
                 loader.postValue(false)
+                observeNotes()
             }.last()
         } catch (e: Exception) {
             loader.postValue(false)
@@ -87,8 +86,7 @@ class NotesPageVM @Inject constructor(
     }
 
     override fun observeNotes() {
-        observeKeysJob?.cancel()
-        observeKeysJob = viewModelScope.launch {
+        viewModelScope.launch {
             sortAndOrderData.asFlow().collectLatest {
                 loader.postValue(true)
                 try {

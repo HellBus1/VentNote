@@ -20,9 +20,6 @@ class ApplicationModule {
     fun provideCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob())
 
     @Provides
-    fun provideMutex(): Mutex = Mutex()
-
-    @Provides
     @Singleton
     fun provideExecutorCoroutineDispatcher(): ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 }

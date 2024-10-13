@@ -11,41 +11,41 @@ import javax.inject.Inject
 class NoteLocalService @Inject constructor(
     private val proxy: DatabaseProxy
 ) {
-    suspend fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> {
-        return proxy.getObject().dao().getNotes(sortBy, order).map {
+    fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> {
+        return proxy.dao().getNotes(sortBy, order).map {
             Result.success(it)
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_NOTE_LIST_ROOM)))
         }
     }
 
-    suspend fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
+    fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
         flow {
-            val result = (proxy.getObject().dao().deleteNotes(*notes) == notes.size)
+            val result = (proxy.dao().deleteNotes(*notes) == notes.size)
             emit(Result.success(result))
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_DELETE_ROOM)))
         }
 
-    suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> {
-        return proxy.getObject().dao().getNoteDetail(id).map {
+    fun getNoteDetail(id: Int): Flow<Result<NoteModel>> {
+        return proxy.dao().getNoteDetail(id).map {
             Result.success(it)
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_NOTE_DETAIL_ROOM)))
         }
     }
 
-    suspend fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
+    fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
         flow {
-            val result = proxy.getObject().dao().updateWithTimestamp(note) >= 1
+            val result = proxy.dao().updateWithTimestamp(note) >= 1
             emit(Result.success(result))
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPDATE_NOTE_ROOM)))
         }
 
-    suspend fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
+    fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
         flow {
-            val result = proxy.getObject().dao().insertWithTimestamp(note) != -1L
+            val result = proxy.dao().insertWithTimestamp(note) != -1L
             emit(Result.success(result))
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_INSERT_NOTE_ROOM)))
