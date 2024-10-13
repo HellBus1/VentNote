@@ -28,10 +28,6 @@ class GoogleDriveService @Inject constructor(
      * @param databaseFile The JavaFile representing the database file.
      * @param fileName The name of the file to be uploaded.
      */
-    // TODO:
-    //  1. Pass the list of data instead of database file
-    //  2. Write the data into the json file, then upload
-    //  3. Delete local json file
     suspend fun uploadDatabaseFile(notes: List<NoteModel>, fileName: String, drive: Drive?) =
         withContext(dispatcher + scope.coroutineContext) {
             val metaData = getMetaData(fileName)
@@ -46,9 +42,6 @@ class GoogleDriveService @Inject constructor(
      * @param file The JavaFile to which the file content will be written.
      * @param fileId The ID of the file to be read from Google Drive.
      */
-    // TODO:
-    //  1. Parse json file to database model
-    //  2. Insert all data into database
     suspend fun readFile(fileId: String, drive: Drive?) =
         withContext(dispatcher + scope.coroutineContext) {
             val jsonString = drive?.files()?.get(fileId)?.executeMediaAsInputStream()?.use {
