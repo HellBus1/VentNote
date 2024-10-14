@@ -6,7 +6,6 @@ import com.google.api.services.drive.Drive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 import com.google.api.services.drive.model.File as DriveFile
 
@@ -15,7 +14,7 @@ class GoogleDriveRepository @Inject constructor(
 ) {
     fun uploadDatabaseFile(notes: List<NoteModel>, fileName: String, drive: Drive?): Flow<Result<Unit>> = flow {
         val result = service.uploadDatabaseFile(notes, fileName, drive)
-        emit(result) // Emit the Result from the service
+        emit(result)
     }.catch { e ->
         emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPLOAD_DATABASE_FILE, e)))
     }
