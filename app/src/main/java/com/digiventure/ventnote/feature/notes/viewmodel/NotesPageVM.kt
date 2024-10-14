@@ -12,7 +12,6 @@ import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.last

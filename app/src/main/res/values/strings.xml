@@ -11,6 +11,8 @@
     <string name="search_nav_icon">search nav icon</string>
     <string name="sort_nav_icon">sort nav icon</string>
     <string name="delete_nav_icon">delete nav icon</string>
+    <string name="logout_nav_icon">logout nav icon</string>
+    <string name="backup_nav_icon">backup nav icon</string>
     <string name="dropdown_nav_icon">dropdown nav icon</string>
     <string name="back_nav_icon">back nav icon</string>
     <string name="menu_nav_icon">menu nav icon</string>
@@ -40,6 +42,7 @@
     <string name="share_note_as_text">Share Note as Text</string>
     <string name="sign_in_with_google">Sign in With Google</string>
     <string name="sign_out">Sign Out</string>
+    <string name="refresh">Refresh</string>
 
     <!--  TextField placeholder  -->
     <string name="search_textField">Input title here</string>

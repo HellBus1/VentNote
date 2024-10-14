@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
 import android.content.pm.ActivityInfo
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -182,7 +181,6 @@ fun NotesPage(
                             deleteDialog.value = true
                         },
                         closeSearchCallback = {
-                            Log.d("pressed", "close pressed")
                             viewModel.closeSearchEvent()
                         }
                     )

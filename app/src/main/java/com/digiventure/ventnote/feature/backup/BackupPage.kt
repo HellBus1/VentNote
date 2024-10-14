@@ -2,14 +2,10 @@ package com.digiventure.ventnote.feature.backup
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -38,10 +34,11 @@ import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.feature.backup.components.BackupPageAppBar
 import com.digiventure.ventnote.feature.backup.components.ListOfBackupFile
 import com.digiventure.ventnote.feature.backup.components.SignInButton
-import com.digiventure.ventnote.feature.backup.components.SignedInButtons
 import com.digiventure.ventnote.feature.backup.viewmodel.AuthBaseVM
 import com.digiventure.ventnote.feature.backup.viewmodel.AuthMockVM
 import com.digiventure.ventnote.feature.backup.viewmodel.AuthVM
+import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageBaseVM
+import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageMockVM
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
 import kotlinx.coroutines.launch
 
@@ -50,7 +47,7 @@ import kotlinx.coroutines.launch
 fun BackupPage(
     navHostController: NavHostController,
     authViewModel: AuthBaseVM = hiltViewModel<AuthVM>(),
-    backupPageVM: BackupPageVM = hiltViewModel<BackupPageVM>()
+    backupPageVM: BackupPageBaseVM = hiltViewModel<BackupPageVM>()
 ) {
     val authUiState = authViewModel.uiState.value
 
@@ -67,6 +64,12 @@ fun BackupPage(
 
     val backedUpMessage = stringResource(id = R.string.successfully_backed_up)
     val restoredMessage = stringResource(id = R.string.successfully_updated)
+
+    fun backupDatabase() {
+        scope.launch {
+            backupPageVM.backupDatabase()
+        }
+    }
 
     val fileBackupState = backupPageVM.uiState.value.fileBackupState
     LaunchedEffect(key1 = fileBackupState) {
@@ -96,56 +99,54 @@ fun BackupPage(
         topBar = {
             BackupPageAppBar(
                 onBackPressed = { navHostController.popBackStack() },
-                scrollBehavior = rememberedScrollBehavior
+                scrollBehavior = rememberedScrollBehavior,
+                onBackupPressed = {
+                    backupDatabase()
+                },
+                onLogoutPressed = {
+                    authViewModel.signOut(onCompleteSignOutCallback = {
+                        backupPageVM.getBackupFileList()
+                    })
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         content = { contentPadding ->
-            Box(modifier = Modifier.padding(contentPadding)) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp)
-                ) {
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    when (authUiState.authState) {
-                        AuthVM.AuthState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
-                        AuthVM.AuthState.SignedOut -> SignInButton(authViewModel, signInSuccessCallback = {
-                            backupPageVM.getBackupFileList()
-                        })
-                        AuthVM.AuthState.SignedIn -> SignedInButtons(authViewModel, backupPageVM, signOutSuccessCallback = {
-                            backupPageVM.getBackupFileList()
-                        })
-                    }
-                    Spacer(modifier = Modifier.padding(6.dp))
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    ListOfBackupFile(backupPageVM = backupPageVM) {
-                        scope.launch {
-                            snackBarHostState.showSnackbar(
-                                message = restoredMessage,
-                                withDismissAction = true
-                            )
+            Box(
+                modifier = Modifier.padding(contentPadding).padding(start = 16.dp, end = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                when (authUiState.authState) {
+                    AuthVM.AuthState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                    AuthVM.AuthState.SignedOut -> SignInButton(authViewModel, signInSuccessCallback = {
+                        backupPageVM.getBackupFileList()
+                    })
+                    AuthVM.AuthState.SignedIn -> {
+                        ListOfBackupFile(backupPageVM = backupPageVM) {
+                            scope.launch {
+                                snackBarHostState.showSnackbar(
+                                    message = restoredMessage,
+                                    withDismissAction = true
+                                )
+                            }
                         }
                     }
                 }
             }
         },
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.background
     )
 
     LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
         modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
 }
 
-@Preview
+@Preview(device = "id:pixel_xl")
 @Composable
 fun BackupPagePreview() {
     BackupPage(
         navHostController = rememberNavController(),
-        authViewModel = AuthMockVM()
+        authViewModel = AuthMockVM(),
+        backupPageVM = BackupPageMockVM()
     )
 }

@@ -3,6 +3,8 @@ package com.digiventure.ventnote.feature.backup.components
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +26,8 @@ import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 @Composable
 fun BackupPageAppBar(
     onBackPressed: () -> Unit,
+    onLogoutPressed: () -> Unit,
+    onBackupPressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior) {
     TopAppBar(
         title = {
@@ -47,5 +51,31 @@ fun BackupPageAppBar(
         },
         scrollBehavior = scrollBehavior,
         modifier = Modifier.semantics {  },
+        actions = {
+            TrailingMenuIcons(
+                onBackupPressed = onBackupPressed,
+                onLogoutPressed = onLogoutPressed
+            )
+        }
     )
+}
+
+@Composable
+fun TrailingMenuIcons(
+    onLogoutPressed: () -> Unit,
+    onBackupPressed: () -> Unit,
+) {
+    TopNavBarIcon(
+        Icons.AutoMirrored.Filled.Logout,
+        stringResource(R.string.logout_nav_icon),
+        modifier = Modifier.semantics { }) {
+        onLogoutPressed()
+    }
+
+    TopNavBarIcon(
+        Icons.Filled.CloudUpload,
+        stringResource(R.string.backup),
+        modifier = Modifier.semantics { }) {
+        onBackupPressed()
+    }
 }

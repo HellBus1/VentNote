@@ -52,6 +52,6 @@ class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
     }
 
     override fun observeNotes() {
-        TODO("Not yet implemented")
+
     }
 }

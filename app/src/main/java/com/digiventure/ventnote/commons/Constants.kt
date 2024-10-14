@@ -9,7 +9,7 @@ object Constants {
     const val GLOBAL_PREFERENCE = "GLOBAL_PREFERENCE"
     const val COLOR_SCHEME = "COLOR_SCHEME"
     const val COLOR_PALLET = "COLOR_PALLET"
-    const val DATABASE_NAME = "note_database"
+    const val BACKUP_FILE_NAME = "backup"
     const val EMPTY_STRING = ""
 }
 

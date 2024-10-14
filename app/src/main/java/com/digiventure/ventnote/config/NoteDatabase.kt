@@ -42,7 +42,7 @@ abstract class NoteDatabase: RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context,
                         NoteDatabase::class.java,
-                        Constants.DATABASE_NAME
+                        Constants.BACKUP_FILE_NAME
                     ).build()
                 }
             }
