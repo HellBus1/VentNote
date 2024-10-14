@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -172,31 +173,33 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
         }
 
         is BackupPageVM.FileBackupListState.FileBackupListFailed -> {
-            val errorMessage = state.errorMessage
-            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+//            val errorMessage = state.errorMessage
+//            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
 
-            OutlinedButton(
-                shape = RoundedCornerShape(10.dp),
-                onClick = {
-                    scope.launch {
-                        backupPageVM.getBackupFileList()
-                    }
-                },
-                contentPadding = PaddingValues(
-                    horizontal = 2.dp,
-                )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = stringResource(id = R.string.refresh),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                )
+                Button(
+                    shape = RoundedCornerShape(10.dp),
+                    onClick = {
+                        scope.launch {
+                            backupPageVM.getBackupFileList()
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(id = R.string.refresh),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
             }
         }
 

@@ -2,6 +2,7 @@ package com.digiventure.ventnote.feature.backup
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
@@ -117,10 +118,20 @@ fun BackupPage(
                 contentAlignment = Alignment.Center
             ) {
                 when (authUiState.authState) {
-                    AuthVM.AuthState.Loading -> CircularProgressIndicator(modifier = Modifier.size(32.dp))
-                    AuthVM.AuthState.SignedOut -> SignInButton(authViewModel, signInSuccessCallback = {
-                        backupPageVM.getBackupFileList()
-                    })
+                    AuthVM.AuthState.Loading -> Box(
+                        modifier = Modifier.padding(top = 16.dp).fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                    }
+                    AuthVM.AuthState.SignedOut -> Box(
+                        modifier = Modifier.padding(top = 16.dp).fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SignInButton(authViewModel, signInSuccessCallback = {
+                            backupPageVM.getBackupFileList()
+                        })
+                    }
                     AuthVM.AuthState.SignedIn -> {
                         ListOfBackupFile(backupPageVM = backupPageVM) {
                             scope.launch {

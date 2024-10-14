@@ -66,16 +66,16 @@ fun TrailingMenuIcons(
     onBackupPressed: () -> Unit,
 ) {
     TopNavBarIcon(
-        Icons.AutoMirrored.Filled.Logout,
-        stringResource(R.string.logout_nav_icon),
-        modifier = Modifier.semantics { }) {
-        onLogoutPressed()
-    }
-
-    TopNavBarIcon(
         Icons.Filled.CloudUpload,
         stringResource(R.string.backup),
         modifier = Modifier.semantics { }) {
         onBackupPressed()
+    }
+
+    TopNavBarIcon(
+        Icons.AutoMirrored.Filled.Logout,
+        stringResource(R.string.logout_nav_icon),
+        modifier = Modifier.semantics { }) {
+        onLogoutPressed()
     }
 }
