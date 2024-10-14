@@ -173,8 +173,8 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
         }
 
         is BackupPageVM.FileBackupListState.FileBackupListFailed -> {
-//            val errorMessage = state.errorMessage
-//            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            val errorMessage = state.errorMessage
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
 
             Box(
                 modifier = Modifier.fillMaxSize(),
