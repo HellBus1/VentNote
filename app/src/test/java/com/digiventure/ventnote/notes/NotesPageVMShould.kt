@@ -58,7 +58,7 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Test
     fun haveNullNoteListInTheInitialState() {
-        val noteList = viewModel.noteList.getValueForTest();
+        val noteList = viewModel.noteList.getValueForTest()
 
         assertEquals(noteList?.getOrNull(), null)
     }
