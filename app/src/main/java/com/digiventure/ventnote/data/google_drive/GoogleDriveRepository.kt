@@ -34,7 +34,6 @@ class GoogleDriveRepository @Inject constructor(
         }
         emit(transformedResult)
     }.catch { e ->
-        Log.e("fetch list backup", e.message.toString())
         emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_LIST_BACKUP_FILE, e)))
     }
 

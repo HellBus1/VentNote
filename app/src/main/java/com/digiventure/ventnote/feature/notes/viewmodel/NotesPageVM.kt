@@ -28,6 +28,8 @@ class NotesPageVM @Inject constructor(
         Pair(Constants.UPDATED_AT, Constants.DESCENDING)
     )
 
+    val defaultException = Exception("Unknown error")
+
     override val noteList: LiveData<Result<List<NoteModel>>>
         get() = _noteList
     private val _noteList = MutableLiveData<Result<List<NoteModel>>>()
@@ -95,8 +97,9 @@ class NotesPageVM @Inject constructor(
                         if (result.isSuccess) {
                             _noteList.postValue(result)
                         } else {
-                            _noteList.postValue(Result.failure(result.exceptionOrNull() ?:
-                            Exception("Unknown error")))
+                            _noteList.postValue(Result.failure(
+                                result.exceptionOrNull() ?: defaultException
+                            ))
                         }
                     }
             }

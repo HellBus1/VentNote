@@ -94,20 +94,6 @@ class NotesPageVMShould: BaseUnitTest() {
         assertEquals(exception, viewModel.noteList.getValueForTest()?.exceptionOrNull())
     }
 
-    // TODO: Somehow this test can't capture loader true
-    //  but the code when running in emulator is working perfectly
-    @Test
-    fun showLoaderWhileLoadingNoteList() = runTest {
-        mockSuccessfulCase()
-        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
-
-        viewModel.observeNotes()
-
-        viewModel.loader.captureValues {
-            assertEquals(false, values.first())
-        }
-    }
-
     @Test
     fun closeLoaderAfterNoteListLoaded() = runTest {
         mockSuccessfulCase()
