@@ -107,7 +107,7 @@ dependencies {
 
     // Unit test
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
 
     // Hilt
     implementation 'com.google.dagger:hilt-android:2.50'
@@ -115,7 +115,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
 
     // Material Icon Extension
-    implementation "androidx.compose.material:material-icons-extended:1.6.8"
+    implementation "androidx.compose.material:material-icons-extended:1.7.3"
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation("com.google.android.play:app-update:2.1.0")
@@ -150,7 +150,7 @@ dependencies {
     testImplementation 'org.mockito.kotlin:mockito-kotlin:5.2.1'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
 
-    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
+    androidTestImplementation 'androidx.test.ext:junit-ktx:1.2.1'
 
     testImplementation "androidx.arch.core:core-testing:2.2.0"
 
@@ -158,11 +158,11 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0'
 
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:33.1.1')
+    implementation platform('com.google.firebase:firebase-bom:33.4.0')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-crashlytics:19.0.2'
+    implementation 'com.google.firebase:firebase-crashlytics:19.2.0'
     implementation 'com.google.firebase:firebase-perf-ktx:21.0.1'
 
     //Google sign in
