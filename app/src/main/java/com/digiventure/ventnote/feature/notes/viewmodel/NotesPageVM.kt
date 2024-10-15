@@ -88,22 +88,18 @@ class NotesPageVM @Inject constructor(
         viewModelScope.launch {
             sortAndOrderData.asFlow().collectLatest {
                 loader.postValue(true)
-                try {
-                    repository.getNoteList(it.first, it.second)
-                        .onEach {
-                            loader.postValue(false)
+                repository.getNoteList(it.first, it.second)
+                    .onEach {
+                        loader.postValue(false)
+                    }
+                    .collect { result ->
+                        if (result.isSuccess) {
+                            _noteList.postValue(result)
+                        } else {
+                            _noteList.postValue(Result.failure(result.exceptionOrNull() ?:
+                            Exception("Unknown error")))
                         }
-                        .catch { e ->
-                            loader.postValue(false)
-                            _noteList.postValue(Result.failure(e))
-                        }
-                        .collect { notes ->
-                            _noteList.postValue(notes)
-                        }
-                } catch (e: Exception) {
-                    loader.postValue(false)
-                    _noteList.postValue(Result.failure(e))
-                }
+                    }
             }
         }
     }

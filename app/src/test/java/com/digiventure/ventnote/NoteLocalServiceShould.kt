@@ -39,9 +39,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     @Before
     fun setup() {
-        val database: NoteDatabase = mock()
-        whenever(proxy.getObject()).thenReturn(database)
-        whenever(database.dao()).thenReturn(dao)
+        whenever(proxy.dao()).thenReturn(dao)
         service = NoteLocalService(proxy)
     }
 
