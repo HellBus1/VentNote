@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.data.google_drive
 
+import android.util.Log
 import com.digiventure.ventnote.commons.ErrorMessage
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.google.api.services.drive.Drive
@@ -33,6 +34,7 @@ class GoogleDriveRepository @Inject constructor(
         }
         emit(transformedResult)
     }.catch { e ->
+        Log.e("fetch list backup", e.message.toString())
         emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_LIST_BACKUP_FILE, e)))
     }
 

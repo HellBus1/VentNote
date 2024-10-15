@@ -204,11 +204,16 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
         }
 
         is BackupPageVM.FileBackupListState.FileBackupListStarted -> {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(top = 16.dp)
-            )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(top = 16.dp)
+                )
+            }
         }
     }
 

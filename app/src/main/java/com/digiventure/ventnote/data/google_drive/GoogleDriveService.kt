@@ -9,6 +9,8 @@ import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
 
@@ -32,17 +34,19 @@ class GoogleDriveService @Inject constructor(
      * @throws IOException If an I/O error occurs during the upload.
      * @throws GoogleJsonResponseException If the Google Drive API returns an error.
      */
-    fun uploadDatabaseFile(notes: List<NoteModel>, fileName: String, drive: Drive?): Result<Unit> = try {
-        val metaData = getMetaData(fileName)
-        metaData.parents = listOf(APP_DATA_FOLDER_SPACE)
-        val jsonString = Gson().toJson(notes)
-        val fileContent = ByteArrayContent(FILE_MIME_TYPE, jsonString.toByteArray())
-        drive?.files()?.create(metaData, fileContent)?.execute()
-        Result.success(Unit)
-    } catch (e: IOException) {
-        Result.failure(e)
-    } catch (e: GoogleJsonResponseException) {
-        Result.failure(e)
+    suspend fun uploadDatabaseFile(notes: List<NoteModel>, fileName: String, drive: Drive?): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val metaData = getMetaData(fileName)
+            metaData.parents = listOf(APP_DATA_FOLDER_SPACE)
+            val jsonString = Gson().toJson(notes)
+            val fileContent = ByteArrayContent(FILE_MIME_TYPE, jsonString.toByteArray())
+            drive?.files()?.create(metaData, fileContent)?.execute()
+            Result.success(Unit)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: GoogleJsonResponseException) {
+            Result.failure(e)
+        }
     }
 
     /**
@@ -58,23 +62,25 @@ class GoogleDriveService @Inject constructor(
      * @throws JsonSyntaxException If the JSON file is malformed or cannot be parsed.
      * @throws IllegalArgumentException If the provided `fileId` is null or blank.
      */
-    fun readFile(fileId: String, drive: Drive?): Result<Unit> = try {
-        val jsonString = drive?.files()?.get(fileId)?.executeMediaAsInputStream()?.use {
-            it.bufferedReader().use { reader -> reader.readText() }
+    suspend fun readFile(fileId: String, drive: Drive?): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val jsonString = drive?.files()?.get(fileId)?.executeMediaAsInputStream()?.use {
+                it.bufferedReader().use { reader -> reader.readText() }
+            }
+
+            val notes = jsonString?.let {
+                Gson().fromJson(it, Array<NoteModel>::class.java).toList()
+            } ?: emptyList()
+
+            proxy.dao().upsertNotesWithTimestamp(notes)
+            Result.success(Unit)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: GoogleJsonResponseException) {
+            Result.failure(e)
+        } catch (e: JsonSyntaxException) {
+            Result.failure(e)
         }
-
-        val notes = jsonString?.let {
-            Gson().fromJson(it, Array<NoteModel>::class.java).toList()
-        } ?: emptyList()
-
-        proxy.dao().upsertNotesWithTimestamp(notes)
-        Result.success(Unit)
-    } catch (e: IOException) {
-        Result.failure(e)
-    } catch (e: GoogleJsonResponseException) {
-        Result.failure(e)
-    } catch (e: JsonSyntaxException) {
-        Result.failure(e)
     }
 
     /**
@@ -86,13 +92,15 @@ class GoogleDriveService @Inject constructor(
      * @throws IOException If an I/O error occurs during the query.
      * @throws GoogleJsonResponseException If the Google Drive API returns an error.
      */
-    fun queryFiles(drive: Drive?): Result<FileList?> = try {
-        val fileList = drive?.files()?.list()?.setSpaces(APP_DATA_FOLDER_SPACE)?.execute()
-        Result.success(fileList)
-    } catch (e: IOException) {
-        Result.failure(e)
-    } catch (e: GoogleJsonResponseException) {
-        Result.failure(e)
+    suspend fun queryFiles(drive: Drive?): Result<FileList?> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val fileList = drive?.files()?.list()?.setSpaces(APP_DATA_FOLDER_SPACE)?.execute()
+            Result.success(fileList)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: GoogleJsonResponseException) {
+            Result.failure(e)
+        }
     }
 
     /**
@@ -106,13 +114,15 @@ class GoogleDriveService @Inject constructor(
      * @throws IOException If an I/O error occurs during the deletion.
      * @throws GoogleJsonResponseException If the Google Drive API returns an error.
      */
-    fun deleteFile(fileId: String, drive: Drive?): Result<Unit> = try {
-        drive?.files()?.delete(fileId)?.execute()
-        Result.success(Unit)
-    } catch (e: IOException) {
-        Result.failure(e)
-    } catch (e: GoogleJsonResponseException) {
-        Result.failure(e)
+    suspend fun deleteFile(fileId: String, drive: Drive?): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            drive?.files()?.delete(fileId)?.execute()
+            Result.success(Unit)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: GoogleJsonResponseException) {
+            Result.failure(e)
+        }
     }
 
     /**

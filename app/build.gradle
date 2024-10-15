@@ -74,22 +74,21 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.13.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.2'
+    implementation "androidx.core:core-ktx:1.13.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.2"
 
-    implementation 'androidx.activity:activity-compose:1.9.0'
+    implementation "androidx.activity:activity-compose:1.9.0"
 
     // Jetpack Compose
-    def compose_version = "1.7.3"
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "androidx.compose.ui:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation "androidx.compose.runtime:runtime-livedata:1.7.3"
+    implementation "androidx.compose.ui:ui:1.7.3"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.7.3"
 
-    implementation 'androidx.compose.material3:material3:1.3.0'
+    implementation "androidx.compose.material3:material3:1.3.0"
 
     // Lifecycle Livedata
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.6'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.6"
 
     // Room
     def room_version = "2.6.1"
@@ -98,22 +97,22 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:$room_version"
 
     // Datastore
-    implementation "androidx.datastore:datastore-preferences:1.1.1"
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Compose Navigation
     implementation "androidx.navigation:navigation-compose:2.8.2"
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
 
     // Unit test
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.test.ext:junit:1.2.1"
 
     // Hilt
-    implementation 'com.google.dagger:hilt-android:2.50'
-    kapt 'com.google.dagger:hilt-android-compiler:2.50'
-    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
+    implementation "com.google.dagger:hilt-android:2.50"
+    kapt "com.google.dagger:hilt-android-compiler:2.50"
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
 
     // Material Icon Extension
     implementation "androidx.compose.material:material-icons-extended:1.7.3"
@@ -124,29 +123,25 @@ dependencies {
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     // Google Play API
-    implementation 'com.google.android.gms:play-services-auth:21.2.0'
-
-    // Coil Load Image Url
-    implementation('io.coil-kt:coil-compose:2.5.0')
+    implementation "com.google.android.gms:play-services-auth:21.2.0"
 
     // Accompanist - Status Bar
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.34.0"
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)
-    androidTestImplementation 'androidx.test:runner:1.6.2'
-    androidTestImplementation 'androidx.test:rules:1.6.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.6.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation "androidx.test:runner:1.6.2"
+    androidTestImplementation "androidx.test:rules:1.6.1"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:3.6.1"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.6.1"
 
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.3"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.7.3"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.7.3"
 
     /// Hilt test (for handling service locator when test)
-    def hilt_version = "2.50"
-    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.50"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.50"
 
     // For mocking purposes & make it visible in instrumented test
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.2.1"
