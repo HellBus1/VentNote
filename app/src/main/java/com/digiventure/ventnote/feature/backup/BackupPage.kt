@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
+import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.backup.components.BackupPageAppBar
 import com.digiventure.ventnote.feature.backup.components.ListOfBackupFile
 import com.digiventure.ventnote.feature.backup.components.SignInButton
@@ -59,7 +60,9 @@ fun BackupPage(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val loadingDialog = remember { mutableStateOf(false) }
+    val loadingDialogState = remember { mutableStateOf(false) }
+    val restoreConfirmationDialogState = remember { mutableStateOf(false) }
+    val restoreDataIdState = remember { mutableStateOf("0") }
 
     val context = LocalContext.current
 
@@ -76,12 +79,12 @@ fun BackupPage(
     LaunchedEffect(key1 = fileBackupState) {
         when(fileBackupState) {
             is BackupPageVM.FileBackupState.SyncFailed -> {
-                loadingDialog.value = false
+                loadingDialogState.value = false
                 val errorMessage = fileBackupState.errorMessage
                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
             BackupPageVM.FileBackupState.SyncFinished -> {
-                loadingDialog.value = false
+                loadingDialogState.value = false
                 scope.launch {
                     snackBarHostState.showSnackbar(
                         message = backedUpMessage,
@@ -90,7 +93,7 @@ fun BackupPage(
                 }
             }
             BackupPageVM.FileBackupState.SyncStarted -> {
-                loadingDialog.value = true
+                loadingDialogState.value = true
             }
             BackupPageVM.FileBackupState.SyncInitial -> {}
         }
@@ -133,14 +136,21 @@ fun BackupPage(
                         })
                     }
                     AuthVM.AuthState.SignedIn -> {
-                        ListOfBackupFile(backupPageVM = backupPageVM) {
-                            scope.launch {
-                                snackBarHostState.showSnackbar(
-                                    message = restoredMessage,
-                                    withDismissAction = true
-                                )
+                        ListOfBackupFile(
+                            backupPageVM = backupPageVM,
+                            onRestoreCallback = {
+                                restoreDataIdState.value = it.id
+                                restoreConfirmationDialogState.value = true
+                            },
+                            successfullyRestoredCallback = {
+                                scope.launch {
+                                    snackBarHostState.showSnackbar(
+                                        message = restoredMessage,
+                                        withDismissAction = true
+                                    )
+                                }
                             }
-                        }
+                        )
                     }
                 }
             }
@@ -148,8 +158,25 @@ fun BackupPage(
         containerColor = MaterialTheme.colorScheme.background
     )
 
-    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
-        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
+    LoadingDialog(
+        isOpened = loadingDialogState.value,
+        onDismissCallback = { loadingDialogState.value = false },
+        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG }
+    )
+
+    TextDialog(
+        title = stringResource(R.string.restore_confirmation_title),
+        description = stringResource(R.string.restore_confirmation_description),
+        isOpened = restoreConfirmationDialogState.value,
+        onDismissCallback = { restoreConfirmationDialogState.value = false },
+        onConfirmCallback = {
+            val selectedId = restoreDataIdState.value;
+            if (selectedId != "0") {
+                backupPageVM.restoreDatabase(selectedId)
+                restoreConfirmationDialogState.value = false
+            }
+        }
+    )
 }
 
 @Preview(device = "id:pixel_xl")

@@ -344,7 +344,8 @@ fun NoteDetailPage(
         description = stringResource(R.string.required_confirmation_text, missingFieldName),
         isOpened = requiredDialogState.value,
         onDismissCallback = { requiredDialogState.value = false },
-        onConfirmCallback = { requiredDialogState.value = false })
+        onConfirmCallback = { requiredDialogState.value = false }
+    )
 
     TextDialog(
         title = stringResource(R.string.cancel_title),

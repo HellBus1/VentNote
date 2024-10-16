@@ -48,10 +48,13 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageBaseVM
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
+import com.google.api.services.drive.model.File
 import kotlinx.coroutines.launch
 
 @Composable
-fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallback: () -> Unit) {
+fun ListOfBackupFile(backupPageVM: BackupPageBaseVM,
+                     successfullyRestoredCallback: () -> Unit,
+                     onRestoreCallback: (File) -> Unit) {
     val backupPageUiState = backupPageVM.uiState.value
     val driveBackupFileListState = backupPageVM.driveBackupFileList.observeAsState()
 
@@ -59,7 +62,7 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
 
     val scope = rememberCoroutineScope()
 
-    val loadingDialog = remember { mutableStateOf(false) }
+    val restoreLoadingDialogState = remember { mutableStateOf(false) }
 
     val fileRestoreState = backupPageVM.uiState.value.fileRestoreState
     val fileDeleteState = backupPageVM.uiState.value.fileDeleteState
@@ -77,7 +80,7 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
         when {
             fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed ||
                     fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> {
-                loadingDialog.value = false
+                restoreLoadingDialogState.value = false
                 val errorMessage = when {
                     fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed -> fileRestoreState.errorMessage
                     fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> fileDeleteState.errorMessage
@@ -88,20 +91,20 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
 
             fileRestoreState is BackupPageVM.FileRestoreState.SyncFinished ||
                     fileDeleteState is BackupPageVM.FileDeleteState.SyncFinished -> {
-                loadingDialog.value = false
+                restoreLoadingDialogState.value = false
                 successfullyRestoredCallback()
             }
 
             fileRestoreState is BackupPageVM.FileRestoreState.SyncStarted ||
                     fileDeleteState is BackupPageVM.FileDeleteState.SyncStarted -> {
-                loadingDialog.value = true
+                restoreLoadingDialogState.value = true
             }
 
             else -> {}
         }
     }
 
-    when (val state = backupPageUiState.fileBackupListState) {
+    when (val state = backupPageUiState.listOfBackupFileState) {
         BackupPageVM.FileBackupListState.FileBackupListFinished -> {
             driveBackupFileListState.value.let {
                 LazyColumn(
@@ -138,7 +141,7 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
                                 Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                                 Row {
                                     OutlinedButton (
-                                        onClick = { backupPageVM.restoreDatabase(it.id) },
+                                        onClick = { onRestoreCallback(it) },
                                         shape = RoundedCornerShape(10.dp),
                                         contentPadding = PaddingValues(
                                             horizontal = 2.dp,
@@ -217,7 +220,9 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM, successfullyRestoredCallbac
         }
     }
 
-    LoadingDialog(isOpened = loadingDialog.value,
-        onDismissCallback = { loadingDialog.value = false },
-        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
+    LoadingDialog(
+        isOpened = restoreLoadingDialogState.value,
+        onDismissCallback = { restoreLoadingDialogState.value = false },
+        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG }
+    )
 }

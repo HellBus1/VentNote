@@ -29,6 +29,8 @@
     <string name="share_note_information">If you press \"copy\" or \"share as text\", the text structure will remain the same, but the content will be in regular text format (with the title not in bold)</string>
     <string name="success">Success</string>
     <string name="update_success_text">The app is successfully updated, press confirm to restart</string>
+    <string name="restore_confirmation_title">Restore Notes</string>
+    <string name="restore_confirmation_description">Are you sure you want to restore this note? This will replace the existing note.</string>
 
     <!--  Button and clickable  -->
     <string name="confirm">Confirm</string>

@@ -82,21 +82,21 @@ class BackupPageVM @Inject constructor(
 
     override fun getBackupFileList() {
         viewModelScope.launch {
-            val currentState = _uiState.value.copy(fileBackupListState = FileBackupListState.FileBackupListStarted)
+            val currentState = _uiState.value.copy(listOfBackupFileState = FileBackupListState.FileBackupListStarted)
             _uiState.value = currentState
 
             val drive = getDriveInstance()
 
             try {
                 repository.getBackupFileList(drive).collect { result ->
-                    _uiState.value = currentState.copy(fileBackupListState = FileBackupListState.FileBackupListFinished)
+                    _uiState.value = currentState.copy(listOfBackupFileState = FileBackupListState.FileBackupListFinished)
                     if (result.isSuccess) {
                         val files = result.getOrNull()
                         _driveBackupFileList.value = files ?: emptyList()
                     } else {
                         val errorMessage = result.exceptionOrNull()?.message ?: Constants.EMPTY_STRING
                         _uiState.value = currentState.copy(
-                            fileBackupListState = FileBackupListState.FileBackupListFailed(
+                            listOfBackupFileState = FileBackupListState.FileBackupListFailed(
                                 errorMessage
                             ))
                     }
@@ -104,7 +104,7 @@ class BackupPageVM @Inject constructor(
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
                 _uiState.value = currentState.copy(
-                    fileBackupListState = FileBackupListState.FileBackupListFailed(
+                    listOfBackupFileState = FileBackupListState.FileBackupListFailed(
                         errorMessage
                     ))
             }
@@ -164,7 +164,7 @@ class BackupPageVM @Inject constructor(
     }
 
     data class BackupPageState(
-        var fileBackupListState: FileBackupListState = FileBackupListState.FileBackupListFinished,
+        var listOfBackupFileState: FileBackupListState = FileBackupListState.FileBackupListFinished,
         var fileBackupState: FileBackupState = FileBackupState.SyncInitial,
         var fileRestoreState: FileRestoreState = FileRestoreState.SyncInitial,
         var fileDeleteState: FileDeleteState = FileDeleteState.SyncInitial
