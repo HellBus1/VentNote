@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.data.google_drive
 
-import android.util.Log
 import com.digiventure.ventnote.commons.ErrorMessage
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.google.api.services.drive.Drive
@@ -13,7 +12,7 @@ import com.google.api.services.drive.model.File as DriveFile
 class GoogleDriveRepository @Inject constructor(
     private val service: GoogleDriveService,
 ) {
-    fun uploadDatabaseFile(notes: List<NoteModel>, fileName: String, drive: Drive?): Flow<Result<Unit>> = flow {
+    fun uploadDatabaseFile(notes: List<NoteModel>, fileName: String, drive: Drive?): Flow<Result<DriveFile?>> = flow {
         val result = service.uploadDatabaseFile(notes, fileName, drive)
         emit(result)
     }.catch { e ->
@@ -37,7 +36,7 @@ class GoogleDriveRepository @Inject constructor(
         emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_LIST_BACKUP_FILE, e)))
     }
 
-    fun deleteFile(fileId: String, drive: Drive?): Flow<Result<Unit>> = flow {
+    fun deleteFile(fileId: String, drive: Drive?): Flow<Result<Void?>> = flow {
         val result = service.deleteFile(fileId, drive)
         emit(result)
     }.catch { e ->

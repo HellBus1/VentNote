@@ -33,14 +33,15 @@ class GoogleDriveRepositoryShould: BaseUnitTest() {
 
     @Test
     fun emitsResultSuccess_whenUploadDatabaseIsSuccess() = runTest {
+        val file = File()
         whenever(service.uploadDatabaseFile(noteList, fileName, drive)).thenReturn(
-            Result.success(Unit)
+            Result.success(file)
         )
 
         val actualResult = repository.uploadDatabaseFile(noteList, fileName, drive).first()
 
         verify(service, times(1)).uploadDatabaseFile(noteList, fileName, drive)
-        assertEquals(Result.success(Unit), actualResult)
+        assertEquals(Result.success(file), actualResult)
     }
 
     @Test
@@ -113,13 +114,13 @@ class GoogleDriveRepositoryShould: BaseUnitTest() {
     @Test
     fun emitsResultSuccess_whenDeleteFileIsSuccess() = runTest {
         whenever(service.deleteFile(fileId, drive)).thenReturn(
-            Result.success(Unit)
+            Result.success(null)
         )
 
         val actualResult = repository.deleteFile(fileId, drive).first()
 
         verify(service, times(1)).deleteFile(fileId, drive)
-        assertEquals(Result.success(Unit), actualResult)
+        assertEquals(Result.success(null), actualResult)
     }
 
     @Test
