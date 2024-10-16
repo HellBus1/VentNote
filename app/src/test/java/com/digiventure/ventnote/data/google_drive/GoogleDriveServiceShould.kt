@@ -25,7 +25,6 @@ class GoogleDriveServiceShould: BaseUnitTest() {
     private val noteList: List<NoteModel> = listOf()
     private val fileName: String = "backup.json"
     private val fileId: String = "1"
-    private val driveFileList: FileList = FileList()
     private val drive: Drive = mock()
 
     private lateinit var service: GoogleDriveService

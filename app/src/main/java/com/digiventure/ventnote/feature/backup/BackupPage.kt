@@ -62,7 +62,8 @@ fun BackupPage(
 
     val loadingDialogState = remember { mutableStateOf(false) }
     val restoreConfirmationDialogState = remember { mutableStateOf(false) }
-    val restoreDataIdState = remember { mutableStateOf("0") }
+    val stringZero = "0"
+    val restoreDataIdState = remember { mutableStateOf(stringZero) }
 
     val context = LocalContext.current
 
@@ -170,8 +171,8 @@ fun BackupPage(
         isOpened = restoreConfirmationDialogState.value,
         onDismissCallback = { restoreConfirmationDialogState.value = false },
         onConfirmCallback = {
-            val selectedId = restoreDataIdState.value;
-            if (selectedId != "0") {
+            val selectedId = restoreDataIdState.value
+            if (selectedId != stringZero) {
                 backupPageVM.restoreDatabase(selectedId)
                 restoreConfirmationDialogState.value = false
             }
