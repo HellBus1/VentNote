@@ -81,6 +81,7 @@ fun NoteDetailPage(
     val bodyTextField = "${stringResource(R.string.body_textField)}-$TAG"
     val titleInput = stringResource(R.string.title_textField_input)
     val bodyInput = stringResource(R.string.body_textField_input)
+    val successFullyUpdatedText = stringResource(R.string.successfully_updated)
 
     val noteDetailState = viewModel.noteDetail.observeAsState()
     val data = noteDetailState.value?.getOrNull()
@@ -153,7 +154,7 @@ fun NoteDetailPage(
                         .onSuccess {
                             viewModel.isEditing.value = false
                             snackBarHostState.showSnackbar(
-                                message = "Note successfully updated",
+                                message = successFullyUpdatedText,
                                 withDismissAction = true
                             )
                         }

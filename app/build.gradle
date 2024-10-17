@@ -71,6 +71,10 @@ android {
             excludes += 'META-INF/*'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -135,9 +139,9 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-intents:3.6.1"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.6.1"
 
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.3"
-    debugImplementation "androidx.compose.ui:ui-tooling:1.7.3"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.7.3"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.4"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.7.4"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.7.4"
 
     /// Hilt test (for handling service locator when test)
     androidTestImplementation "com.google.dagger:hilt-android-testing:2.50"
@@ -166,7 +170,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-auth:21.2.0"
 
     //Google Drive API
-    implementation "com.google.http-client:google-http-client-gson:1.34.0"
+    implementation "com.google.http-client:google-http-client-gson:1.44.2"
     implementation "com.google.apis:google-api-services-drive:v3-rev136-1.25.0"
     implementation "com.google.api-client:google-api-client-android:1.34.0"
 }

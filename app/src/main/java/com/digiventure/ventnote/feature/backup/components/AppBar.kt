@@ -45,7 +45,10 @@ fun BackupPageAppBar(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         navigationIcon = {
-            TopNavBarIcon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back_nav_icon), Modifier.semantics {  }) {
+            TopNavBarIcon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                stringResource(R.string.backup_nav_icon),
+                Modifier.semantics {  }) {
                 onBackPressed()
             }
         },

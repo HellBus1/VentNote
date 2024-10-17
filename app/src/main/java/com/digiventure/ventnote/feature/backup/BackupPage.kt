@@ -68,7 +68,7 @@ fun BackupPage(
     val context = LocalContext.current
 
     val backedUpMessage = stringResource(id = R.string.successfully_backed_up)
-    val restoredMessage = stringResource(id = R.string.successfully_updated)
+    val restoredMessage = stringResource(id = R.string.successfully_restored)
 
     fun backupDatabase() {
         scope.launch {
