@@ -2,7 +2,7 @@ package com.digiventure.ventnote.navigation
 
 import android.os.Bundle
 import androidx.navigation.NavType
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.google.gson.Gson
 
 class NoteModelParamType : NavType<NoteModel>(isNullableAllowed = false) {

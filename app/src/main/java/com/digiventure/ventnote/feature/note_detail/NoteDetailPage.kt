@@ -81,6 +81,7 @@ fun NoteDetailPage(
     val bodyTextField = "${stringResource(R.string.body_textField)}-$TAG"
     val titleInput = stringResource(R.string.title_textField_input)
     val bodyInput = stringResource(R.string.body_textField_input)
+    val successFullyUpdatedText = stringResource(R.string.successfully_updated)
 
     val noteDetailState = viewModel.noteDetail.observeAsState()
     val data = noteDetailState.value?.getOrNull()
@@ -153,7 +154,7 @@ fun NoteDetailPage(
                         .onSuccess {
                             viewModel.isEditing.value = false
                             snackBarHostState.showSnackbar(
-                                message = "Note successfully updated",
+                                message = successFullyUpdatedText,
                                 withDismissAction = true
                             )
                         }
@@ -253,75 +254,8 @@ fun NoteDetailPage(
                         .verticalScroll(rememberScrollState())
                         .padding(bottom = keyboardHeight.value)
                 ) {
-                    TextField(
-                        value = viewModel.titleText.value,
-                        onValueChange = {
-                            viewModel.titleText.value = it
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        ),
-                        singleLine = false,
-                        readOnly = !isEditingState,
-                        enabled = isEditingState,
-                        colors = TextFieldDefaults.colors(
-                            disabledTextColor = MaterialTheme.colorScheme.surface,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            disabledContainerColor = MaterialTheme.colorScheme.surface,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .semantics { contentDescription = titleTextField },
-                        placeholder = {
-                            Text(
-                                text = titleInput,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    )
-                    TextField(
-                        value = viewModel.descriptionText.value,
-                        onValueChange = {
-                            viewModel.descriptionText.value = it
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onSurface
-                        ),
-                        singleLine = false,
-                        readOnly = !isEditingState,
-                        enabled = isEditingState,
-                        shape = RectangleShape,
-                        colors = TextFieldDefaults.colors(
-                            disabledTextColor = MaterialTheme.colorScheme.surface,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            disabledContainerColor = MaterialTheme.colorScheme.surface,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .semantics { contentDescription = bodyTextField },
-                        placeholder = {
-                            Text(
-                                text = bodyInput,
-                                fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        },
-                    )
+                    TitleTextField(viewModel, isEditingState, titleTextField, titleInput)
+                    DescriptionTextField(viewModel, isEditingState, bodyTextField, bodyInput)
                 }
             }
         },
@@ -344,7 +278,8 @@ fun NoteDetailPage(
         description = stringResource(R.string.required_confirmation_text, missingFieldName),
         isOpened = requiredDialogState.value,
         onDismissCallback = { requiredDialogState.value = false },
-        onConfirmCallback = { requiredDialogState.value = false })
+        onConfirmCallback = { requiredDialogState.value = false }
+    )
 
     TextDialog(
         title = stringResource(R.string.cancel_title),
@@ -372,6 +307,95 @@ fun NoteDetailPage(
             navHostController.popBackStack()
         }
     }
+}
+
+@Composable
+fun TitleTextField(
+    viewModel: NoteDetailPageBaseVM,
+    isEditingState: Boolean,
+    titleTextField: String,
+    titleInput: String
+) {
+    TextField(
+        value = viewModel.titleText.value,
+        onValueChange = {
+            viewModel.titleText.value = it
+        },
+        textStyle = TextStyle(
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        ),
+        singleLine = false,
+        readOnly = !isEditingState,
+        colors = TextFieldDefaults.colors(
+            disabledTextColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surface,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { contentDescription = titleTextField },
+        placeholder = {
+            if (isEditingState) {
+                Text(
+                    text = titleInput,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun DescriptionTextField(
+    viewModel: NoteDetailPageBaseVM,
+    isEditingState: Boolean,
+    bodyTextField: String,
+    bodyInput: String
+) {
+    TextField(
+        value = viewModel.descriptionText.value,
+        onValueChange = {
+            viewModel.descriptionText.value = it
+        },
+        textStyle = TextStyle(
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface
+        ),
+        singleLine = false,
+        readOnly = !isEditingState,
+        shape = RectangleShape,
+        colors = TextFieldDefaults.colors(
+            disabledTextColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surface,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .semantics { contentDescription = bodyTextField },
+        placeholder = {
+            if (isEditingState) {
+                Text(
+                    text = bodyInput,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+    )
 }
 
 @Preview

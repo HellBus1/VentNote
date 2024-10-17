@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.digiventure.ventnote.commons.ColorPalletName
 import com.digiventure.ventnote.commons.ColorSchemeName
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.data.NoteDataStore
+import com.digiventure.ventnote.data.local.NoteDataStore
 import com.digiventure.ventnote.ui.ColorSchemeChoice
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.combine

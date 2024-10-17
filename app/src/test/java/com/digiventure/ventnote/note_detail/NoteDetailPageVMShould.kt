@@ -3,8 +3,8 @@ package com.digiventure.ventnote.note_detail
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
 import com.digiventure.utils.getValueForTest
-import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteRepository
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageVM
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf

@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
 import android.content.pm.ActivityInfo
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,7 +44,7 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
 import com.digiventure.ventnote.feature.notes.components.item.NotesItem
 import com.digiventure.ventnote.feature.notes.components.navbar.NotesAppBar
@@ -81,8 +80,11 @@ fun NotesPage(
         skipPartiallyExpanded = skipPartiallyExpanded.value
     )
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.observeNotes()
+    }
+
     LaunchedEffect(key1 = noteListState.value) {
-        // Showing error snackBar on error
         noteListState.value?.onFailure {
             scope.launch {
                 snackBarHostState.showSnackbar(
@@ -94,15 +96,12 @@ fun NotesPage(
     }
 
     LaunchedEffect(noteListState.value, viewModel.searchedTitleText.value) {
-        // Replace filteredNoteListState value with filtered noteList state
-        // every searchedTitleText changed
         filteredNoteListState.value = noteListState.value?.getOrNull()?.filter { note ->
             note.title.contains(viewModel.searchedTitleText.value, true)
         } ?: listOf()
     }
 
     LaunchedEffect(key1 = loadingState.value) {
-        // Showing loading dialog whenever loading state is true
         loadingDialog.value = (loadingState.value == true)
     }
 
@@ -114,6 +113,7 @@ fun NotesPage(
                 .onSuccess {
                     deleteDialog.value = false
                     viewModel.unMarkAllNote()
+                    viewModel.closeMarkingEvent()
 
                     snackBarHostState.showSnackbar(
                         message = deletedMessage,
@@ -140,6 +140,9 @@ fun NotesPage(
                     withDismissAction = true
                 )
             }
+        },
+        onBackupPressed = {
+            navHostController.navigate(Route.BackupPage.routeName)
         },
         content = {
             Scaffold(
@@ -179,7 +182,6 @@ fun NotesPage(
                             deleteDialog.value = true
                         },
                         closeSearchCallback = {
-                            Log.d("pressed", "close pressed")
                             viewModel.closeSearchEvent()
                         }
                     )

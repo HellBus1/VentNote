@@ -5,16 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -24,27 +25,17 @@ class NotesPageVM @Inject constructor(
 ): ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
     override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData(
-        Pair(Constants.CREATED_AT, Constants.DESCENDING)
+        Pair(Constants.UPDATED_AT, Constants.DESCENDING)
     )
+
+    val defaultException = Exception("Unknown error")
+
+    override val noteList: LiveData<Result<List<NoteModel>>>
+        get() = _noteList
+    private val _noteList = MutableLiveData<Result<List<NoteModel>>>()
 
     override fun sortAndOrder(sortBy: String, orderBy: String) {
         sortAndOrderData.value = Pair(sortBy, orderBy)
-    }
-
-    override val noteList: LiveData<Result<List<NoteModel>>> = sortAndOrderData.switchMap {
-        liveData {
-            loader.postValue(true)
-            try {
-                emitSource(repository.getNoteList(it.first, it.second)
-                    .onEach {
-                        loader.postValue(false)
-                    }
-                    .asLiveData())
-            } catch (e: Exception) {
-                loader.postValue(false)
-                emit(Result.failure(e))
-            }
-        }
     }
 
     override val isSearching = mutableStateOf(false)
@@ -76,6 +67,7 @@ class NotesPageVM @Inject constructor(
             val items: List<NoteModel> = if (notes.isEmpty()) { markedNoteList } else { notes.toList() }
             repository.deleteNoteList(*items.toTypedArray()).onEach {
                 loader.postValue(false)
+                observeNotes()
             }.last()
         } catch (e: Exception) {
             loader.postValue(false)
@@ -91,6 +83,27 @@ class NotesPageVM @Inject constructor(
     override fun closeSearchEvent() {
         isSearching.value = false
         searchedTitleText.value = ""
+    }
+
+    override fun observeNotes() {
+        viewModelScope.launch {
+            sortAndOrderData.asFlow().collectLatest {
+                loader.postValue(true)
+                repository.getNoteList(it.first, it.second)
+                    .onEach {
+                        loader.postValue(false)
+                    }
+                    .collect { result ->
+                        if (result.isSuccess) {
+                            _noteList.postValue(result)
+                        } else {
+                            _noteList.postValue(Result.failure(
+                                result.exceptionOrNull() ?: defaultException
+                            ))
+                        }
+                    }
+            }
+        }
     }
 }
 

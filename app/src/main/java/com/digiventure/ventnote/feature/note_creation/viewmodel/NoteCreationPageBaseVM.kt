@@ -2,7 +2,7 @@ package com.digiventure.ventnote.feature.note_creation.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.MutableLiveData
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 
 interface NoteCreationPageBaseVM {
     /**

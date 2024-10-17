@@ -1,10 +1,7 @@
-package com.digiventure.ventnote
+package com.digiventure.ventnote.data.persistence
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.data.local.NoteLocalService
-import com.digiventure.ventnote.data.local.NoteModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
