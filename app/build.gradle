@@ -74,49 +74,48 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation "androidx.core:core-ktx:1.13.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.6"
 
-    implementation 'androidx.activity:activity-compose:1.8.2'
-    implementation "androidx.compose.ui:ui:1.6.2"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.6.2"
+    implementation "androidx.activity:activity-compose:1.9.3"
 
-    implementation 'androidx.compose.material3:material3:1.2.0'
+    // Jetpack Compose
+    implementation "androidx.compose.runtime:runtime-livedata:1.7.4"
+    implementation "androidx.compose.ui:ui:1.7.4"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.7.4"
+
+    implementation "androidx.compose.material3:material3:1.3.0"
 
     // Lifecycle Livedata
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.6"
 
     // Room
-    implementation "androidx.room:room-ktx:2.6.1"
-    kapt "androidx.room:room-compiler:2.6.1"
-    androidTestImplementation "androidx.room:room-testing:2.6.1"
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
 
     // Datastore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Compose Navigation
-    implementation "androidx.navigation:navigation-compose:2.7.7"
+    implementation "androidx.navigation:navigation-compose:2.8.3"
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
-
-    // Livedata
-    implementation 'androidx.compose.runtime:runtime-livedata:1.6.2'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
 
     // Unit test
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-
-    implementation 'com.google.code.gson:gson:2.10.1'
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.test.ext:junit:1.2.1"
 
     // Hilt
-    implementation 'com.google.dagger:hilt-android:2.50'
-    kapt 'com.google.dagger:hilt-android-compiler:2.50'
-    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
+    implementation "com.google.dagger:hilt-android:2.50"
+    kapt "com.google.dagger:hilt-android-compiler:2.50"
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
 
     // Material Icon Extension
-    implementation "androidx.compose.material:material-icons-extended:1.6.2"
+    implementation "androidx.compose.material:material-icons-extended:1.7.4"
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation("com.google.android.play:app-update:2.1.0")
@@ -124,47 +123,52 @@ dependencies {
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     // Google Play API
-    implementation 'com.google.android.gms:play-services-auth:21.0.0'
-
-    // Coil Load Image Url
-    implementation('io.coil-kt:coil-compose:2.5.0')
+    implementation "com.google.android.gms:play-services-auth:21.2.0"
 
     // Accompanist - Status Bar
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.34.0"
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation "androidx.test:runner:1.6.2"
+    androidTestImplementation "androidx.test:rules:1.6.1"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:3.6.1"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.6.1"
 
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.2"
-    debugImplementation "androidx.compose.ui:ui-tooling:1.6.2"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.2"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.3"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.7.3"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.7.3"
 
     /// Hilt test (for handling service locator when test)
     androidTestImplementation "com.google.dagger:hilt-android-testing:2.50"
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.50'
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.50"
 
     // For mocking purposes & make it visible in instrumented test
-    testImplementation 'org.mockito.kotlin:mockito-kotlin:5.2.1'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
+    testImplementation "org.mockito.kotlin:mockito-kotlin:5.2.1"
+    testImplementation "org.mockito:mockito-inline:5.2.0"
 
-    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.2.1"
 
     testImplementation "androidx.arch.core:core-testing:2.2.0"
 
     // For unit testing coroutines
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0'
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0"
 
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:32.7.2')
+    implementation platform("com.google.firebase:firebase-bom:33.4.0")
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-crashlytics:18.6.2'
-    implementation 'com.google.firebase:firebase-perf-ktx:20.5.2'
+    implementation "com.google.firebase:firebase-analytics"
+    implementation "com.google.firebase:firebase-crashlytics:19.2.0"
+    implementation "com.google.firebase:firebase-perf-ktx:21.0.1"
+
+    //Google sign in
+    implementation "com.google.android.gms:play-services-auth:21.2.0"
+
+    //Google Drive API
+    implementation "com.google.http-client:google-http-client-gson:1.34.0"
+    implementation "com.google.apis:google-api-services-drive:v3-rev136-1.25.0"
+    implementation "com.google.api-client:google-api-client-android:1.34.0"
 }
 
 kapt {

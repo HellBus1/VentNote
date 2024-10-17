@@ -46,7 +46,7 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.bottomSheet.RegularBottomSheet
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.share_preview.components.SharePreviewAppBar
 import java.util.Date
 

@@ -1,10 +1,8 @@
-package com.digiventure.ventnote
+package com.digiventure.ventnote.data.persistence
 
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.data.local.NoteDAO
-import com.digiventure.ventnote.data.local.NoteLocalService
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -18,6 +16,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class NoteLocalServiceShould: BaseUnitTest() {
+    private val proxy: DatabaseProxy = mock()
     private val dao: NoteDAO = mock()
     private val noteList = mock<List<NoteModel>>()
     private val note = mock<NoteModel>()
@@ -36,7 +35,8 @@ class NoteLocalServiceShould: BaseUnitTest() {
 
     @Before
     fun setup() {
-        service = NoteLocalService(dao)
+        whenever(proxy.dao()).thenReturn(dao)
+        service = NoteLocalService(proxy)
     }
 
     /**

@@ -2,7 +2,6 @@ package com.digiventure.ventnote.feature.notes.components.drawer
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.Star
@@ -61,7 +61,7 @@ import com.digiventure.ventnote.commons.ColorPalletName
 import com.digiventure.ventnote.commons.ColorSchemeName
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
-import com.digiventure.ventnote.data.NoteDataStore
+import com.digiventure.ventnote.data.local.NoteDataStore
 import com.digiventure.ventnote.ui.theme.CadmiumGreenLightPrimary
 import com.digiventure.ventnote.ui.theme.CobaltBlueLightPrimary
 import com.digiventure.ventnote.ui.theme.CrimsonLightPrimary
@@ -71,7 +71,10 @@ import java.util.Locale
 
 @Composable
 fun NavDrawer(
-    drawerState: DrawerState, content: @Composable () -> Unit, onError: (String) -> Unit
+    drawerState: DrawerState,
+    content: @Composable () -> Unit,
+    onError: (String) -> Unit,
+    onBackupPressed: () -> Unit
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -113,7 +116,6 @@ fun NavDrawer(
 
     fun setColorScheme(colorScheme: String) {
         scope.launch {
-            Log.d("state", colorScheme)
             dataStore.setStringData(Constants.COLOR_SCHEME, colorScheme)
         }
     }
@@ -165,6 +167,15 @@ fun NavDrawer(
             ) {
                 setColorScheme(it)
             }
+
+            SectionTitle(title = stringResource(id = R.string.settings))
+
+            NavDrawerItem(
+                leftIcon = Icons.Filled.CloudUpload,
+                title = stringResource(id = R.string.backup),
+                subtitle = stringResource(id = R.string.backup_description),
+                testTagName = "",
+                onClick = { onBackupPressed() })
         }
     }, content = { content() }, modifier = Modifier.semantics { testTag = TestTags.NAV_DRAWER })
 }
@@ -393,6 +404,6 @@ fun NavDrawerItemColorSchemeSwitch(
 @Composable
 fun DrawerPreview() {
     val drawerState = rememberDrawerState(DrawerValue.Open)
-    NavDrawer(drawerState = drawerState, content = { }, onError = {})
+    NavDrawer(drawerState = drawerState, content = { }, onError = {}, onBackupPressed = {})
 }
 

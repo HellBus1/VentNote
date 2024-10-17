@@ -1,7 +1,5 @@
-package com.digiventure.ventnote.data
+package com.digiventure.ventnote.data.persistence
 
-import com.digiventure.ventnote.data.local.NoteLocalService
-import com.digiventure.ventnote.data.local.NoteModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -9,7 +7,7 @@ import javax.inject.Inject
 class NoteRepository @Inject constructor(
     private val service: NoteLocalService
 ) {
-    suspend fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> =
+    fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> =
         service.getNoteList(sortBy, order).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: listOf())
@@ -18,7 +16,7 @@ class NoteRepository @Inject constructor(
             }
         }
 
-    suspend fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
+    fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
         service.deleteNoteList(*notes).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: false)
@@ -27,7 +25,7 @@ class NoteRepository @Inject constructor(
             }
         }
 
-    suspend fun getNoteDetail(id: Int): Flow<Result<NoteModel>> =
+    fun getNoteDetail(id: Int): Flow<Result<NoteModel>> =
         service.getNoteDetail(id).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: NoteModel(1, "", ""))
@@ -36,7 +34,7 @@ class NoteRepository @Inject constructor(
             }
         }
 
-    suspend fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
+    fun updateNoteList(note: NoteModel): Flow<Result<Boolean>> =
         service.updateNoteList(note).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: false)
@@ -45,7 +43,7 @@ class NoteRepository @Inject constructor(
             }
         }
 
-    suspend fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
+    fun insertNote(note: NoteModel): Flow<Result<Boolean>> =
         service.insertNote(note).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: false)

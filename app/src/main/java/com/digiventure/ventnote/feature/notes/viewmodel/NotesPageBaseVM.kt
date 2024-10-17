@@ -4,7 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 
 interface NotesPageBaseVM {
     /**
@@ -72,4 +72,6 @@ interface NotesPageBaseVM {
      * Close search event
      * */
     fun closeSearchEvent()
+
+    fun observeNotes()
 }

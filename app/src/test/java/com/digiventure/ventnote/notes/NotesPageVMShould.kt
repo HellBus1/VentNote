@@ -4,8 +4,8 @@ import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
 import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.commons.Constants
-import com.digiventure.ventnote.data.NoteRepository
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteRepository
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -57,53 +57,51 @@ class NotesPageVMShould: BaseUnitTest() {
     // TODO: Add test for when sortAndOrderData is change, the list is refetching
 
     @Test
-    fun getNotesFromRepository() = runTest {
-        mockSuccessfulCase()
+    fun haveNullNoteListInTheInitialState() {
+        val noteList = viewModel.noteList.getValueForTest()
 
-        viewModel.noteList.getValueForTest()
-
-        verify(repository, times(1)).getNoteList(sortBy, orderBy)
+        assertEquals(noteList?.getOrNull(), null)
     }
 
     @Test
-    fun emitsNotesFromRepository() = runTest {
+    fun emitsNotesFromRepositoryWhenObserveNotesIsInvoked() = runTest {
         mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
 
+        viewModel.observeNotes()
+
+        verify(repository, times(1)).getNoteList(sortBy, orderBy)
         assertEquals(expected, viewModel.noteList.getValueForTest())
     }
 
     @Test
     fun emitsErrorWhenReceiveError() = runTest {
         mockErrorCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
+
+        viewModel.observeNotes()
 
         assertEquals(exception, viewModel.noteList.getValueForTest()?.exceptionOrNull())
     }
 
     @Test
     fun emitErrorWhenGetNoteListIsThrowingError() = runTest {
-        whenever(repository.getNoteList(sortBy, orderBy)).thenThrow(exception)
+        mockErrorCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
+
+        viewModel.observeNotes()
 
         assertEquals(exception, viewModel.noteList.getValueForTest()?.exceptionOrNull())
     }
 
     @Test
-    fun showLoaderWhileLoadingNoteList() = runTest {
-        mockSuccessfulCase()
-
-        viewModel.loader.captureValues {
-            viewModel.noteList.getValueForTest()
-
-            assertEquals(true, values.first())
-        }
-    }
-
-    @Test
     fun closeLoaderAfterNoteListLoaded() = runTest {
         mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
+
+        viewModel.observeNotes()
 
         viewModel.loader.captureValues {
-            viewModel.noteList.getValueForTest()
-
             assertEquals(false, values.last())
         }
     }
@@ -111,6 +109,9 @@ class NotesPageVMShould: BaseUnitTest() {
     @Test
     fun closeLoaderAfterGetNoteListError() = runTest {
         mockErrorCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
+
+        viewModel.observeNotes()
 
         viewModel.loader.captureValues {
             viewModel.noteList.getValueForTest()
@@ -155,6 +156,8 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Test
     fun deleteNoteListFromRepository() = runTest {
+        mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
         mockSuccessfulDeletionCase()
 
         viewModel.deleteNoteList(note)
@@ -164,6 +167,8 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Test
     fun emitsBooleanFromRepository() = runTest {
+        mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
         mockSuccessfulDeletionCase()
 
         val result = viewModel.deleteNoteList(note)
@@ -173,6 +178,8 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Test
     fun emitsErrorWhenDeletionError() = runTest {
+        mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
         mockErrorDeletionCase()
 
         val result = viewModel.deleteNoteList(note)
@@ -191,6 +198,8 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Test
     fun showLoaderWhileDeletingNote() = runTest {
+        mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
         mockSuccessfulDeletionCase()
 
         viewModel.loader.captureValues {
@@ -202,6 +211,8 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Test
     fun closeLoaderAfterDeleteNoteSuccess() = runTest {
+        mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
         mockSuccessfulDeletionCase()
 
         viewModel.loader.captureValues {
@@ -213,6 +224,8 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Test
     fun closeLoaderAfterDeleteNoteError() = runTest {
+        mockSuccessfulCase()
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
         mockErrorDeletionCase()
 
         viewModel.loader.captureValues {

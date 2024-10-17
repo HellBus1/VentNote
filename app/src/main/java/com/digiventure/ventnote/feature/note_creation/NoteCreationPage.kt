@@ -49,7 +49,7 @@ import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.data.local.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.note_creation.components.NoteCreationAppBar
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageBaseVM
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageMockVM
@@ -85,9 +85,11 @@ fun NoteCreationPage(
             requiredDialogState.value = true
         } else {
             scope.launch {
-                viewModel.addNote(NoteModel(
+                viewModel.addNote(
+                    NoteModel(
                     title = viewModel.titleText.value,
-                    note = viewModel.descriptionText.value))
+                    note = viewModel.descriptionText.value)
+                )
                     .onSuccess {
                         navHostController.popBackStack()
                         snackBarHostState.showSnackbar(
