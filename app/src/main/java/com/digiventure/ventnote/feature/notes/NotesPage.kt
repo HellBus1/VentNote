@@ -113,6 +113,7 @@ fun NotesPage(
                 .onSuccess {
                     deleteDialog.value = false
                     viewModel.unMarkAllNote()
+                    viewModel.closeMarkingEvent()
 
                     snackBarHostState.showSnackbar(
                         message = deletedMessage,
