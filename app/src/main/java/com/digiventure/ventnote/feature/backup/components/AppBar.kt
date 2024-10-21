@@ -21,14 +21,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
+import com.digiventure.ventnote.feature.backup.viewmodel.AuthBaseVM
+import com.digiventure.ventnote.feature.backup.viewmodel.AuthVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackupPageAppBar(
+    authVM: AuthBaseVM,
     onBackPressed: () -> Unit,
     onLogoutPressed: () -> Unit,
     onBackupPressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior) {
+
+    val authUiState = authVM.uiState.value
+
     TopAppBar(
         title = {
             Text(
@@ -55,10 +61,12 @@ fun BackupPageAppBar(
         scrollBehavior = scrollBehavior,
         modifier = Modifier.semantics {  },
         actions = {
-            TrailingMenuIcons(
-                onBackupPressed = onBackupPressed,
-                onLogoutPressed = onLogoutPressed
-            )
+            if (authUiState.authState == AuthVM.AuthState.SignedIn) {
+                TrailingMenuIcons(
+                    onBackupPressed = onBackupPressed,
+                    onLogoutPressed = onLogoutPressed
+                )
+            }
         }
     )
 }
