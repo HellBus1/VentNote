@@ -90,4 +90,6 @@
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>
     <string name="body_textField">body textField</string>
+
+    <string name="web_client_id">WEB_CLIENT_ID</string>
 </resources>

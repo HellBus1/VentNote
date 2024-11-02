@@ -82,8 +82,10 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM,
                     fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> {
                 restoreLoadingDialogState.value = false
                 val errorMessage = when {
-                    fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed -> fileRestoreState.errorMessage
-                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> fileDeleteState.errorMessage
+                    fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed ->
+                        "Restore notes process failed : ${fileRestoreState.errorMessage}"
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed ->
+                        "Delete notes process failed : ${fileDeleteState.errorMessage}"
                     else -> ""
                 }
                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
@@ -176,7 +178,7 @@ fun ListOfBackupFile(backupPageVM: BackupPageBaseVM,
         }
 
         is BackupPageVM.FileBackupListState.FileBackupListFailed -> {
-            val errorMessage = state.errorMessage
+            val errorMessage = "Get notes process failed : ${state.errorMessage}"
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
 
             Box(

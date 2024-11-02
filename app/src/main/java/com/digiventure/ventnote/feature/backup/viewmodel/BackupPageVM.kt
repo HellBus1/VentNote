@@ -40,9 +40,8 @@ class BackupPageVM @Inject constructor(
             val currentState = _uiState.value.copy(fileBackupState = FileBackupState.SyncStarted)
             _uiState.value = currentState
 
-            val drive = getDriveInstance()
-
             try {
+                val drive = getDriveInstance()
                 databaseRepository.getNoteList(Constants.UPDATED_AT, Constants.DESCENDING)
                     .collect {
                         repository.uploadDatabaseFile(
@@ -66,9 +65,8 @@ class BackupPageVM @Inject constructor(
             val currentState = _uiState.value.copy(fileRestoreState = FileRestoreState.SyncStarted)
             _uiState.value = currentState
 
-            val drive = getDriveInstance()
-
             try {
+                val drive = getDriveInstance()
                 repository.restoreDatabaseFile(fileId, drive)
                     .onEach {
                         _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFinished)
@@ -85,9 +83,8 @@ class BackupPageVM @Inject constructor(
             val currentState = _uiState.value.copy(listOfBackupFileState = FileBackupListState.FileBackupListStarted)
             _uiState.value = currentState
 
-            val drive = getDriveInstance()
-
             try {
+                val drive = getDriveInstance()
                 repository.getBackupFileList(drive).collect { result ->
                     _uiState.value = currentState.copy(listOfBackupFileState = FileBackupListState.FileBackupListFinished)
                     if (result.isSuccess) {
@@ -116,9 +113,8 @@ class BackupPageVM @Inject constructor(
             val currentState = _uiState.value.copy(fileDeleteState = FileDeleteState.SyncStarted)
             _uiState.value = currentState
 
-            val drive = getDriveInstance()
-
             try {
+                val drive = getDriveInstance()
                 repository.deleteFile(fileId, drive)
                     .onEach {
                         _uiState.value = currentState.copy(fileDeleteState = FileDeleteState.SyncFinished)

@@ -5,12 +5,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.digiventure.ventnote.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.Scope
+import com.google.api.services.drive.DriveScopes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -60,9 +61,12 @@ class AuthVM @Inject constructor(
     }
 
     private fun getGoogleSignInOptions(): GoogleSignInOptions {
-        val scopeDriveAppFolder = Scope(Scopes.DRIVE_APPFOLDER)
+        val scopeDriveAppFolder = Scope(DriveScopes.DRIVE_APPDATA)
+        val idToken = app.getString(R.string.web_client_id)
         return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
+            .requestIdToken(idToken)
+            .requestId()
             .requestScopes(scopeDriveAppFolder)
             .build()
     }

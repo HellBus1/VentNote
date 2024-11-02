@@ -81,7 +81,7 @@ fun BackupPage(
         when(fileBackupState) {
             is BackupPageVM.FileBackupState.SyncFailed -> {
                 loadingDialogState.value = false
-                val errorMessage = fileBackupState.errorMessage
+                val errorMessage = "Backup notes process failed : ${fileBackupState.errorMessage}"
                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
             BackupPageVM.FileBackupState.SyncFinished -> {
@@ -103,6 +103,7 @@ fun BackupPage(
     Scaffold(
         topBar = {
             BackupPageAppBar(
+                authVM = authViewModel,
                 onBackPressed = { navHostController.popBackStack() },
                 scrollBehavior = rememberedScrollBehavior,
                 onBackupPressed = {
