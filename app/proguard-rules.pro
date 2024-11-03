@@ -25,3 +25,12 @@
    void traceEventStart(int,int,int,java.lang.String);
    void traceEventEnd();
 }
+
+-keep class !androidx.compose.material3.** { *; }
+-keep class !androidx.compose.material.** { *; }
+
+-dontwarn com.google.android.gms.fido.**
+-dontwarn javax.naming.**
+-dontwarn javax.servlet.**
+-dontwarn org.apache.**
+-dontwarn org.ietf.jgss.**
