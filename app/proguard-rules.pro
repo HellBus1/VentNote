@@ -25,3 +25,21 @@
    void traceEventStart(int,int,int,java.lang.String);
    void traceEventEnd();
 }
+
+-keep class !androidx.core.** { *; }
+-keep class !androidx.lifecycle.** { *; }
+-keep class !androidx.activity.** { *; }
+-keep class !androidx.compose.runtime.** { *; }
+-keep class !androidx.compose.ui.** { *; }
+-keep class !androidx.compose.material3.** { *; }
+-keep class !androidx.lifecycle.** { *; }
+-keep class !androidx.datastore.** { *; }
+-keep class !androidx.navigation.** { *; }
+-keep class !com.google.dagger.** { *; }
+-keep class !androidx.compose.material.** { *; }
+
+-dontwarn com.google.android.gms.fido.**
+-dontwarn javax.naming.**
+-dontwarn javax.servlet.**
+-dontwarn org.apache.**
+-dontwarn org.ietf.jgss.**
