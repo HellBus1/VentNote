@@ -127,7 +127,10 @@ dependencies {
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     // Google Play API
-    implementation "com.google.android.gms:play-services-auth:21.2.0"
+    implementation("com.google.android.gms:play-services-auth:21.2.0") {
+        exclude(group: "com.google.android.gms", module: "play-services-auth-api-phone")
+        exclude(group: "com.google.android.gms", module: "play-services-fido")
+    }
 
     // Accompanist - Status Bar
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.34.0"
@@ -166,19 +169,16 @@ dependencies {
     implementation "com.google.firebase:firebase-crashlytics:19.2.0"
     implementation "com.google.firebase:firebase-perf-ktx:21.0.1"
 
-    //Google sign in
-    implementation "com.google.android.gms:play-services-auth:21.2.0"
-
     //Google Drive API
     implementation("com.google.http-client:google-http-client-gson:1.44.2") {
         exclude(group: "com.google.http-client", module: "google-http-client")
     }
     implementation("com.google.apis:google-api-services-drive:v3-rev136-1.25.0") {
         exclude(group: "com.google.http-client", module: "google-http-client")
-        exclude(group: "com.google.guava", module: "guava:20.0")
+        exclude(group: "com.google.guava", module: "guava")
     }
     implementation("com.google.api-client:google-api-client-android:1.34.0") {
-        exclude(group: "com.google.guava", module: "guava:30.1.1-android")
+        exclude(group: "com.google.guava", module: "guava")
     }
 }
 
