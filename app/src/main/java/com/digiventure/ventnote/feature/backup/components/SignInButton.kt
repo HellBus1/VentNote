@@ -33,7 +33,8 @@ fun SignInButton(authViewModel: AuthBaseVM, signInSuccessCallback: () -> Unit) {
                 authViewModel.checkAuthState()
                 signInSuccessCallback()
             } else {
-                Toast.makeText(context, "Auth Failed", Toast.LENGTH_LONG).show()
+                val errorMessage = "Auth Failed"
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
         }
 

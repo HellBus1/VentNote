@@ -29,11 +29,11 @@ class AuthVM @Inject constructor(
     private val _eventFlow = MutableSharedFlow<AuthState>()
     override val eventFlow = _eventFlow.asSharedFlow()
 
-    private val googleSignInClient: GoogleSignInClient by lazy {
-        GoogleSignIn.getClient(app.applicationContext, getGoogleSignInOptions())
-    }
+    private var googleSignInClient: GoogleSignInClient
 
     init {
+        googleSignInClient =
+            GoogleSignIn.getClient(app.applicationContext, getGoogleSignInOptions())
         checkAuthState()
     }
 
