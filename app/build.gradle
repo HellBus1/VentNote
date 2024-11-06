@@ -19,7 +19,7 @@ android {
         applicationId "com.digiventure.ventnote"
         minSdk 21
         targetSdk 34
-        versionCode 38
+        versionCode 40
         versionName "1.0.7"
 
         testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
