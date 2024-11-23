@@ -61,7 +61,7 @@ import com.digiventure.ventnote.feature.note_detail.components.NoteDetailAppBar
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageBaseVM
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageMockVM
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageVM
-import com.digiventure.ventnote.navigation.Route
+import com.digiventure.ventnote.navigation.PageNavigation
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
@@ -75,6 +75,10 @@ fun NoteDetailPage(
     id: String
 ) {
     LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
+    val navigationActions = remember(navHostController) {
+        PageNavigation(navHostController)
+    }
 
     // String resource
     val titleTextField = "${stringResource(R.string.title_textField)}-$TAG"
@@ -202,7 +206,9 @@ fun NoteDetailPage(
                 isEditing = isEditingState,
                 descriptionTextLength = viewModel.descriptionText.value.length,
                 onBackPressed = {
-                    navHostController.popBackStack()
+                    scope.launch {
+                        navigationActions.navigateToNotesPage()
+                    }
                 },
                 onClosePressed = {
                     cancelDialogState.value = true
@@ -213,7 +219,8 @@ fun NoteDetailPage(
                 scrollBehavior = rememberedScrollBehavior,
                 onSharePressed = {
                     val json = Uri.encode(Gson().toJson(data))
-                    navHostController.navigate("${Route.SharePreviewPage.routeName}/${json}")
+                    navigationActions.navigateToSharePage(json)
+
                 }
             )
         },
