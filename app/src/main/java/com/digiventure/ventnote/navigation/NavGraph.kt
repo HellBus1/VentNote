@@ -14,13 +14,13 @@ import com.digiventure.ventnote.feature.notes.NotesPage
 import com.digiventure.ventnote.feature.share_preview.SharePreviewPage
 
 @Composable
-fun NavGraph(navHostController: NavHostController) {
+fun NavGraph(navHostController: NavHostController, openDrawer: () -> Unit) {
     NavHost(
         navController = navHostController,
-        startDestination = Route.NotesPage.routeName
+        startDestination = Route.NotesPage.routeName,
     ) {
         composable(Route.NotesPage.routeName) {
-            NotesPage(navHostController = navHostController)
+            NotesPage(navHostController = navHostController, openDrawer = openDrawer)
         }
         composable(
             route = "${Route.NoteDetailPage.routeName}/{noteId}",
