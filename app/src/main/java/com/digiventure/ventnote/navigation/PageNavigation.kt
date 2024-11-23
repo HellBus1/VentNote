@@ -39,4 +39,14 @@ class PageNavigation(navController: NavHostController) {
             }
         }
     }
+    val navigateToSharePage: (noteJson: String) -> Unit = { noteJson ->
+        val routeName = "${Route.SharePreviewPage.routeName}/${noteJson}"
+        navController.navigate(routeName) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
 }

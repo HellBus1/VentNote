@@ -71,18 +71,13 @@ class MainActivity : ComponentActivity() {
                     NavDrawer(
                         drawerState = drawerState,
                         onError = {
-                            coroutineScope.launch {
-                                snackBarHostState.showSnackbar(
-                                    message = it,
-                                    withDismissAction = true
-                                )
-                            }
+
                         },
                         onBackupPressed = {
                             navigationActions.navigateToBackupPage()
                         },
                         content = {
-                            NavGraph(navHostController = rememberNavController(), openDrawer = {
+                            NavGraph(navHostController = navController, openDrawer = {
                                 coroutineScope.launch { drawerState.open() }
                             })
                         },
