@@ -2,7 +2,6 @@ package com.digiventure.ventnote.feature.note_detail
 
 import android.content.pm.ActivityInfo
 import android.net.Uri
-import android.view.ViewTreeObserver
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +27,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -47,7 +44,6 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -177,29 +173,6 @@ fun NoteDetailPage(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val rememberedScrollBehavior = remember { scrollBehavior }
 
-    val view = LocalView.current
-    val keyboardHeight = remember { mutableStateOf(0.dp) }
-
-    val viewTreeObserver = remember { view.viewTreeObserver }
-    val onGlobalLayoutListener = remember {
-        ViewTreeObserver.OnGlobalLayoutListener {
-            val rect = android.graphics.Rect().apply {
-                view.getWindowVisibleDisplayFrame(this)
-            }
-            val keyboardHeightNew = view.rootView.height - rect.bottom
-            if (keyboardHeightNew.dp != keyboardHeight.value) {
-                keyboardHeight.value = keyboardHeightNew.dp
-            }
-        }
-    }
-
-    DisposableEffect(view) {
-        viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
-        onDispose {
-            viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
-        }
-    }
-
     Scaffold(
         topBar = {
             NoteDetailAppBar(
@@ -259,7 +232,6 @@ fun NoteDetailPage(
                         .fillMaxWidth()
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(bottom = keyboardHeight.value)
                 ) {
                     TitleTextField(viewModel, isEditingState, titleTextField, titleInput)
                     DescriptionTextField(viewModel, isEditingState, bodyTextField, bodyInput)
