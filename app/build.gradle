@@ -19,8 +19,8 @@ android {
         applicationId "com.digiventure.ventnote"
         minSdk 21
         targetSdk 34
-        versionCode 40
-        versionName "1.0.7"
+        versionCode 41
+        versionName "1.0.8"
 
         testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
         vectorDrawables {
