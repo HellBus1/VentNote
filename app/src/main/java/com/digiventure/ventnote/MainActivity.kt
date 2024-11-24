@@ -5,13 +5,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.components.dialog.TextDialog
+import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
 import com.digiventure.ventnote.navigation.NavGraph
+import com.digiventure.ventnote.navigation.PageNavigation
 import com.digiventure.ventnote.ui.theme.VentNoteTheme
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -21,6 +28,7 @@ import com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -44,12 +52,36 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VentNoteTheme {
+                val navController = rememberNavController()
+                val navigationActions = remember(navController) {
+                    PageNavigation(navController)
+                }
+
+                val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+                val coroutineScope = rememberCoroutineScope()
+
+                val snackBarHostState = remember { SnackbarHostState() }
+
                 Surface(
                     modifier = Modifier.safeDrawingPadding(),
                     color = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.secondary
                 ) {
-                    NavGraph(navHostController = rememberNavController())
+                    NavDrawer(
+                        drawerState = drawerState,
+                        onError = {
+
+                        },
+                        onBackupPressed = {
+                            navigationActions.navigateToBackupPage()
+                        },
+                        content = {
+                            NavGraph(navHostController = navController, openDrawer = {
+                                coroutineScope.launch { drawerState.open() }
+                            })
+                        },
+                    )
 
                     TextDialog(
                         isOpened = isDialogShowed,
@@ -76,9 +108,11 @@ class MainActivity : ComponentActivity() {
                     // and request user confirmation to restart the app.
                     showDialogForCompleteUpdate()
                 }
+
                 InstallStatus.INSTALLED -> {
                     appUpdateManager.unregisterListener(installStateUpdatedListener)
                 }
+
                 else -> {}
             }
         }
@@ -98,11 +132,17 @@ class MainActivity : ComponentActivity() {
                     val updateTypes = arrayOf(AppUpdateType.FLEXIBLE, IMMEDIATE)
                     for (type in updateTypes) {
                         if (it.isUpdateTypeAllowed(type)) {
-                            appUpdateManager.startUpdateFlowForResult(it, type, this, REQUEST_UPDATE_CODE)
+                            appUpdateManager.startUpdateFlowForResult(
+                                it,
+                                type,
+                                this,
+                                REQUEST_UPDATE_CODE
+                            )
                             break
                         }
                     }
                 }
+
                 else -> {}
             }
         }

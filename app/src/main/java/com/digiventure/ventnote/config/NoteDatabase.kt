@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.config
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -25,8 +26,11 @@ object DateConverters {
 
 @Database(
     entities = [NoteModel::class],
-    version = 1,
-    exportSchema = true
+    version = 2,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration (from = 1, to = 2)
+    ]
 )
 @TypeConverters(DateConverters::class)
 abstract class NoteDatabase: RoomDatabase() {

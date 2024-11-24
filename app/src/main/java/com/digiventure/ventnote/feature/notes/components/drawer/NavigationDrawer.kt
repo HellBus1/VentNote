@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Update
+import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -41,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -122,12 +122,12 @@ fun NavDrawer(
 
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
         ModalDrawerSheet(
-            drawerShape = RectangleShape,
+            drawerShape = DrawerDefaults.shape,
             drawerContainerColor = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .fillMaxHeight()
                 .padding(0.dp)
-                .width(screenWidth - 50.dp)
+                .width(screenWidth - 60.dp)
         ) {
             SectionTitle(title = stringResource(id = R.string.about_us))
 
