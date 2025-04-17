@@ -72,7 +72,7 @@ fun NotesPage(
     val snackBarHostState = remember { SnackbarHostState() }
     val filteredNotes = remember(noteListState.value, viewModel.searchedTitleText.value) {
         noteListState.value?.getOrNull()?.filter { note ->
-            note.title.contains(viewModel.searchedTitleText.value, true)
+            note.title.contains(viewModel.searchedTitleText.value, true) || note.content.contains(viewModel.searchedTitleText.value, true)
         } ?: listOf()
     }
     val loadingDialog = remember { mutableStateOf(false) }
