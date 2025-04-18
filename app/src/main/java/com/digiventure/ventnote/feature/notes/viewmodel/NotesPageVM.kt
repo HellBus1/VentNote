@@ -28,7 +28,7 @@ class NotesPageVM @Inject constructor(
         Pair(Constants.UPDATED_AT, Constants.DESCENDING)
     )
 
-    val defaultException = Exception("Unknown error")
+    private val defaultException = Exception("Unknown error")
 
     override val noteList: LiveData<Result<List<NoteModel>>>
         get() = _noteList
