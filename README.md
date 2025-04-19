@@ -11,12 +11,12 @@ Note management app built with jetpack compose and newest modern android archite
 <br />
 
 <p>
-  <img src="assets/screen_one.png" width="200"/>
-  <img src="assets/screen_two.png" width="200"/>
-  <img src="assets/screen_three.png" width="200"/>
-  <img src="assets/screen_four.png" width="200"/>
-  <img src="assets/screen_five.png" width="200"/>
-  <img src="assets/screen_six.png" width="200"/>
+  <img src="assets/screen_one.png" width="200" alt=""/>
+  <img src="assets/screen_two.png" width="200" alt=""/>
+  <img src="assets/screen_three.png" width="200" alt=""/>
+  <img src="assets/screen_four.png" width="200" alt=""/>
+  <img src="assets/screen_five.png" width="200" alt=""/>
+  <img src="assets/screen_six.png" width="200" alt=""/>
 </p>
 
 <br />

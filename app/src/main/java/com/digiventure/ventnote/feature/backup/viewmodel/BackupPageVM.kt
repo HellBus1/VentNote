@@ -133,29 +133,29 @@ class BackupPageVM @Inject constructor(
     }
 
     sealed class FileBackupState {
-        object SyncInitial : FileBackupState()
-        object SyncStarted : FileBackupState()
-        object SyncFinished : FileBackupState()
+        data object SyncInitial : FileBackupState()
+        data object SyncStarted : FileBackupState()
+        data object SyncFinished : FileBackupState()
         data class SyncFailed(val errorMessage: String) : FileBackupState()
     }
 
     sealed class FileRestoreState {
-        object SyncInitial : FileRestoreState()
-        object SyncStarted : FileRestoreState()
-        object SyncFinished : FileRestoreState()
+        data object SyncInitial : FileRestoreState()
+        data object SyncStarted : FileRestoreState()
+        data object SyncFinished : FileRestoreState()
         data class SyncFailed(val errorMessage: String) : FileRestoreState()
     }
 
     sealed class FileDeleteState {
-        object SyncInitial : FileDeleteState()
-        object SyncStarted : FileDeleteState()
-        object SyncFinished : FileDeleteState()
+        data object SyncInitial : FileDeleteState()
+        data object SyncStarted : FileDeleteState()
+        data object SyncFinished : FileDeleteState()
         data class SyncFailed(val errorMessage: String) : FileDeleteState()
     }
 
     sealed class FileBackupListState {
-        object FileBackupListStarted : FileBackupListState()
-        object FileBackupListFinished : FileBackupListState()
+        data object FileBackupListStarted : FileBackupListState()
+        data object FileBackupListFinished : FileBackupListState()
         data class FileBackupListFailed(val errorMessage: String) : FileBackupListState()
     }
 

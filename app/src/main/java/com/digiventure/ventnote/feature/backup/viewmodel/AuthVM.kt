@@ -76,8 +76,8 @@ class AuthVM @Inject constructor(
     )
 
     sealed interface AuthState {
-        object Loading : AuthState
-        object SignedOut : AuthState
-        object SignedIn : AuthState
+        data object Loading : AuthState
+        data object SignedOut : AuthState
+        data object SignedIn : AuthState
     }
 }

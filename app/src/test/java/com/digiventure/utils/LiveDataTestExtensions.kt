@@ -41,7 +41,7 @@ class LiveDataValueCapture<T> {
  * Extension function to capture all values that are emitted to a LiveData<T> during the execution of
  * `captureBlock`.
  *
- * @param captureBlock a lambda that will
+ * @param block a lambda that will
  */
 inline fun <T> LiveData<T>.captureValues(block: LiveDataValueCapture<T>.() -> Unit) {
     val capture = LiveDataValueCapture<T>()
