@@ -58,6 +58,7 @@ fun NotesPage(
     viewModel: NotesPageBaseVM = hiltViewModel<NotesPageVM>(),
     openDrawer: () -> Unit
 ) {
+    val emptyString = ""
     LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     val navigationActions = remember(navHostController) {
@@ -72,7 +73,7 @@ fun NotesPage(
     val snackBarHostState = remember { SnackbarHostState() }
     val filteredNotes = remember(noteListState.value, viewModel.searchedTitleText.value) {
         noteListState.value?.getOrNull()?.filter { note ->
-            note.title.contains(viewModel.searchedTitleText.value, true) || note.content.contains(viewModel.searchedTitleText.value, true)
+            note.title.contains(viewModel.searchedTitleText.value, true) || note.note.contains(viewModel.searchedTitleText.value, true)
         } ?: listOf()
     }
     val loadingDialog = remember { mutableStateOf(false) }
@@ -92,7 +93,7 @@ fun NotesPage(
         noteListState.value?.onFailure {
             scope.launch {
                 snackBarHostState.showSnackbar(
-                    message = it.message ?: "",
+                    message = it.message ?: emptyString,
                     withDismissAction = true
                 )
             }
@@ -122,7 +123,7 @@ fun NotesPage(
                     deleteDialog.value = false
 
                     snackBarHostState.showSnackbar(
-                        message = it.message ?: "",
+                        message = it.message ?: emptyString,
                         withDismissAction = true
                     )
                 }

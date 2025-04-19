@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.navigation
 
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -15,6 +16,11 @@ import com.digiventure.ventnote.feature.share_preview.SharePreviewPage
 
 @Composable
 fun NavGraph(navHostController: NavHostController, openDrawer: () -> Unit) {
+    val emptyString = ""
+    val noteIdNavArgument = "noteId"
+    val noteDataNavArgument = "noteData"
+    val stringZero = "0"
+
     NavHost(
         navController = navHostController,
         startDestination = Route.NotesPage.routeName,
@@ -23,25 +29,30 @@ fun NavGraph(navHostController: NavHostController, openDrawer: () -> Unit) {
             NotesPage(navHostController = navHostController, openDrawer = openDrawer)
         }
         composable(
-            route = "${Route.NoteDetailPage.routeName}/{noteId}",
-            arguments = listOf(navArgument("noteId") {
+            route = "${Route.NoteDetailPage.routeName}/{${noteIdNavArgument}}",
+            arguments = listOf(navArgument(noteIdNavArgument) {
                 type = NavType.StringType
-                defaultValue = ""
+                defaultValue = emptyString
             })
         ) {
             NoteDetailPage(navHostController = navHostController,
-                id = it.arguments?.getString("noteId") ?: "0")
+                id = it.arguments?.getString(noteIdNavArgument) ?: stringZero)
         }
         composable(Route.NoteCreationPage.routeName) {
             NoteCreationPage(navHostController = navHostController)
         }
         composable(
-            route = "${Route.SharePreviewPage.routeName}/{noteData}",
-            arguments = listOf(navArgument("noteData") {
+            route = "${Route.SharePreviewPage.routeName}/{${noteDataNavArgument}}",
+            arguments = listOf(navArgument(noteDataNavArgument) {
                 type = NoteModelParamType()
             })
         ) {
-            val note = it.arguments?.getParcelable<NoteModel>("noteData")
+            val note = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                it.arguments?.getParcelable(noteDataNavArgument, NoteModel::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                it.arguments?.getParcelable(noteDataNavArgument)
+            }
             SharePreviewPage(navHostController = navHostController, note = note)
         }
         composable(Route.BackupPage.routeName) {

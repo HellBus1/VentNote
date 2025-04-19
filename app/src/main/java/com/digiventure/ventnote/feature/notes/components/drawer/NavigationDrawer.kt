@@ -68,6 +68,7 @@ import com.digiventure.ventnote.ui.theme.CrimsonLightPrimary
 import com.digiventure.ventnote.ui.theme.PurpleLightPrimary
 import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.core.net.toUri
 
 @Composable
 fun NavDrawer(
@@ -84,7 +85,7 @@ fun NavDrawer(
     fun openPlayStore(appURL: String) {
         val playIntent: Intent = Intent().apply {
             action = Intent.ACTION_VIEW
-            data = Uri.parse(appURL)
+            data = appURL.toUri()
         }
         try {
             context.startActivity(playIntent)
