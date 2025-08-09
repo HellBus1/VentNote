@@ -5,38 +5,36 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import com.digiventure.ventnote.data.persistence.NoteModel
 
 class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
-    override val loader = MutableLiveData<Boolean>()
+    override val loader = MutableLiveData<Boolean>(false) // Initial value
     override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData()
 
     override fun sortAndOrder(sortBy: String, orderBy: String) {
-
+        // Mock implementation if needed
     }
 
-    override val noteList: LiveData<Result<List<NoteModel>>> = liveData {
-        Result.success(
-            listOf(
-                NoteModel("", ""),
-                NoteModel("", ""),
-                NoteModel("", ""),
-                NoteModel("", ""),
+    // More preview-friendly way to expose a list
+    override val noteList: LiveData<Result<List<NoteModel>>> =
+        MutableLiveData( // Use MutableLiveData and set its value directly
+            Result.success(
+                listOf(
+                    NoteModel("Title 1", "Note 1"),
+                    NoteModel("Title 2", "Note 2"),
+                    NoteModel("Title 3", "Note 3"),
+                    NoteModel("Title 4", "Note 4")
+                )
             )
         )
-    }
 
-    override val isSearching = mutableStateOf(false)
     override val searchedTitleText = mutableStateOf("")
 
     override val isMarking = mutableStateOf(false)
     override val markedNoteList = mutableStateListOf<NoteModel>()
 
     override fun markAllNote(notes: List<NoteModel>) {}
-
     override fun unMarkAllNote() {}
-
     override fun addToMarkedNoteList(note: NoteModel) {}
 
     override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> = Result.success(true)
@@ -46,12 +44,8 @@ class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
         markedNoteList.clear()
     }
 
-    override fun closeSearchEvent() {
-        isSearching.value = false
-        searchedTitleText.value = ""
-    }
-
     override fun observeNotes() {
-
+        // In a real ViewModel, this might trigger the data loading.
+        // For a mock, the data is already set.
     }
 }

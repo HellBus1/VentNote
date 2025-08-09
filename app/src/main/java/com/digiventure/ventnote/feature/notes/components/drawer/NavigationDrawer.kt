@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.feature.notes.components.drawer
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -55,6 +54,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.digiventure.ventnote.BuildConfig
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.ColorPalletName
@@ -68,7 +68,6 @@ import com.digiventure.ventnote.ui.theme.CrimsonLightPrimary
 import com.digiventure.ventnote.ui.theme.PurpleLightPrimary
 import kotlinx.coroutines.launch
 import java.util.Locale
-import androidx.core.net.toUri
 
 @Composable
 fun NavDrawer(
