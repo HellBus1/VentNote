@@ -264,7 +264,7 @@ fun NotesPage(
                                     translationY = scrollBehavior.state.heightOffset
                                 }
                                 .fillMaxWidth()
-                                .padding(24.dp, 24.dp, 24.dp, 8.dp)
+                                .padding(16.dp, 24.dp, 16.dp, 8.dp)
                         ) {
                             SearchBar(
                                 query = searchQuery,
@@ -324,7 +324,8 @@ fun NotesPage(
         FilterSheet(
             openBottomSheet = remember { mutableStateOf(true) },
             bottomSheetState = bottomSheetState,
-            onDismiss = { openBottomSheet = false }
+            onDismiss = { openBottomSheet = false },
+            sortAndOrderData = viewModel.sortAndOrderData.value
         ) { sortBy, orderBy ->
             viewModel.sortAndOrder(sortBy, orderBy)
         }

@@ -38,6 +38,8 @@ fun SearchBar(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
             disabledContainerColor = Color.Transparent,
+            focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
             cursorColor = MaterialTheme.colorScheme.onSurfaceVariant,
             focusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
             unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -50,7 +52,7 @@ fun SearchBar(
             )
         },
         textStyle = TextStyle(
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 16.sp,
             lineHeight = 0.sp
         ),
