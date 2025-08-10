@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.DateRange
@@ -90,7 +91,7 @@ fun FilterSheet(
             // Sort By Section
             FilterSection(
                 title = stringResource(R.string.sort_by),
-                icon = Icons.Outlined.Sort
+                icon = Icons.AutoMirrored.Outlined.Sort
             ) {
                 LazyRow (
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
