@@ -15,7 +15,6 @@ import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.SwapVert
 import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material.icons.outlined.Update
