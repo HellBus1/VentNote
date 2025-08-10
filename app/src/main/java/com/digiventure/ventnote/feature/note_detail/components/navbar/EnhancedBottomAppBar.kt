@@ -33,8 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.digiventure.ventnote.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +61,7 @@ fun EnhancedBottomAppBar(
                     // Cancel button in editing mode
                     EnhancedBottomBarButton(
                         icon = Icons.Rounded.Close,
-                        label = "Cancel",
+                        label = stringResource(R.string.cancel),
                         onClick = onCancelClick,
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -68,7 +70,7 @@ fun EnhancedBottomAppBar(
                     // Save button in editing mode
                     EnhancedBottomBarButton(
                         icon = Icons.Rounded.Check,
-                        label = "Save",
+                        label = stringResource(R.string.save),
                         onClick = onSaveClick,
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -78,7 +80,7 @@ fun EnhancedBottomAppBar(
                     // Edit button in view mode
                     EnhancedBottomBarButton(
                         icon = Icons.Rounded.Edit,
-                        label = "Edit",
+                        label = stringResource(R.string.edit),
                         onClick = onEditClick,
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -87,7 +89,7 @@ fun EnhancedBottomAppBar(
                     // Delete button in view mode
                     EnhancedBottomBarButton(
                         icon = Icons.Rounded.DeleteOutline,
-                        label = "Delete",
+                        label = stringResource(R.string.delete),
                         onClick = onDeleteClick,
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer

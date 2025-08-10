@@ -28,12 +28,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.digiventure.ventnote.R
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageBaseVM
 
 @Composable
@@ -56,7 +58,7 @@ fun NoteSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Notes",
+                text = stringResource(R.string.notes),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -79,10 +81,11 @@ fun ImprovedDescriptionTextField(
     bodyTextField: String,
     bodyInput: String
 ) {
+    val label = "border_color"
     val borderColor by animateColorAsState(
         targetValue = if (isEditingState) MaterialTheme.colorScheme.primary else Color.Transparent,
         animationSpec = tween(300),
-        label = "border_color"
+        label = label
     )
 
     Card(
@@ -110,10 +113,10 @@ fun ImprovedDescriptionTextField(
             value = viewModel.descriptionText.value,
             onValueChange = { viewModel.descriptionText.value = it },
             textStyle = TextStyle(
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurface,
-                lineHeight = 24.sp
+                lineHeight = 20.sp
             ),
             singleLine = false,
             readOnly = !isEditingState,
@@ -134,7 +137,7 @@ fun ImprovedDescriptionTextField(
                 if (isEditingState) {
                     Text(
                         text = bodyInput,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 }

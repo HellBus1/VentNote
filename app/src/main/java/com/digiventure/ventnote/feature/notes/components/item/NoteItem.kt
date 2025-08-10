@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -77,9 +78,12 @@ fun NotesItem(
                     text = data.title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 24.sp
+                    ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
             }
@@ -98,8 +102,12 @@ fun NotesItem(
                         text = data.note,
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            lineHeight = 20.sp
+                        ),
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
                     Text(

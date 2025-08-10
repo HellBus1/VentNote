@@ -30,12 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.digiventure.ventnote.R
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageBaseVM
 import kotlinx.coroutines.delay
 
@@ -59,7 +61,7 @@ fun TitleSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Title",
+                text = stringResource(R.string.sort_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -82,11 +84,12 @@ fun ImprovedTitleTextField(
     titleTextField: String,
     titleInput: String
 ) {
+    val label = "border_color"
     val focusRequester = remember { FocusRequester() }
     val borderColor by animateColorAsState(
         targetValue = if (isEditingState) MaterialTheme.colorScheme.primary else Color.Transparent,
         animationSpec = tween(300),
-        label = "border_color"
+        label = label
     )
 
     LaunchedEffect(isEditingState) {
@@ -120,10 +123,10 @@ fun ImprovedTitleTextField(
             value = viewModel.titleText.value,
             onValueChange = { viewModel.titleText.value = it },
             textStyle = TextStyle(
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
-                lineHeight = 28.sp
+                lineHeight = 24.sp
             ),
             singleLine = false,
             maxLines = 3,
@@ -145,7 +148,7 @@ fun ImprovedTitleTextField(
                 if (isEditingState) {
                     Text(
                         text = titleInput,
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )

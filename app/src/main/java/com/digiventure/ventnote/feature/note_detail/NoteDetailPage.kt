@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.Constants.EMPTY_STRING
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
@@ -53,8 +54,6 @@ import com.digiventure.ventnote.navigation.PageNavigation
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
-const val TAG : String = "NoteDetailPage"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDetailPage(
@@ -69,19 +68,19 @@ fun NoteDetailPage(
     }
 
     // String resources - memoized for better performance
-    val titleTextFieldTag = stringResource(R.string.title_textField)
-    val bodyTextFieldTag = stringResource(R.string.body_textField)
-    val titleInputTag = stringResource(R.string.title_textField_input)
-    val bodyInputTag = stringResource(R.string.body_textField_input)
-    val successFullyUpdatedTag = stringResource(R.string.successfully_updated)
+    val titleTextFieldContentDescription = stringResource(R.string.title_textField)
+    val bodyTextFieldContentDescription = stringResource(R.string.body_textField)
+    val titleInputPlaceholder = stringResource(R.string.title_textField_input)
+    val bodyInputPlaceholder = stringResource(R.string.body_textField_input)
+    val successFullyUpdatedLabel = stringResource(R.string.successfully_updated)
 
     val strings = remember {
         mapOf(
-            "titleTextField" to "${titleTextFieldTag}-$TAG",
-            "bodyTextField" to "${bodyTextFieldTag}-$TAG",
-            "titleInput" to titleInputTag,
-            "bodyInput" to bodyInputTag,
-            "successFullyUpdatedText" to successFullyUpdatedTag
+            "titleTextField" to titleTextFieldContentDescription,
+            "bodyTextField" to bodyTextFieldContentDescription,
+            "titleInput" to titleInputPlaceholder,
+            "bodyInput" to bodyInputPlaceholder,
+            "successFullyUpdatedText" to successFullyUpdatedLabel
         )
     }
 
@@ -234,8 +233,8 @@ fun NoteDetailPage(
                     TitleSection(
                         viewModel = viewModel,
                         isEditingState = isEditingState,
-                        titleTextField = strings["titleTextField"] ?: "",
-                        titleInput = strings["titleInput"] ?: ""
+                        titleTextField = strings["titleTextField"] ?: EMPTY_STRING,
+                        titleInput = strings["titleInput"] ?: EMPTY_STRING
                     )
                 }
 
@@ -243,8 +242,8 @@ fun NoteDetailPage(
                     NoteSection(
                         viewModel = viewModel,
                         isEditingState = isEditingState,
-                        bodyTextField = strings["bodyTextField"] ?: "",
-                        bodyInput = strings["bodyInput"] ?: ""
+                        bodyTextField = strings["bodyTextField"] ?: EMPTY_STRING,
+                        bodyInput = strings["bodyInput"] ?: EMPTY_STRING
                     )
                 }
             }
@@ -268,14 +267,17 @@ fun NoteDetailPage(
     )
 
     // Dialogs
+    val titlePlaceholderText = stringResource(R.string.title_textField_input)
+    val notePlaceholderText = stringResource(R.string.body_textField_input)
+
     val missingFieldName = remember(
         viewModel.titleText.value,
         viewModel.descriptionText.value
     ) {
         when {
-            viewModel.titleText.value.isEmpty() -> "Title"
-            viewModel.descriptionText.value.isEmpty() -> "Notes"
-            else -> ""
+            viewModel.titleText.value.isEmpty() -> titlePlaceholderText
+            viewModel.descriptionText.value.isEmpty() -> notePlaceholderText
+            else -> EMPTY_STRING
         }
     }
 
