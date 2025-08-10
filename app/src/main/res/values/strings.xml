@@ -53,6 +53,7 @@
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
     <string name="note_detail">Note Detail</string>
+    <string name="note_edit">Editing Note</string>
     <string name="add_new_note">Add New Note</string>
     <string name="share_preview">Share Preview</string>
     <string name="backup_notes">Backup Notes</string>

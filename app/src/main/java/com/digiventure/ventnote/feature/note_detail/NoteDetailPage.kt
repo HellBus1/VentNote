@@ -3,48 +3,37 @@ package com.digiventure.ventnote.feature.note_detail
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -53,7 +42,10 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.feature.note_detail.components.NoteDetailAppBar
+import com.digiventure.ventnote.feature.note_detail.components.navbar.EnhancedBottomAppBar
+import com.digiventure.ventnote.feature.note_detail.components.navbar.NoteDetailAppBar
+import com.digiventure.ventnote.feature.note_detail.components.section.NoteSection
+import com.digiventure.ventnote.feature.note_detail.components.section.TitleSection
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageBaseVM
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageMockVM
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageVM
@@ -76,208 +68,255 @@ fun NoteDetailPage(
         PageNavigation(navHostController)
     }
 
-    // String resource
-    val titleTextField = "${stringResource(R.string.title_textField)}-$TAG"
-    val bodyTextField = "${stringResource(R.string.body_textField)}-$TAG"
-    val titleInput = stringResource(R.string.title_textField_input)
-    val bodyInput = stringResource(R.string.body_textField_input)
-    val successFullyUpdatedText = stringResource(R.string.successfully_updated)
+    // String resources - memoized for better performance
+    val titleTextFieldTag = stringResource(R.string.title_textField)
+    val bodyTextFieldTag = stringResource(R.string.body_textField)
+    val titleInputTag = stringResource(R.string.title_textField_input)
+    val bodyInputTag = stringResource(R.string.body_textField_input)
+    val successFullyUpdatedTag = stringResource(R.string.successfully_updated)
 
-    val noteDetailState = viewModel.noteDetail.observeAsState()
-    val data = noteDetailState.value?.getOrNull()
+    val strings = remember {
+        mapOf(
+            "titleTextField" to "${titleTextFieldTag}-$TAG",
+            "bodyTextField" to "${bodyTextFieldTag}-$TAG",
+            "titleInput" to titleInputTag,
+            "bodyInput" to bodyInputTag,
+            "successFullyUpdatedText" to successFullyUpdatedTag
+        )
+    }
 
-    val isEditingState = viewModel.isEditing.value
+    // State observers
+    val noteDetailState by viewModel.noteDetail.observeAsState()
+    val data = noteDetailState?.getOrNull()
+    val isEditingState by viewModel.isEditing
+    val loadingState by viewModel.loader.observeAsState()
+
     val focusManager = LocalFocusManager.current
-
-    val loadingState = viewModel.loader.observeAsState()
-
     val scope = rememberCoroutineScope()
 
+    // Dialog states - using derivedStateOf where appropriate
     val requiredDialogState = remember { mutableStateOf(false) }
     val deleteDialogState = remember { mutableStateOf(false) }
     val cancelDialogState = remember { mutableStateOf(false) }
     val openLoadingDialog = remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
-    
-    fun initData() {
-        viewModel.titleText.value = data?.title ?: ""
-        viewModel.descriptionText.value = data?.note ?: ""
+
+    // Memoized functions to prevent unnecessary recompositions
+    val initData = {
+        data?.let {
+            viewModel.titleText.value = it.title
+            viewModel.descriptionText.value = it.note
+        }
     }
 
-    LaunchedEffect(key1 = Unit) {
+    val deleteNote = remember(data, scope, snackBarHostState) {
+        {
+            data?.let { noteData ->
+                scope.launch {
+                    viewModel.deleteNoteList(noteData)
+                        .onSuccess {
+                            deleteDialogState.value = false
+                            navHostController.popBackStack()
+                        }
+                        .onFailure { error ->
+                            deleteDialogState.value = false
+                            snackBarHostState.showSnackbar(
+                                message = error.message ?: "",
+                                withDismissAction = true
+                            )
+                        }
+                }
+            }
+        }
+    }
+
+    val updateNote = remember(
+        data,
+        scope,
+        focusManager,
+        snackBarHostState,
+        strings["successFullyUpdatedText"]
+    ) {
+        {
+            val titleText = viewModel.titleText.value
+            val descriptionText = viewModel.descriptionText.value
+
+            if (titleText.isEmpty() || descriptionText.isEmpty()) {
+                requiredDialogState.value = true
+            } else {
+                data?.let { noteData ->
+                    focusManager.clearFocus()
+
+                    scope.launch {
+                        val updatedNote = noteData.copy(
+                            title = titleText,
+                            note = descriptionText
+                        )
+                        viewModel.updateNote(updatedNote)
+                            .onSuccess {
+                                viewModel.isEditing.value = false
+                                snackBarHostState.showSnackbar(
+                                    message = strings["successFullyUpdatedText"] ?: "",
+                                    withDismissAction = true
+                                )
+                            }
+                            .onFailure { error ->
+                                snackBarHostState.showSnackbar(
+                                    message = error.message ?: "",
+                                    withDismissAction = true
+                                )
+                            }
+                    }
+                }
+            }
+        }
+    }
+
+    // Effects
+    LaunchedEffect(id) {
         viewModel.getNoteDetail(id.toInt())
     }
 
-    LaunchedEffect(key1 = noteDetailState.value) {
+    LaunchedEffect(noteDetailState) {
         initData()
     }
 
-    LaunchedEffect(key1 = isEditingState) {
+    LaunchedEffect(isEditingState) {
         if (!isEditingState) {
             focusManager.clearFocus()
         }
     }
 
-    LaunchedEffect(key1 = loadingState.value) {
-        openLoadingDialog.value = loadingState.value == true
+    LaunchedEffect(loadingState) {
+        openLoadingDialog.value = loadingState == true
     }
 
-    fun deleteNote() {
-        if (data != null) {
-            scope.launch {
-                viewModel.deleteNoteList(data)
-                    .onSuccess {
-                        deleteDialogState.value = false
-                        navHostController.popBackStack()
-                    }
-                    .onFailure {
-                        deleteDialogState.value = false
-                        snackBarHostState.showSnackbar(
-                            message = it.message ?: "",
-                            withDismissAction = true
-                        )
-                    }
-            }
-        }
-    }
+    // Scroll behavior setup
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        rememberTopAppBarState()
+    )
 
-    fun updateNote() {
-        if (viewModel.titleText.value.isEmpty() || viewModel.descriptionText.value.isEmpty()) {
-            requiredDialogState.value = true
-        } else {
-            if (data != null) {
-                focusManager.clearFocus()
-
-                scope.launch {
-                    val updatedNote = data.copy(title = viewModel.titleText.value, note = viewModel.descriptionText.value)
-                    viewModel.updateNote(updatedNote)
-                        .onSuccess {
-                            viewModel.isEditing.value = false
-                            snackBarHostState.showSnackbar(
-                                message = successFullyUpdatedText,
-                                withDismissAction = true
-                            )
-                        }
-                        .onFailure {
-                            snackBarHostState.showSnackbar(
-                                message = it.message ?: "",
-                                withDismissAction = true
-                            )
-                        }
-                }
-            }
-        }
-    }
-
-    val appBarState = rememberTopAppBarState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
-    val rememberedScrollBehavior = remember { scrollBehavior }
+    val haptics = LocalHapticFeedback.current
 
     Scaffold(
         topBar = {
             NoteDetailAppBar(
                 isEditing = isEditingState,
-                descriptionTextLength = viewModel.descriptionText.value.length,
                 onBackPressed = {
-                    scope.launch {
-                        navigationActions.navigateToNotesPage()
-                    }
+                    navigationActions.navigateToNotesPage()
                 },
-                onClosePressed = {
-                    cancelDialogState.value = true
-                },
-                onDeletePressed = {
-                    deleteDialogState.value = true
-                },
-                scrollBehavior = rememberedScrollBehavior,
+                scrollBehavior = scrollBehavior,
                 onSharePressed = {
-                    val json = Uri.encode(Gson().toJson(data))
-                    navigationActions.navigateToSharePage(json)
-
+                    data?.let {
+                        val json = Uri.encode(Gson().toJson(it))
+                        navigationActions.navigateToSharePage(json)
+                    }
                 }
             )
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    if(isEditingState) {
-                        updateNote()
-                    } else {
-                        viewModel.isEditing.value = true
-                    }
-                },
-                modifier = Modifier.semantics {
-                    testTag = "edit-note-fab"
-                },
-                text = {
-                    Text(if(isEditingState) stringResource(R.string.save) else stringResource(R.string.edit),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium)
-                },
-                icon = {
-                    Icon(
-                        imageVector = if(isEditingState) Icons.Filled.Check else Icons.Filled.Edit,
-                        contentDescription = stringResource(R.string.fab),
-                    )
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        },
         content = { contentPadding ->
-            Box(modifier = Modifier.padding(contentPadding)) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    TitleTextField(viewModel, isEditingState, titleTextField, titleInput)
-                    DescriptionTextField(viewModel, isEditingState, bodyTextField, bodyInput)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding)
+                    .padding(horizontal = 16.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        focusManager.clearFocus()
+                    },
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = PaddingValues(vertical = 16.dp)
+            ) {
+                item {
+                    TitleSection(
+                        viewModel = viewModel,
+                        isEditingState = isEditingState,
+                        titleTextField = strings["titleTextField"] ?: "",
+                        titleInput = strings["titleInput"] ?: ""
+                    )
+                }
+
+                item {
+                    NoteSection(
+                        viewModel = viewModel,
+                        isEditingState = isEditingState,
+                        bodyTextField = strings["bodyTextField"] ?: "",
+                        bodyInput = strings["bodyInput"] ?: ""
+                    )
                 }
             }
+        },
+        bottomBar = {
+            EnhancedBottomAppBar(
+                isEditing = isEditingState,
+                onEditClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    viewModel.isEditing.value = true
+                },
+                onSaveClick = { updateNote() },
+                onDeleteClick = { deleteDialogState.value = true },
+                onCancelClick = { cancelDialogState.value = true }
+            )
         },
         modifier = Modifier
             .semantics { testTag = TestTags.NOTE_DETAIL_PAGE }
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.surface,
     )
 
-    val missingFieldName = if (viewModel.titleText.value.isEmpty()) {
-        "Title"
-    } else if (viewModel.descriptionText.value.isEmpty()) {
-        "Notes"
-    } else {
-        ""
+    // Dialogs
+    val missingFieldName = remember(
+        viewModel.titleText.value,
+        viewModel.descriptionText.value
+    ) {
+        when {
+            viewModel.titleText.value.isEmpty() -> "Title"
+            viewModel.descriptionText.value.isEmpty() -> "Notes"
+            else -> ""
+        }
     }
 
-    TextDialog(
-        title = stringResource(R.string.required_title),
-        description = stringResource(R.string.required_confirmation_text, missingFieldName),
-        isOpened = requiredDialogState.value,
-        onDismissCallback = { requiredDialogState.value = false },
-        onConfirmCallback = { requiredDialogState.value = false }
-    )
+    if (requiredDialogState.value) {
+        TextDialog(
+            title = stringResource(R.string.required_title),
+            description = stringResource(R.string.required_confirmation_text, missingFieldName),
+            isOpened = requiredDialogState.value,
+            onDismissCallback = { requiredDialogState.value = false },
+            onConfirmCallback = { requiredDialogState.value = false }
+        )
+    }
 
-    TextDialog(
-        title = stringResource(R.string.cancel_title),
-        description = stringResource(R.string.cancel_confirmation_text),
-        isOpened = cancelDialogState.value,
-        onDismissCallback = { cancelDialogState.value = false },
-        onConfirmCallback = {
-            viewModel.isEditing.value = false
-            cancelDialogState.value = false
+    if (cancelDialogState.value) {
+        TextDialog(
+            title = stringResource(R.string.cancel_title),
+            description = stringResource(R.string.cancel_confirmation_text),
+            isOpened = cancelDialogState.value,
+            onDismissCallback = { cancelDialogState.value = false },
+            onConfirmCallback = {
+                viewModel.isEditing.value = false
+                cancelDialogState.value = false
+                initData()
+            }
+        )
+    }
 
-            initData()
-        })
+    if (deleteDialogState.value) {
+        TextDialog(
+            isOpened = deleteDialogState.value,
+            onDismissCallback = { deleteDialogState.value = false },
+            onConfirmCallback = { deleteNote() }
+        )
+    }
 
-    TextDialog(
-        isOpened = deleteDialogState.value,
-        onDismissCallback = { deleteDialogState.value = false },
-        onConfirmCallback = { deleteNote() })
-
-    LoadingDialog(isOpened = openLoadingDialog.value, onDismissCallback = { openLoadingDialog.value = false })
+    if (openLoadingDialog.value) {
+        LoadingDialog(
+            isOpened = openLoadingDialog.value,
+            onDismissCallback = { openLoadingDialog.value = false }
+        )
+    }
 
     BackHandler {
         if (viewModel.isEditing.value) {
@@ -286,95 +325,6 @@ fun NoteDetailPage(
             navHostController.popBackStack()
         }
     }
-}
-
-@Composable
-fun TitleTextField(
-    viewModel: NoteDetailPageBaseVM,
-    isEditingState: Boolean,
-    titleTextField: String,
-    titleInput: String
-) {
-    TextField(
-        value = viewModel.titleText.value,
-        onValueChange = {
-            viewModel.titleText.value = it
-        },
-        textStyle = TextStyle(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
-        ),
-        singleLine = false,
-        readOnly = !isEditingState,
-        colors = TextFieldDefaults.colors(
-            disabledTextColor = MaterialTheme.colorScheme.surface,
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            disabledContainerColor = MaterialTheme.colorScheme.surface,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics { contentDescription = titleTextField },
-        placeholder = {
-            if (isEditingState) {
-                Text(
-                    text = titleInput,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-    )
-}
-
-@Composable
-fun DescriptionTextField(
-    viewModel: NoteDetailPageBaseVM,
-    isEditingState: Boolean,
-    bodyTextField: String,
-    bodyInput: String
-) {
-    TextField(
-        value = viewModel.descriptionText.value,
-        onValueChange = {
-            viewModel.descriptionText.value = it
-        },
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface
-        ),
-        singleLine = false,
-        readOnly = !isEditingState,
-        shape = RectangleShape,
-        colors = TextFieldDefaults.colors(
-            disabledTextColor = MaterialTheme.colorScheme.surface,
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            disabledContainerColor = MaterialTheme.colorScheme.surface,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .semantics { contentDescription = bodyTextField },
-        placeholder = {
-            if (isEditingState) {
-                Text(
-                    text = bodyInput,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        },
-    )
 }
 
 @Preview
