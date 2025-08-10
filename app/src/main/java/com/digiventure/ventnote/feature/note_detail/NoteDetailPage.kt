@@ -115,7 +115,7 @@ fun NoteDetailPage(
                     viewModel.deleteNoteList(noteData)
                         .onSuccess {
                             deleteDialogState.value = false
-                            navHostController.popBackStack()
+                            navHostController.navigateUp()
                         }
                         .onFailure { error ->
                             deleteDialogState.value = false
@@ -324,7 +324,7 @@ fun NoteDetailPage(
         if (viewModel.isEditing.value) {
             cancelDialogState.value = true
         } else {
-            navHostController.popBackStack()
+            navHostController.navigateUp()
         }
     }
 }

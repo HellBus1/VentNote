@@ -41,8 +41,10 @@
     <string name="edit">Edit</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
+    <string name="close">Close</string>
     <string name="share_note">Share Note</string>
     <string name="share_note_as_text">Share Note as Text</string>
+    <string name="share_note_as_text_subtitle">Shares the note\'s content as a simple text message</string>
     <string name="sign_in_with_google">Sign In With Google</string>
     <string name="refresh">Refresh</string>
 
@@ -50,6 +52,8 @@
     <string name="search_textField">Input title here</string>
     <string name="title_textField_input">Insert title</string>
     <string name="body_textField_input">Insert note</string>
+    <string name="empty_note_title_placeholder">Untitled Note</string>
+    <string name="empty_note_placeholder">Note</string>
 
     <!--  Label text  -->
     <string name="selected_text">Selected</string>
@@ -90,6 +94,7 @@
     <string name="successfully_backed_up">Note is successfully backed up</string>
     <string name="successfully_restored">Note is successfully restored</string>
     <string name="successfully_updated">Note is successfully updated</string>
+    <string name="failed_to_share_note">Failed to share note</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>
