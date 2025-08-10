@@ -136,6 +136,8 @@ fun NotesPage(
         showLoadingDialog = loadingState == true
     }
 
+    val noteIsDeletedText = stringResource(R.string.note_is_successfully_deleted)
+
     // Memoized callbacks
     val deleteNoteList = remember {
         {
@@ -147,7 +149,7 @@ fun NotesPage(
                         viewModel.closeMarkingEvent()
 
                         snackBarHostState.showSnackbar(
-                            message = "Note is successfully deleted", // Consider using stringResource
+                            message = noteIsDeletedText,
                             withDismissAction = true
                         )
                     }
@@ -253,7 +255,6 @@ fun NotesPage(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
-                    // SearchBar as first item
                     item(key = "search_bar") {
                         Box(
                             modifier = Modifier
@@ -276,7 +277,6 @@ fun NotesPage(
                         }
                     }
 
-                    // Notes items with keys for better performance
                     items(
                         items = filteredNotes,
                         key = { note -> note.id }
@@ -285,7 +285,7 @@ fun NotesPage(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
-                                .animateItem() // Add item animation
+                                .animateItem()
                         ) {
                             NotesItem(
                                 isMarking = isMarking,
@@ -303,7 +303,6 @@ fun NotesPage(
         modifier = Modifier.semantics { testTag = TestTags.NOTES_PAGE }
     )
 
-    // Dialogs
     if (showLoadingDialog) {
         LoadingDialog(
             isOpened = true,

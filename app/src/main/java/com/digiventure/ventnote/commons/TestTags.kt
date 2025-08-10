@@ -9,6 +9,9 @@ object TestTags {
     // Appbar test tags
     const val TOP_APPBAR = "top_appbar"
 
+    // Bottom sheet test tags
+    const val BOTTOM_SHEET = "bottom_sheet"
+
     const val DELETE_ICON_BUTTON = "delete_icon_button"
     const val CLOSE_SEARCH_ICON_BUTTON = "close_search_icon_button"
     const val SEARCH_ICON_BUTTON = "search_icon_button"

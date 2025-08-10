@@ -41,11 +41,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.Constants
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.bottomSheet.RegularBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,6 +82,9 @@ fun FilterSheet(
     RegularBottomSheet(
         isOpened = openBottomSheet.value,
         bottomSheetState = bottomSheetState,
+        modifier = Modifier.semantics {
+            testTag = TestTags.BOTTOM_SHEET
+        },
         onDismissRequest = { openBottomSheet.value = false }
     ) {
         Column(
@@ -87,7 +93,6 @@ fun FilterSheet(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Sort By Section
             FilterSection(
                 title = stringResource(R.string.sort_by),
                 icon = Icons.AutoMirrored.Outlined.Sort
@@ -127,7 +132,6 @@ fun FilterSheet(
                 }
             }
 
-            // Action Buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
