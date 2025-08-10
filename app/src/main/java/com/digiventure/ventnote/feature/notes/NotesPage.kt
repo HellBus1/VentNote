@@ -202,7 +202,8 @@ fun NotesPage(
                 unSelectAllCallback = viewModel::unMarkAllNote,
                 closeMarkingCallback = viewModel::closeMarkingEvent,
                 sortCallback = { openBottomSheet = true },
-                deleteCallback = { showDeleteDialog = true }
+                deleteCallback = { showDeleteDialog = true },
+                totalNotesCount = filteredNotes.size
             )
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },

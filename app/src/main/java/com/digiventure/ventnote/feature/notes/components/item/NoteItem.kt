@@ -80,7 +80,7 @@ fun NotesItem(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 12.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp)
                 )
             }
 
