@@ -46,8 +46,10 @@ fun NoteDetailAppBar(
             }
         },
         actions = {
-            TopNavBarIcon(Icons.Filled.Share, stringResource(R.string.share_nav_icon), Modifier.semantics {  }) {
-                onSharePressed()
+            if (!isEditing) {
+                TopNavBarIcon(Icons.Filled.Share, stringResource(R.string.share_nav_icon), Modifier.semantics {  }) {
+                    onSharePressed()
+                }
             }
         },
         scrollBehavior = scrollBehavior,

@@ -44,6 +44,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,8 +55,8 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.components.LockScreenOrientation
+import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
-import com.digiventure.ventnote.feature.share_preview.components.dialog.HelpDialog
 import com.digiventure.ventnote.feature.share_preview.components.navbar.EnhancedBottomAppBar
 import com.digiventure.ventnote.feature.share_preview.components.navbar.SharePreviewAppBar
 import com.digiventure.ventnote.feature.share_preview.components.sheets.ShareSheet
@@ -237,9 +238,13 @@ fun SharePreviewPage(
     )
 
     if (shareNoteDialogState.value) {
-        HelpDialog {
-            shareNoteDialogState.value = false
-        }
+        TextDialog(
+            title = stringResource(R.string.information),
+            description = stringResource(R.string.share_note_information),
+            isOpened = true,
+            onDismissCallback = { shareNoteDialogState.value = false },
+            modifier = Modifier.semantics { }
+        )
     }
 
     if (openBottomSheet.value) {
