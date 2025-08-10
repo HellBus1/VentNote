@@ -13,14 +13,14 @@ fun RegularBottomSheet(
     isOpened: Boolean,
     bottomSheetState: SheetState,
     onDismissRequest: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier?,
     content: @Composable () -> Unit
 ) {
     if (isOpened) {
         ModalBottomSheet(
             onDismissRequest = { onDismissRequest() },
             sheetState = bottomSheetState,
-            modifier = modifier,
+            modifier = modifier ?: Modifier,
             containerColor = MaterialTheme.colorScheme.background,
         ) {
             content()

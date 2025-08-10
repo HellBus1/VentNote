@@ -159,6 +159,7 @@ fun SharePreviewPage(
     RegularBottomSheet(
         isOpened = openBottomSheet.value,
         bottomSheetState = bottomSheetState,
+        modifier = null,
         onDismissRequest = { openBottomSheet.value = false }
     ) {
         Column(modifier = Modifier

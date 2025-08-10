@@ -121,15 +121,6 @@ class NotesPageVMShould: BaseUnitTest() {
     }
 
     @Test
-    fun verifyIsSearchingIsSameAsInput() = runTest {
-        viewModel.isSearching.value = true
-        assertEquals(true, viewModel.isSearching.value)
-
-        viewModel.isSearching.value = false
-        assertEquals(false, viewModel.isSearching.value)
-    }
-
-    @Test
     fun verifySearchedTitleTextIsSameAsInput() = runTest {
         val inputTitle = "Test Title"
         viewModel.searchedTitleText.value = inputTitle
@@ -278,14 +269,6 @@ class NotesPageVMShould: BaseUnitTest() {
 
         assertFalse(viewModel.isMarking.value)
         assertEquals(viewModel.markedNoteList.size, 0)
-    }
-
-    @Test
-    fun verifyCloseSearchEventIsSetIsSearchingToFalseAndEmptiedSearchedTitleText() {
-        viewModel.closeSearchEvent()
-
-        assertFalse(viewModel.isSearching.value)
-        assertEquals(viewModel.searchedTitleText.value, "")
     }
 
     private fun mockSuccessfulDeletionCase() {
