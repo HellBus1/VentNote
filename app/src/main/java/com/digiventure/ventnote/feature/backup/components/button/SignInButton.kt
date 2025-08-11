@@ -12,7 +12,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +46,7 @@ fun SignInButton(
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
 
+    val authenticationFailedText = stringResource(R.string.authentication_failed);
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -55,11 +55,7 @@ fun SignInButton(
             authViewModel.checkAuthState()
             signInSuccessCallback()
         } else {
-            Toast.makeText(
-                context,
-                "Authentication failed. Please try again.",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(context, authenticationFailedText, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -68,9 +64,7 @@ fun SignInButton(
             isLoading = true
             launcher.launch(authViewModel.getSignInIntent())
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
+        modifier = Modifier.height(56.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -100,7 +94,7 @@ fun SignInButton(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Text(
-                        text = "Signing in...",
+                        text = stringResource(R.string.signing_in),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Medium
                     )
@@ -111,7 +105,7 @@ fun SignInButton(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Login, // Add Google icon
+                        imageVector = Icons.AutoMirrored.Filled.Login,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )

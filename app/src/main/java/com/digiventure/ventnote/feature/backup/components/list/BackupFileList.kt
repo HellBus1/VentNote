@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudQueue
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Refresh
@@ -53,6 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.Constants.EMPTY_STRING
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageBaseVM
@@ -62,10 +65,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BackupFileList(backupPageVM: BackupPageBaseVM,
-                   successfullyRestoredCallback: () -> Unit,
-                   successfullyDeletedCallback: () -> Unit,
-                   onRestoreCallback: (File) -> Unit,
-                   onDeleteCallback: (File) -> Unit) {
+                   successfullyRestoredRequest: () -> Unit,
+                   successfullyDeletedRequest: () -> Unit,
+                   onRestoreRequest: (File) -> Unit,
+                   onDeleteRequest: (File) -> Unit,
+                   onBackupRequest: () -> Unit) {
     val backupPageUiState = backupPageVM.uiState.value
     val driveBackupFileListState = backupPageVM.driveBackupFileList.observeAsState()
 
@@ -97,19 +101,19 @@ fun BackupFileList(backupPageVM: BackupPageBaseVM,
                         "Restore notes process failed : ${fileRestoreState.errorMessage}"
                     fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed ->
                         "Delete notes process failed : ${fileDeleteState.errorMessage}"
-                    else -> ""
+                    else -> EMPTY_STRING
                 }
                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
 
             fileRestoreState is BackupPageVM.FileRestoreState.SyncFinished-> {
                 restoreLoadingDialogState.value = false
-                successfullyRestoredCallback()
+                successfullyRestoredRequest()
             }
 
             fileDeleteState is BackupPageVM.FileDeleteState.SyncFinished -> {
                 restoreLoadingDialogState.value = false
-                successfullyDeletedCallback()
+                successfullyDeletedRequest()
             }
 
             fileRestoreState is BackupPageVM.FileRestoreState.SyncStarted ||
@@ -121,14 +125,14 @@ fun BackupFileList(backupPageVM: BackupPageBaseVM,
         }
     }
 
-    when (val state = backupPageUiState.listOfBackupFileState) {
+    when (backupPageUiState.listOfBackupFileState) {
         BackupPageVM.FileBackupListState.FileBackupListFinished -> {
             driveBackupFileListState.value.let { backupFiles ->
                 if (backupFiles.isNullOrEmpty()) {
                     EmptyBackupListContainer()
                 }
                 else {
-                    BackupListContainer(backupFiles, onRestoreCallback, onDeleteCallback)
+                    BackupListContainer(backupFiles, onRestoreRequest, onDeleteRequest, onBackupRequest)
                 }
             }
         }
@@ -172,14 +176,14 @@ fun EmptyBackupListContainer() {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "No backups found",
+                text = stringResource(R.string.no_backup_found),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Create your first backup using the backup button",
-                style = MaterialTheme.typography.bodyMedium,
+                text = stringResource(R.string.create_your_first_backup),
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
@@ -190,19 +194,54 @@ fun EmptyBackupListContainer() {
 @Composable
 fun BackupListContainer(
     backupFiles: List<File>,
-    onRestoreCallback: (File) -> Unit,
-    onDeleteCallback: (File) -> Unit
+    onRestoreRequest: (File) -> Unit,
+    onDeleteRequest: (File) -> Unit,
+    onBackupRequest: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
+        item(key = "backup_note_button") {
+            Button(
+                onClick = {
+                    onBackupRequest()
+                },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp,
+                    pressedElevation = 8.dp
+                ),
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CloudUpload,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.backup_notes),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+
         items(items = backupFiles) { file ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .semantics { contentDescription = "" },
+                    .semantics { contentDescription = EMPTY_STRING },
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -254,7 +293,7 @@ fun BackupListContainer(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         FilledTonalButton(
-                            onClick = { onRestoreCallback(file) },
+                            onClick = { onRestoreRequest(file) },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.filledTonalButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -264,13 +303,13 @@ fun BackupListContainer(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.CloudDownload,
-                                contentDescription = "Restore",
+                                contentDescription = stringResource(R.string.restore_icon),
                                 modifier = Modifier.size(18.dp)
                             )
                         }
 
                         OutlinedButton(
-                            onClick = { onDeleteCallback(file) },
+                            onClick = { onDeleteRequest(file) },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error
@@ -280,7 +319,7 @@ fun BackupListContainer(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete",
+                                contentDescription = stringResource(R.string.delete_icon),
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -326,7 +365,7 @@ fun BackupFailedContainer(
             }
 
             Text(
-                text = "Failed to load backups",
+                text = stringResource(R.string.failed_to_load_backups),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
@@ -374,7 +413,7 @@ fun FileBackupListStartedContainer() {
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "Loading backups...",
+                text = stringResource(R.string.loading_backups),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -27,8 +27,8 @@ class BackupPageMockVM: ViewModel(), BackupPageBaseVM {
 
     init {
         _uiState.value = _uiState.value.copy(
-            listOfBackupFileState = BackupPageVM.FileBackupListState.FileBackupListFailed("error")
-//            listOfBackupFileState = BackupPageVM.FileBackupListState.FileBackupListFinished
+//            listOfBackupFileState = BackupPageVM.FileBackupListState.FileBackupListFailed("error")
+            listOfBackupFileState = BackupPageVM.FileBackupListState.FileBackupListFinished
         )
     }
 

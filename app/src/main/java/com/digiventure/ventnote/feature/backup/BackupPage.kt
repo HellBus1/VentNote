@@ -120,12 +120,9 @@ fun BackupPage(
         topBar = {
             BackupPageAppBar(
                 authVM = authViewModel,
-                onBackPressed = { navHostController.popBackStack() },
+                onBackRequest = { navHostController.popBackStack() },
                 scrollBehavior = rememberedScrollBehavior,
-                onBackupPressed = {
-                    backupDatabase()
-                },
-                onLogoutPressed = {
+                onLogoutRequest = {
                     authViewModel.signOut(onCompleteSignOutCallback = {
                         backupPageVM.getBackupFileList()
                     })
@@ -160,15 +157,15 @@ fun BackupPage(
                     AuthVM.AuthState.SignedIn -> {
                         BackupFileList(
                             backupPageVM = backupPageVM,
-                            onRestoreCallback = {
+                            onRestoreRequest = {
                                 restoreDataIdState.value = it.id
                                 restoreConfirmationDialogState.value = true
                             },
-                            onDeleteCallback = {
+                            onDeleteRequest = {
                                 deleteDataIdState.value = it.id
                                 deleteConfirmationDialogState.value = true
                             },
-                            successfullyRestoredCallback = {
+                            successfullyRestoredRequest = {
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = restoredMessage,
@@ -176,13 +173,16 @@ fun BackupPage(
                                     )
                                 }
                             },
-                            successfullyDeletedCallback = {
+                            successfullyDeletedRequest = {
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = deletedMessage,
                                         withDismissAction = true
                                     )
                                 }
+                            },
+                            onBackupRequest = {
+                                backupDatabase()
                             }
                         )
                     }
@@ -221,7 +221,7 @@ fun BackupPage(
             isOpened = deleteConfirmationDialogState.value,
             onDismissCallback = { deleteConfirmationDialogState.value = false },
             onConfirmCallback = {
-                val selectedId = restoreDataIdState.value
+                val selectedId = deleteDataIdState.value
                 if (selectedId != stringZero) {
                     backupPageVM.deleteDatabase(selectedId)
                     deleteConfirmationDialogState.value = false
@@ -247,8 +247,8 @@ private fun LoadingStateContent() {
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "Loading...",
-                style = MaterialTheme.typography.bodyLarge,
+                text = stringResource(R.string.loading),
+                style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -290,8 +290,8 @@ private fun SignedOutStateContent(
         }
 
         Text(
-            text = "Sign in to access backups",
-            style = MaterialTheme.typography.headlineSmall,
+            text = stringResource(R.string.sign_in_to_access_backup),
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface
@@ -300,8 +300,8 @@ private fun SignedOutStateContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Connect with Google to backup and restore your data securely",
-            style = MaterialTheme.typography.bodyMedium,
+            text = stringResource(R.string.connect_with_google_to_backup),
+            style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 16.dp)

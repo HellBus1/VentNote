@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -26,9 +25,8 @@ import com.digiventure.ventnote.feature.backup.viewmodel.AuthVM
 @Composable
 fun BackupPageAppBar(
     authVM: AuthBaseVM,
-    onBackPressed: () -> Unit,
-    onLogoutPressed: () -> Unit,
-    onBackupPressed: () -> Unit,
+    onBackRequest: () -> Unit,
+    onLogoutRequest: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior) {
 
     val authUiState = authVM.uiState.value
@@ -52,7 +50,7 @@ fun BackupPageAppBar(
                 Icons.AutoMirrored.Filled.ArrowBack,
                 stringResource(R.string.backup_nav_icon),
                 Modifier.semantics {  }) {
-                onBackPressed()
+                onBackRequest()
             }
         },
         scrollBehavior = scrollBehavior,
@@ -60,8 +58,7 @@ fun BackupPageAppBar(
         actions = {
             if (authUiState.authState == AuthVM.AuthState.SignedIn) {
                 TrailingMenuIcons(
-                    onBackupPressed = onBackupPressed,
-                    onLogoutPressed = onLogoutPressed
+                    onLogoutRequest = onLogoutRequest
                 )
             }
         }
@@ -70,20 +67,12 @@ fun BackupPageAppBar(
 
 @Composable
 fun TrailingMenuIcons(
-    onLogoutPressed: () -> Unit,
-    onBackupPressed: () -> Unit,
+    onLogoutRequest: () -> Unit,
 ) {
-    TopNavBarIcon(
-        Icons.Filled.CloudUpload,
-        stringResource(R.string.backup),
-        modifier = Modifier.semantics { }) {
-        onBackupPressed()
-    }
-
     TopNavBarIcon(
         Icons.AutoMirrored.Filled.Logout,
         stringResource(R.string.logout_nav_icon),
         modifier = Modifier.semantics { }) {
-        onLogoutPressed()
+        onLogoutRequest()
     }
 }

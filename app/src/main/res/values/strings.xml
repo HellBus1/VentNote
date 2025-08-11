@@ -62,7 +62,6 @@
     <string name="add_new_note">Add New Note</string>
     <string name="share_preview">Share Preview</string>
     <string name="backup_notes">Backup Notes</string>
-    <string name="loading">Loading</string>
     <string name="sort_by">Sort By</string>
     <string name="sort_title">Title</string>
     <string name="sort_modified_date">Modified Date</string>
@@ -72,6 +71,11 @@
     <string name="order_descending">Descending</string>
     <string name="notes">Notes</string>
     <string name="cancel">Cancel</string>
+    <string name="no_backup_found">No backups found</string>
+    <string name="create_your_first_backup">Create your first backup using the backup button</string>
+    <string name="failed_to_load_backups">Failed to load backups</string>
+    <string name="sign_in_to_access_backup">Sign in to access backups</string>
+    <string name="connect_with_google_to_backup">Connect with Google to backup and restore your data securely</string>
 
     <!--  Nav Drawer Tile  -->
     <string name="about_us">about us</string>
@@ -89,16 +93,24 @@
     <string name="switch_to_dark_mode">switch to dark mode</string>
     <string name="switch_to_light_mode">switch to light mode</string>
 
-    <!--  SnackBar alert message  -->
+    <!--  Toast & SnackBar alert message  -->
     <string name="note_is_successfully_deleted">Note is successfully deleted</string>
     <string name="successfully_backed_up">Note is successfully backed up</string>
     <string name="successfully_restored">Note is successfully restored</string>
     <string name="successfully_updated">Note is successfully updated</string>
     <string name="failed_to_share_note">Failed to share note</string>
+    <string name="authentication_failed">Authentication failed. Please try again</string>
+
+    <!--  Loading message  -->
+    <string name="signing_in">Signing in …</string>
+    <string name="loading_backups">Loading backups …</string>
+    <string name="loading">Loading …</string>
 
     <!--  TextField Content Description  -->
     <string name="title_textField">title textField</string>
     <string name="body_textField">body textField</string>
+    <string name="restore_icon">Restore Icon</string>
+    <string name="delete_icon">Delete Icon</string>
 
     <string name="web_client_id">WEB_CLIENT_ID</string>
 </resources>
