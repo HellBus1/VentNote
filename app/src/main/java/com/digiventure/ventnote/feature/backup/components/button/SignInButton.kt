@@ -46,7 +46,7 @@ fun SignInButton(
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
 
-    val authenticationFailedText = stringResource(R.string.authentication_failed);
+    val authenticationFailedText = stringResource(R.string.authentication_failed)
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
