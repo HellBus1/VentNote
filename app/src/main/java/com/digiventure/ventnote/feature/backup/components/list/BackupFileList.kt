@@ -1,0 +1,383 @@
+package com.digiventure.ventnote.feature.backup.components.list
+
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.CloudQueue
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.components.dialog.LoadingDialog
+import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageBaseVM
+import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
+import com.google.api.services.drive.model.File
+import kotlinx.coroutines.launch
+
+@Composable
+fun BackupFileList(backupPageVM: BackupPageBaseVM,
+                   successfullyRestoredCallback: () -> Unit,
+                   successfullyDeletedCallback: () -> Unit,
+                   onRestoreCallback: (File) -> Unit,
+                   onDeleteCallback: (File) -> Unit) {
+    val backupPageUiState = backupPageVM.uiState.value
+    val driveBackupFileListState = backupPageVM.driveBackupFileList.observeAsState()
+
+    val context = LocalContext.current
+
+    val scope = rememberCoroutineScope()
+
+    val restoreLoadingDialogState = remember { mutableStateOf(false) }
+
+    val fileRestoreState = backupPageVM.uiState.value.fileRestoreState
+    val fileDeleteState = backupPageVM.uiState.value.fileDeleteState
+
+    LaunchedEffect(key1 = true, key2 = backupPageVM.uiState.value.fileDeleteState) {
+        scope.launch {
+            backupPageVM.getBackupFileList()
+        }
+    }
+
+    LaunchedEffect(
+        key1 = backupPageVM.uiState.value.fileRestoreState,
+        key2 = backupPageVM.uiState.value.fileDeleteState
+    ) {
+        when {
+            fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed ||
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> {
+                restoreLoadingDialogState.value = false
+                val errorMessage = when {
+                    fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed ->
+                        "Restore notes process failed : ${fileRestoreState.errorMessage}"
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed ->
+                        "Delete notes process failed : ${fileDeleteState.errorMessage}"
+                    else -> ""
+                }
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            }
+
+            fileRestoreState is BackupPageVM.FileRestoreState.SyncFinished-> {
+                restoreLoadingDialogState.value = false
+                successfullyRestoredCallback()
+            }
+
+            fileDeleteState is BackupPageVM.FileDeleteState.SyncFinished -> {
+                restoreLoadingDialogState.value = false
+                successfullyDeletedCallback()
+            }
+
+            fileRestoreState is BackupPageVM.FileRestoreState.SyncStarted ||
+                    fileDeleteState is BackupPageVM.FileDeleteState.SyncStarted -> {
+                restoreLoadingDialogState.value = true
+            }
+
+            else -> {}
+        }
+    }
+
+    when (val state = backupPageUiState.listOfBackupFileState) {
+        BackupPageVM.FileBackupListState.FileBackupListFinished -> {
+            driveBackupFileListState.value.let { backupFiles ->
+                if (backupFiles.isNullOrEmpty()) {
+                    EmptyBackupListContainer()
+                }
+                else {
+                    BackupListContainer(backupFiles, onRestoreCallback, onDeleteCallback)
+                }
+            }
+        }
+
+        is BackupPageVM.FileBackupListState.FileBackupListFailed -> {
+            BackupFailedContainer(onGetBackupList = {
+                scope.launch {
+                    backupPageVM.getBackupFileList()
+                }
+            })
+        }
+
+        is BackupPageVM.FileBackupListState.FileBackupListStarted -> {
+            FileBackupListStartedContainer()
+        }
+    }
+
+    if (restoreLoadingDialogState.value) {
+        LoadingDialog(
+            isOpened = restoreLoadingDialogState.value,
+            onDismissCallback = { restoreLoadingDialogState.value = false },
+            modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG }
+        )
+    }
+}
+
+@Composable
+fun EmptyBackupListContainer() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.CloudOff,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "No backups found",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Create your first backup using the backup button",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun BackupListContainer(
+    backupFiles: List<File>,
+    onRestoreCallback: (File) -> Unit,
+    onDeleteCallback: (File) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(vertical = 16.dp)
+    ) {
+        items(items = backupFiles) { file ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { contentDescription = "" },
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp,
+                    hoveredElevation = 4.dp
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    // File icon
+                    Surface(
+                        modifier = Modifier.size(48.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.CloudQueue,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Text(
+                        text = file.name.substringBefore("."),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 16.dp),
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilledTonalButton(
+                            onClick = { onRestoreCallback(file) },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.CloudDownload,
+                                contentDescription = "Restore",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = { onDeleteCallback(file) },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BackupFailedContainer(
+    onGetBackupList: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Card(
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(bottom = 24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                shape = CircleShape
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ErrorOutline,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
+            Text(
+                text = "Failed to load backups",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
+            )
+
+            Button(
+                onClick = {
+                    onGetBackupList()
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(id = R.string.refresh),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FileBackupListStartedContainer() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                strokeWidth = 4.dp,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Loading backups...",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}

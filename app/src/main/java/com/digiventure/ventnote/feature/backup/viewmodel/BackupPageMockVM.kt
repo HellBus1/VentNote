@@ -21,11 +21,15 @@ class BackupPageMockVM: ViewModel(), BackupPageBaseVM {
             dummyGoogleDriveFileOne,
             dummyGoogleDriveFileTwo
         )
+//        emptyList<File>()
     )
     override val driveBackupFileList: LiveData<List<File>> = _driveBackupFileList
 
     init {
-        _uiState.value = _uiState.value.copy(listOfBackupFileState = BackupPageVM.FileBackupListState.FileBackupListFailed("error"))
+        _uiState.value = _uiState.value.copy(
+            listOfBackupFileState = BackupPageVM.FileBackupListState.FileBackupListFailed("error")
+//            listOfBackupFileState = BackupPageVM.FileBackupListState.FileBackupListFinished
+        )
     }
 
     override fun backupDatabase() {
