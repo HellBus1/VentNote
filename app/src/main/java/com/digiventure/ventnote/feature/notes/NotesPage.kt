@@ -315,7 +315,7 @@ fun NotesPage(
         TextDialog(
             isOpened = true,
             onDismissCallback = { showDeleteDialog = false },
-            onConfirmCallback = { deleteNoteList },
+            onConfirmCallback = { deleteNoteList() },
             modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
         )
     }

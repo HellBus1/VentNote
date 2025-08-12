@@ -52,7 +52,7 @@
     <string name="search_textField">Input title here</string>
     <string name="title_textField_input">Insert title</string>
     <string name="body_textField_input">Insert note</string>
-    <string name="empty_note_title_placeholder">Untitled Note</string>
+    <string name="empty_note_title_placeholder">Title</string>
     <string name="empty_note_placeholder">Note</string>
 
     <!--  Label text  -->
@@ -100,6 +100,7 @@
     <string name="successfully_updated">Note is successfully updated</string>
     <string name="failed_to_share_note">Failed to share note</string>
     <string name="authentication_failed">Authentication failed. Please try again</string>
+    <string name="successfully_added">Note is successfully added</string>
 
     <!--  Loading message  -->
     <string name="signing_in">Signing in …</string>
