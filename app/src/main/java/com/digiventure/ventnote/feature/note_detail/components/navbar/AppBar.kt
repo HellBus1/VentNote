@@ -30,7 +30,7 @@ fun NoteDetailAppBar(
             Text(
                 text = if(isEditing) stringResource(id = R.string.note_edit) else stringResource(id = R.string.note_detail),
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.headlineSmall.copy(
+                style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
             )

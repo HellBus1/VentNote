@@ -19,9 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 
@@ -51,10 +49,8 @@ fun SearchBar(
                 tint = Color.Gray
             )
         },
-        textStyle = TextStyle(
+        textStyle = MaterialTheme.typography.titleMedium.copy(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 16.sp,
-            lineHeight = 0.sp
         ),
         singleLine = true,
         modifier = Modifier
@@ -66,8 +62,9 @@ fun SearchBar(
         placeholder = {
             Text(
                 text = stringResource(R.string.search_textField),
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
                 modifier = Modifier.semantics { }
             )
         })

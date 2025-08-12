@@ -1,8 +1,9 @@
 package com.digiventure.ventnote.feature.note_creation
 
 import android.content.pm.ActivityInfo
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -60,8 +62,7 @@ fun NoteCreationPage(
     val titleInput = stringResource(R.string.title_textField_input)
     val bodyInput = stringResource(R.string.body_textField_input)
 
-    val length = viewModel.descriptionText.value.length
-
+    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
 
     // Optimized state management - using delegation for better performance
@@ -79,6 +80,7 @@ fun NoteCreationPage(
                 scope.launch {
                     viewModel.addNote(
                         NoteModel(
+                            id = 0,
                             title = viewModel.titleText.value,
                             note = viewModel.descriptionText.value
                         )
@@ -107,7 +109,6 @@ fun NoteCreationPage(
     Scaffold(
         topBar = {
             NoteCreationAppBar(
-                descriptionTextLength = length,
                 onBackPressed = {
                     cancelDialogState.value = true
                 },
@@ -121,26 +122,28 @@ fun NoteCreationPage(
             )
         },
         content = { contentPadding ->
-            Box(
+            // Better scrolling performance with LazyColumn
+            LazyColumn(
                 modifier = Modifier
                     .padding(contentPadding)
-                    .fillMaxSize()
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        focusManager.clearFocus()
+                    }
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 8.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Better scrolling performance with LazyColumn
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        horizontal = 16.dp,
-                        vertical = 8.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item {
-                        TitleSection(viewModel, titleTextField, titleInput)
-                    }
-                    item {
-                        NoteSection(viewModel, bodyTextField, bodyInput)
-                    }
+                item {
+                    TitleSection(viewModel, titleTextField, titleInput)
+                }
+                item {
+                    NoteSection(viewModel, bodyTextField, bodyInput)
                 }
             }
         },

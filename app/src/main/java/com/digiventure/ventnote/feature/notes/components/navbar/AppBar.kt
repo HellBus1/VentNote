@@ -47,7 +47,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 
@@ -161,7 +160,7 @@ private fun SelectionTitle(
                         append(" of $totalNotesCount selected")
                     }
                 },
-                fontSize = 16.sp
+                style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.width(4.dp))
@@ -230,15 +229,17 @@ private fun EnhancedDropdownMenu(
                     Column {
                         Text(
                             text = stringResource(R.string.select_all),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
                         )
                         if (totalNotesCount > 0) {
                             Text(
                                 text = "Select all $totalNotesCount notes",
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                )
                             )
                         }
                     }
@@ -281,15 +282,17 @@ private fun EnhancedDropdownMenu(
                     Column {
                         Text(
                             text = stringResource(R.string.unselect_all),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
                         )
                         if (markedNoteListSize > 0) {
                             Text(
                                 text = "Clear selection of $markedNoteListSize notes",
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                )
                             )
                         }
                     }
@@ -313,7 +316,7 @@ private fun AppTitle() {
     Text(
         text = stringResource(id = R.string.title),
         color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.headlineSmall.copy(
+        style = MaterialTheme.typography.titleLarge.copy(
             fontWeight = FontWeight.SemiBold
         ),
         modifier = Modifier.semantics { testTag = TestTags.TOP_APPBAR_TITLE },

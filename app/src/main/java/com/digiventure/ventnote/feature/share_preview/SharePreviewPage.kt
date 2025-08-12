@@ -45,11 +45,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
@@ -179,9 +177,10 @@ fun SharePreviewPage(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = date,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
-                                    fontWeight = FontWeight.Medium
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                                        fontWeight = FontWeight.Medium
+                                    ),
                                 )
                             }
                         }
@@ -191,13 +190,10 @@ fun SharePreviewPage(
                         SelectionContainer {
                             Text(
                                 text = title,
-                                style = TextStyle(
-                                    fontSize = 16.sp,
+                                style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    lineHeight = 24.sp
                                 ),
-                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -215,13 +211,10 @@ fun SharePreviewPage(
                             SelectionContainer {
                                 Text(
                                     text = text,
-                                    style = TextStyle(
-                                        fontSize = 14.sp,
+                                    style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Normal,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        lineHeight = 20.sp
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
                                     ),
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
                                     modifier = Modifier.padding(20.dp)
                                 )
                             }

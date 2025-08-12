@@ -20,17 +20,17 @@ class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
         MutableLiveData( // Use MutableLiveData and set its value directly
             Result.success(
                 listOf(
-                    NoteModel("Title 1", "Note 1"),
-                    NoteModel("Title 2", "Note 2"),
-                    NoteModel("Title 3", "Note 3"),
-                    NoteModel("Title 4", "Note 4")
+                    NoteModel(0, "Title 1", "Note 1"),
+                    NoteModel(1, "Title 2", "Note 2"),
+                    NoteModel(2, "Title 3", "Note 3"),
+                    NoteModel(3, "Title 4", "Note 4")
                 )
             )
         )
 
     override val searchedTitleText = mutableStateOf("")
 
-    override val isMarking = mutableStateOf(false)
+    override val isMarking = mutableStateOf(true)
     override val markedNoteList = mutableStateListOf<NoteModel>()
 
     override fun markAllNote(notes: List<NoteModel>) {}

@@ -15,7 +15,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
 
@@ -59,8 +58,9 @@ fun TextDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.confirm),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                            )
                         )
                     }
                 }
@@ -73,8 +73,9 @@ fun TextDialog(
                 ) {
                     Text(
                         text = stringResource(R.string.dismiss),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        )
                     )
                 }
             },

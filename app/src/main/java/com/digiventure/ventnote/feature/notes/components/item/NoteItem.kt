@@ -22,11 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 import com.digiventure.ventnote.data.persistence.NoteModel
@@ -78,11 +76,9 @@ fun NotesItem(
                     text = data.title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.titleMedium.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 24.sp
+                        fontWeight = FontWeight.Medium,
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
@@ -102,11 +98,9 @@ fun NotesItem(
                         text = data.note,
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface,
-                            lineHeight = 20.sp
+                            fontWeight = FontWeight.Normal,
                         ),
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
@@ -117,8 +111,10 @@ fun NotesItem(
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            fontWeight = FontWeight.Normal,
+                        ),
                     )
                 }
             }

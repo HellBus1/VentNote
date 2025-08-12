@@ -31,10 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageBaseVM
 
@@ -112,11 +110,8 @@ fun ImprovedDescriptionTextField(
         TextField(
             value = viewModel.descriptionText.value,
             onValueChange = { viewModel.descriptionText.value = it },
-            textStyle = TextStyle(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
+            textStyle = MaterialTheme.typography.titleMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface,
-                lineHeight = 20.sp
             ),
             singleLine = false,
             readOnly = !isEditingState,
@@ -137,8 +132,9 @@ fun ImprovedDescriptionTextField(
                 if (isEditingState) {
                     Text(
                         text = bodyInput,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        ),
                     )
                 }
             }

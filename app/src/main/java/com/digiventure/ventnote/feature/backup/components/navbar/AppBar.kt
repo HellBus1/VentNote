@@ -37,7 +37,7 @@ fun BackupPageAppBar(
                 text = stringResource(id = R.string.backup_notes),
                 modifier = Modifier.padding(start = 4.dp),
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.headlineSmall.copy(
+                style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
             )

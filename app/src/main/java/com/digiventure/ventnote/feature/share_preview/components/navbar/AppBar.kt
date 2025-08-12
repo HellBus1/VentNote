@@ -29,7 +29,7 @@ fun SharePreviewAppBar(
             Text(
                 text = stringResource(id = R.string.share_preview),
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.headlineSmall.copy(
+                style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
             )

@@ -33,10 +33,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageBaseVM
 import kotlinx.coroutines.delay
@@ -122,14 +120,10 @@ fun ImprovedTitleTextField(
         TextField(
             value = viewModel.titleText.value,
             onValueChange = { viewModel.titleText.value = it },
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
+            textStyle = MaterialTheme.typography.titleMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface,
-                lineHeight = 24.sp
             ),
             singleLine = false,
-            maxLines = 3,
             readOnly = !isEditingState,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
@@ -148,9 +142,10 @@ fun ImprovedTitleTextField(
                 if (isEditingState) {
                     Text(
                         text = titleInput,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            fontWeight = FontWeight.Medium,
+                        ),
                     )
                 }
             }

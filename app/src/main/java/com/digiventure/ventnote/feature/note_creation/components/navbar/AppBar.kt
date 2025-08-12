@@ -19,14 +19,13 @@ import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteCreationAppBar(
-    descriptionTextLength: Int,
     onBackPressed: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior) {
 
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = if(descriptionTextLength > 0) "$descriptionTextLength" else stringResource(id = R.string.add_new_note),
+                text = stringResource(id = R.string.add_new_note),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
