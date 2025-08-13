@@ -209,31 +209,33 @@ fun NotesPage(
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    viewModel.closeMarkingEvent()
-                    navigationActions.navigateToCreatePage()
-                },
-                modifier = Modifier.semantics {
-                    testTag = TestTags.ADD_NOTE_FAB
-                },
-                text = {
-                    Text(
-                        text = stringResource(R.string.add),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Medium
+            if (!isMarking) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        viewModel.closeMarkingEvent()
+                        navigationActions.navigateToCreatePage()
+                    },
+                    modifier = Modifier.semantics {
+                        testTag = TestTags.ADD_NOTE_FAB
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.add),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Medium
+                            )
                         )
-                    )
-                },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.fab)
-                    )
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(R.string.fab)
+                        )
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         },
         content = { contentPadding ->
             Box(
@@ -322,7 +324,7 @@ fun NotesPage(
 
     if (openBottomSheet) {
         FilterSheet(
-            openBottomSheet = remember { mutableStateOf(true) },
+            openBottomSheet = openBottomSheet,
             bottomSheetState = bottomSheetState,
             onDismiss = { openBottomSheet = false },
             sortAndOrderData = viewModel.sortAndOrderData.value

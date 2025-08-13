@@ -94,7 +94,7 @@ fun NavDrawer(
     }
 
     val appPath = "https://play.google.com/store/apps/details?id=com.digiventure.ventnote"
-    val devPagePath = "https://play.google.com/store/apps/developer?id=DigiVenture"
+    val devPagePath = "https://play.google.com/store/apps/developer?id=Mattrmost"
 
     val dataStore = NoteDataStore(LocalContext.current)
 

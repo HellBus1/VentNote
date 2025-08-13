@@ -31,7 +31,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +53,7 @@ import com.digiventure.ventnote.components.bottomSheet.RegularBottomSheet
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterSheet(
-    openBottomSheet: MutableState<Boolean>,
+    openBottomSheet: Boolean,
     bottomSheetState: SheetState,
     onDismiss: () -> Unit,
     sortAndOrderData: Pair<String, String>?,
@@ -80,12 +79,12 @@ fun FilterSheet(
     var selectedOrderBy by remember { mutableStateOf(sortAndOrderData?.second)}
 
     RegularBottomSheet(
-        isOpened = openBottomSheet.value,
+        isOpened = openBottomSheet,
         bottomSheetState = bottomSheetState,
         modifier = Modifier.semantics {
             testTag = TestTags.BOTTOM_SHEET
         },
-        onDismissRequest = { openBottomSheet.value = false }
+        onDismissRequest = { onDismiss() }
     ) {
         Column(
             modifier = Modifier
@@ -251,10 +250,10 @@ private data class OrderOption(
 @Preview
 @Composable
 fun FilterSheetPreview() {
-    val openBottomSheet = rememberSaveable { mutableStateOf(true) }
-    val skipPartiallyExpanded = remember { mutableStateOf(false) }
+    val openBottomSheet by rememberSaveable { mutableStateOf(true) }
+    val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded.value
+        skipPartiallyExpanded = skipPartiallyExpanded
     )
 
     Scaffold(

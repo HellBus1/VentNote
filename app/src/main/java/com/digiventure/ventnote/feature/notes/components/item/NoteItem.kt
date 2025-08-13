@@ -104,10 +104,13 @@ fun NotesItem(
                         ),
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Text(
                         text = DateUtil.convertDateString(
                             "EEEE, MMMM d h:mm a",
-                            data.createdAt.toString()
+                            data.updatedAt.toString()
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Close
@@ -22,7 +23,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -385,7 +385,7 @@ fun TrailingMenuIcons(
             modifier = Modifier.semantics { testTag = TestTags.SORT_ICON_BUTTON }
         ) {
             Icon(
-                imageVector = Icons.Outlined.MoreVert,
+                imageVector = Icons.AutoMirrored.Outlined.Sort,
                 contentDescription = stringResource(R.string.sort_nav_icon),
                 tint = MaterialTheme.colorScheme.onSurface
             )
