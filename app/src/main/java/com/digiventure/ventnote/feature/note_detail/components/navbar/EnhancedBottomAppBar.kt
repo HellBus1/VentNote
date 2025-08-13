@@ -63,8 +63,8 @@ fun EnhancedBottomAppBar(
                         icon = Icons.Rounded.Close,
                         label = stringResource(R.string.cancel),
                         onClick = onCancelClick,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
 
                     // Save button in editing mode
@@ -72,8 +72,8 @@ fun EnhancedBottomAppBar(
                         icon = Icons.Rounded.Check,
                         label = stringResource(R.string.save),
                         onClick = onSaveClick,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         isProminent = true
                     )
                 } else {
@@ -82,8 +82,8 @@ fun EnhancedBottomAppBar(
                         icon = Icons.Rounded.Edit,
                         label = stringResource(R.string.edit),
                         onClick = onEditClick,
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     )
 
                     // Delete button in view mode

@@ -272,7 +272,7 @@ private fun SignedOutStateContent(
                 .size(100.dp)
                 .padding(bottom = 24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.primaryContainer
             ),
             shape = CircleShape
         ) {
@@ -284,7 +284,7 @@ private fun SignedOutStateContent(
                     imageVector = Icons.Filled.CloudOff,
                     contentDescription = null,
                     modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }

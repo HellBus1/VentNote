@@ -54,8 +54,8 @@ fun EnhancedBottomAppBar(
                     icon = Icons.Rounded.Share,
                     label = stringResource(R.string.share_note),
                     onClick = onCancelClick,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }

@@ -261,7 +261,7 @@ fun BackupListContainer(
                     Surface(
                         modifier = Modifier.size(48.dp),
                         shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Box(
                             contentAlignment = Alignment.Center
@@ -269,7 +269,7 @@ fun BackupListContainer(
                             Icon(
                                 imageVector = Icons.Filled.CloudQueue,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -296,8 +296,8 @@ fun BackupListContainer(
                             onClick = { onRestoreRequest(file) },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                             ),
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
@@ -347,7 +347,7 @@ fun BackupFailedContainer(
                     .size(100.dp)
                     .padding(bottom = 24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 ),
                 shape = CircleShape
             ) {
@@ -359,7 +359,7 @@ fun BackupFailedContainer(
                         imageVector = Icons.Filled.ErrorOutline,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
