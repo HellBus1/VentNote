@@ -84,7 +84,7 @@ private fun ShareOptionItem(
         ) {
             Surface(
                 modifier = Modifier.size(40.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {

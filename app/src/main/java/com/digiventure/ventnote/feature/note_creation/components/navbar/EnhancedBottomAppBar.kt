@@ -54,8 +54,8 @@ fun EnhancedBottomAppBar(
                     icon = Icons.Rounded.Check,
                     label = stringResource(R.string.save),
                     onClick = onSaveClick,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     isProminent = true
                 )
             }

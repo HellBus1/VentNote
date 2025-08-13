@@ -134,7 +134,7 @@ fun NavDrawer(
             NavDrawerItem(leftIcon = Icons.Filled.Star,
                 title = stringResource(id = R.string.rate_app),
                 subtitle = stringResource(id = R.string.rate_app_description),
-                testTagName = "",
+                testTagName = TestTags.RATE_APP_TILE,
                 onClick = { openPlayStore(appPath) })
 
             NavDrawerItem(leftIcon = Icons.Filled.Shop,
