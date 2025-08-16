@@ -124,7 +124,7 @@ fun BackupPage(
                 scrollBehavior = rememberedScrollBehavior,
                 onLogoutRequest = {
                     authViewModel.signOut(onCompleteSignOutCallback = {
-                        backupPageVM.getBackupFileList()
+                        backupPageVM.clearBackupFileList()
                     })
                 }
             )
