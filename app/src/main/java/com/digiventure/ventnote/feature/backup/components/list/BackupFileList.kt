@@ -88,36 +88,41 @@ fun BackupFileList(backupPageVM: BackupPageBaseVM,
         }
     }
 
-    LaunchedEffect(
-        key1 = backupPageVM.uiState.value.fileRestoreState,
-        key2 = backupPageVM.uiState.value.fileDeleteState
-    ) {
-        when {
-            fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed ||
-                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed -> {
+    LaunchedEffect(key1 = backupPageVM.uiState.value.fileRestoreState) {
+        when (fileRestoreState) {
+            is BackupPageVM.FileRestoreState.SyncFailed -> {
                 restoreLoadingDialogState.value = false
-                val errorMessage = when {
-                    fileRestoreState is BackupPageVM.FileRestoreState.SyncFailed ->
-                        "Restore notes process failed : ${fileRestoreState.errorMessage}"
-                    fileDeleteState is BackupPageVM.FileDeleteState.SyncFailed ->
-                        "Delete notes process failed : ${fileDeleteState.errorMessage}"
-                    else -> EMPTY_STRING
-                }
+                val errorMessage = "Restore notes process failed : ${fileRestoreState.errorMessage}"
                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             }
 
-            fileRestoreState is BackupPageVM.FileRestoreState.SyncFinished-> {
+            is BackupPageVM.FileRestoreState.SyncFinished -> {
                 restoreLoadingDialogState.value = false
                 successfullyRestoredRequest()
             }
 
-            fileDeleteState is BackupPageVM.FileDeleteState.SyncFinished -> {
+            is BackupPageVM.FileRestoreState.SyncStarted -> {
+                restoreLoadingDialogState.value = true
+            }
+
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(key1 = backupPageVM.uiState.value.fileDeleteState) {
+        when (fileDeleteState) {
+            is BackupPageVM.FileDeleteState.SyncFailed -> {
+                restoreLoadingDialogState.value = false
+                val errorMessage = "Delete notes process failed : ${fileDeleteState.errorMessage}"
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            }
+
+            is BackupPageVM.FileDeleteState.SyncFinished -> {
                 restoreLoadingDialogState.value = false
                 successfullyDeletedRequest()
             }
 
-            fileRestoreState is BackupPageVM.FileRestoreState.SyncStarted ||
-                    fileDeleteState is BackupPageVM.FileDeleteState.SyncStarted -> {
+            is BackupPageVM.FileDeleteState.SyncStarted -> {
                 restoreLoadingDialogState.value = true
             }
 
