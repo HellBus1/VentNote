@@ -1,135 +1,172 @@
 package com.digiventure.ventnote.feature.notes.components.sheets
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Sort
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.SwapVert
+import androidx.compose.material.icons.outlined.Title
+import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.Constants
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.bottomSheet.RegularBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterSheet(
-    openBottomSheet: MutableState<Boolean>,
+    openBottomSheet: Boolean,
     bottomSheetState: SheetState,
     onDismiss: () -> Unit,
+    sortAndOrderData: Pair<String, String>?,
     onFilter: (sortBy: String, orderBy: String) -> Unit
 ) {
-    val createdDate = stringResource(id = R.string.sort_created_date)
-    val title = stringResource(id = R.string.sort_title)
-    val modifiedDate = stringResource(id = R.string.sort_modified_date)
-    val sortByOptions = listOf(title, createdDate, modifiedDate)
-
-    val ascending = stringResource(id = R.string.order_ascending)
-    val descending = stringResource(id = R.string.order_descending)
-    val orderByOptions = listOf(ascending, descending)
-
-    val selectedSortBy = remember { mutableStateOf(createdDate) }
-    val selectedOrderBy = remember { mutableStateOf(descending) }
-
-    fun convertSortBy(sortBy: String): String {
-        return when (sortBy) {
-            title -> Constants.TITLE
-            createdDate -> Constants.CREATED_AT
-            modifiedDate -> Constants.UPDATED_AT
-            else -> {
-                Constants.CREATED_AT
-            }
-        }
+    // Memoized sort options with constants mapping
+    val sortOptions = remember {
+        listOf(
+            SortOption(R.string.sort_title, Constants.TITLE, Icons.Outlined.Title),
+            SortOption(R.string.sort_created_date, Constants.CREATED_AT, Icons.Outlined.DateRange),
+            SortOption(R.string.sort_modified_date, Constants.UPDATED_AT, Icons.Outlined.Update)
+        )
     }
 
-    fun convertOrderBy(orderBy: String): String {
-        return when (orderBy) {
-            ascending -> Constants.ASCENDING
-            descending -> Constants.DESCENDING
-            else -> {
-                Constants.DESCENDING
-            }
-        }
+    val orderOptions = remember {
+        listOf(
+            OrderOption(R.string.order_ascending, Constants.ASCENDING, Icons.Outlined.ArrowUpward),
+            OrderOption(R.string.order_descending, Constants.DESCENDING, Icons.Outlined.ArrowDownward)
+        )
     }
+
+    var selectedSortBy by remember { mutableStateOf(sortAndOrderData?.first) }
+    var selectedOrderBy by remember { mutableStateOf(sortAndOrderData?.second)}
 
     RegularBottomSheet(
-        isOpened = openBottomSheet.value,
+        isOpened = openBottomSheet,
         bottomSheetState = bottomSheetState,
-        onDismissRequest = { openBottomSheet.value = false }
+        modifier = Modifier.semantics {
+            testTag = TestTags.BOTTOM_SHEET
+        },
+        onDismissRequest = { onDismiss() }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.sort_by),
-                style = TextStyle(
-                    fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
-            Box(modifier = Modifier.padding(8.dp))
-            SortByList(sortByOptions = sortByOptions, selectedValue = selectedSortBy.value) {
-                selectedSortBy.value = it
-            }
-            Box(modifier = Modifier.padding(16.dp))
-            Text(
-                text = stringResource(id = R.string.order_by),
-                style = TextStyle(
-                    fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
-            Box(modifier = Modifier.padding(8.dp))
-            OrderByList(orderByOptions = orderByOptions, selectedValue = selectedOrderBy.value) {
-                selectedOrderBy.value = it
-            }
-            Box(modifier = Modifier.padding(16.dp))
-            Row {
-                TextButton(
-                    onClick = { onDismiss() },
-                    shape = RoundedCornerShape(20),
-                    modifier = Modifier.weight(1f)
+            FilterSection(
+                title = stringResource(R.string.sort_by),
+                icon = Icons.AutoMirrored.Outlined.Sort
+            ) {
+                LazyRow (
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
-                    Text(text = stringResource(id = R.string.dismiss))
+                    items(sortOptions) { option ->
+                        CompactFilterChip(
+                            label = stringResource(option.labelRes),
+                            icon = option.icon,
+                            selected = selectedSortBy == option.value,
+                            onClick = { selectedSortBy = option.value }
+                        )
+                    }
                 }
+            }
+
+            // Order By Section
+            FilterSection(
+                title = stringResource(R.string.order_by),
+                icon = Icons.Outlined.SwapVert
+            ) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp)
+                ) {
+                    items(orderOptions) { option ->
+                        CompactFilterChip(
+                            label = stringResource(option.labelRes),
+                            icon = option.icon,
+                            selected = selectedOrderBy == option.value,
+                            onClick = { selectedOrderBy = option.value }
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedButton (
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.dismiss),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
                 Button(
                     onClick = {
                         onFilter(
-                            convertSortBy(selectedSortBy.value),
-                            convertOrderBy(selectedOrderBy.value)
+                            selectedSortBy ?: Constants.CREATED_AT,
+                            selectedOrderBy ?: Constants.DESCENDING
                         )
                         onDismiss()
                     },
-                    shape = RoundedCornerShape(20),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
                 ) {
-                    Text(text = stringResource(id = R.string.confirm))
+                    Text(
+                        text = stringResource(id = R.string.confirm),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         }
@@ -137,62 +174,86 @@ fun FilterSheet(
 }
 
 @Composable
-fun SortByList(
-    sortByOptions: List<String>, selectedValue: String,
-    onPress: (sortByValue: String) -> Unit
+private fun FilterSection(
+    title: String,
+    icon: ImageVector,
+    content: @Composable () -> Unit
 ) {
-    Column(modifier = Modifier.selectableGroup()) {
-        sortByOptions.forEach {
-            ListItem(title = it, selectedValue = selectedValue) {
-                onPress(it)
-            }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
+        content()
     }
 }
 
 @Composable
-fun OrderByList(
-    orderByOptions: List<String>, selectedValue: String,
-    onPress: (orderByValue: String) -> Unit
+private fun CompactFilterChip(
+    label: String,
+    icon: ImageVector,
+    selected: Boolean,
+    onClick: () -> Unit
 ) {
-    Column(modifier = Modifier.selectableGroup()) {
-        orderByOptions.forEach {
-            ListItem(title = it, selectedValue = selectedValue) {
-                onPress(it)
-            }
-        }
-    }
+    FilterChip(
+        onClick = onClick,
+        label = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+            )
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+        },
+        selected = selected,
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary
+        ),
+    )
 }
 
-@Composable
-fun ListItem(title: String, selectedValue: String, onPress: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable(
-            indication = null,
-            interactionSource = remember { MutableInteractionSource() }
-        ) { onPress() }
-    ) {
-        Text(
-            text = title,
-            style = TextStyle(
-                fontSize = 16.sp, fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier.weight(1f)
-        )
-        RadioButton(selected = (title == selectedValue), onClick = { onPress() })
-    }
-}
+// Data classes for type safety and better organization
+private data class SortOption(
+    val labelRes: Int,
+    val value: String,
+    val icon: ImageVector
+)
+
+private data class OrderOption(
+    val labelRes: Int,
+    val value: String,
+    val icon: ImageVector
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun FilterSheetPreview() {
-    val openBottomSheet = rememberSaveable { mutableStateOf(true) }
-    val skipPartiallyExpanded = remember { mutableStateOf(false) }
+    val openBottomSheet by rememberSaveable { mutableStateOf(true) }
+    val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded.value
+        skipPartiallyExpanded = skipPartiallyExpanded
     )
 
     Scaffold(
@@ -204,7 +265,8 @@ fun FilterSheetPreview() {
     FilterSheet(
         openBottomSheet = openBottomSheet,
         bottomSheetState = bottomSheetState,
-        onDismiss = {}
+        onDismiss = {},
+        sortAndOrderData = null
     ) { _, _ ->
 
     }

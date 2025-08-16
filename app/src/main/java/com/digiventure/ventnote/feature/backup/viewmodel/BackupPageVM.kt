@@ -126,6 +126,16 @@ class BackupPageVM @Inject constructor(
         }
     }
 
+    override fun clearBackupFileList() {
+        _driveBackupFileList.value = emptyList()
+        _uiState.value = _uiState.value.copy(
+            listOfBackupFileState = FileBackupListState.FileBackupListFinished,
+            fileBackupState = FileBackupState.SyncInitial,
+            fileRestoreState = FileRestoreState.SyncInitial,
+            fileDeleteState = FileDeleteState.SyncInitial
+        )
+    }
+
     private fun getDriveInstance(): Drive? {
         return GoogleSignIn.getLastSignedInAccount(app.applicationContext)?.run {
             DriveAPI.getInstance(app.applicationContext, this)

@@ -16,4 +16,6 @@ interface BackupPageBaseVM {
     fun getBackupFileList()
 
     fun deleteDatabase(fileId: String)
+
+    fun clearBackupFileList()
 }
