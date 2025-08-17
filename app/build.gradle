@@ -4,7 +4,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
-    id 'org.jetbrains.kotlin.plugin.compose' version '2.1.0'
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.2.10'
 
     // disabled for internal purpose (if you want to enable, you must create firebase project first)
 //    id 'com.google.gms.google-services'
@@ -14,12 +14,12 @@ plugins {
 
 android {
     namespace 'com.digiventure.ventnote'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.digiventure.ventnote"
-        minSdk 21
-        targetSdk 35
+        minSdk 23
+        targetSdk 36
         versionCode 41
         versionName "1.0.8"
 
@@ -65,35 +65,41 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.15'
     }
-    
-    packagingOptions {
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    packaging {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
             excludes += 'META-INF/*'
         }
     }
 
-    lintOptions {
+    lint {
         abortOnError false
     }
 }
 
+
 dependencies {
-    implementation "androidx.core:core-ktx:1.16.0"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
+    implementation "androidx.core:core-ktx:1.17.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.9.2"
 
     implementation "androidx.activity:activity-compose:1.10.1"
 
     // Jetpack Compose
-    implementation "androidx.compose.runtime:runtime-livedata:1.7.8"
-    implementation "androidx.compose.ui:ui:1.7.8"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.7.8"
+    implementation "androidx.compose.runtime:runtime-livedata:1.9.0"
+    implementation "androidx.compose.ui:ui:1.9.0"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.9.0"
 
     implementation "androidx.compose.material3:material3:1.3.2"
 
     // Lifecycle Livedata
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.7"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.9.2"
 
     implementation "androidx.compose.compiler:compiler:1.5.15"
     implementation 'androidx.test.ext:junit-ktx:1.3.0'
@@ -105,17 +111,17 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:$room_version"
 
     // Datastore
-    implementation("androidx.datastore:datastore-preferences:1.1.4")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
 
     // Compose Navigation
-    implementation "androidx.navigation:navigation-compose:2.8.9"
+    implementation "androidx.navigation:navigation-compose:2.9.3"
 
     // Coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
 
     // Unit test
     testImplementation "junit:junit:4.13.2"
-    androidTestImplementation "androidx.test.ext:junit:1.2.1"
+    androidTestImplementation "androidx.test.ext:junit:1.3.0"
 
     // Hilt
     def dagger_version = "2.56.2"
@@ -132,10 +138,10 @@ dependencies {
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     // Google Play API
-    implementation "com.google.android.gms:play-services-auth:21.3.0"
+    implementation "com.google.android.gms:play-services-auth:21.4.0"
 
     // Accompanist - Status Bar
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.34.0"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.36.0"
 
     // Instrumented test
     /// Espresso (for ui interaction purpose)
@@ -144,16 +150,16 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-intents:3.7.0"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.7.0"
 
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.8.3"
-    debugImplementation "androidx.compose.ui:ui-tooling:1.8.3"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.8.3"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.9.0"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.9.0"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.9.0"
 
     /// Hilt test (for handling service locator when test)
     androidTestImplementation "com.google.dagger:hilt-android-testing:$dagger_version"
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$dagger_version"
 
     // For mocking purposes & make it visible in instrumented test
-    testImplementation "org.mockito.kotlin:mockito-kotlin:5.2.1"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:6.0.0"
     testImplementation "org.mockito:mockito-inline:5.2.0"
 
     androidTestImplementation "androidx.test.ext:junit-ktx:1.3.0"
@@ -164,20 +170,20 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
 
     // Import the Firebase BoM
-    implementation platform("com.google.firebase:firebase-bom:33.12.0")
+    implementation platform("com.google.firebase:firebase-bom:34.1.0")
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation "com.google.firebase:firebase-analytics"
-    implementation "com.google.firebase:firebase-crashlytics:19.4.2"
+    implementation "com.google.firebase:firebase-crashlytics:20.0.0"
     implementation "com.google.firebase:firebase-perf-ktx:21.0.5"
 
     //Google sign in
-    implementation "com.google.android.gms:play-services-auth:21.3.0"
+    implementation "com.google.android.gms:play-services-auth:21.4.0"
 
     //Google Drive API
-    implementation "com.google.http-client:google-http-client-gson:1.44.2"
+    implementation "com.google.http-client:google-http-client-gson:2.0.0"
     implementation "com.google.apis:google-api-services-drive:v3-rev136-1.25.0"
-    implementation "com.google.api-client:google-api-client-android:1.34.0"
+    implementation "com.google.api-client:google-api-client-android:2.8.1"
 }
 
 kapt {
