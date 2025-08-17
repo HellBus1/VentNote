@@ -9,6 +9,18 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 
+/**
+ * Provides a helper for obtaining a Google Drive API client instance.
+ *
+ * This class encapsulates the logic for creating and managing a [Drive] client,
+ * ensuring that only a single instance is used throughout the application (singleton pattern).
+ * It handles authentication using a [GoogleSignInAccount] and scopes access to app data.
+ *
+ * Note: This implementation uses the Drive REST API, as the deprecated Drive Android API
+ * is no longer supported (https://developers.google.com/drive/api/guides/android-api-deprecation).
+ * Once the Google Drive SDK provides updated support or a new official Android API,
+ * this class may be updated to utilize it for improved performance and features.
+ */
 class DriveAPI {
     companion object {
         private var instance: Drive? = null

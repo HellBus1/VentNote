@@ -1,10 +1,13 @@
 package com.digiventure.ventnote.feature.notes
 
 import android.content.pm.ActivityInfo
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,22 +21,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -42,8 +53,10 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
+import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.notes.components.item.NotesItem
 import com.digiventure.ventnote.feature.notes.components.navbar.NotesAppBar
+import com.digiventure.ventnote.feature.notes.components.searchbar.SearchBar
 import com.digiventure.ventnote.feature.notes.components.sheets.FilterSheet
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageBaseVM
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageMockVM
@@ -58,178 +71,231 @@ fun NotesPage(
     viewModel: NotesPageBaseVM = hiltViewModel<NotesPageVM>(),
     openDrawer: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    var searchBarHeightPx by remember { mutableFloatStateOf(0f) }
+
     LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     val navigationActions = remember(navHostController) {
         PageNavigation(navHostController)
     }
 
-    val noteListState = viewModel.noteList.observeAsState()
-    val loadingState = viewModel.loader.observeAsState()
+    // Observe states
+    val noteListState by viewModel.noteList.observeAsState()
+    val loadingState by viewModel.loader.observeAsState()
+    val searchQuery by viewModel.searchedTitleText
+    val isMarking by viewModel.isMarking
+    val markedNoteList = viewModel.markedNoteList
 
     val scope = rememberCoroutineScope()
-
     val snackBarHostState = remember { SnackbarHostState() }
-    val filteredNotes = remember(noteListState.value, viewModel.searchedTitleText.value) {
-        noteListState.value?.getOrNull()?.filter { note ->
-            note.title.contains(viewModel.searchedTitleText.value, true)
-        } ?: listOf()
-    }
-    val loadingDialog = remember { mutableStateOf(false) }
-    val deleteDialog = remember { mutableStateOf(false) }
 
-    val openBottomSheet = rememberSaveable { mutableStateOf(false) }
-    val skipPartiallyExpanded = remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded.value
-    )
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.observeNotes()
-    }
-
-    LaunchedEffect(key1 = noteListState.value) {
-        noteListState.value?.onFailure {
-            scope.launch {
-                snackBarHostState.showSnackbar(
-                    message = it.message ?: "",
-                    withDismissAction = true
-                )
+    // Memoized filtered notes with proper dependencies
+    val filteredNotes by remember {
+        derivedStateOf {
+            val notes = noteListState?.getOrNull() ?: emptyList()
+            if (searchQuery.isBlank()) {
+                notes
+            } else {
+                notes.filter { note ->
+                    note.title.contains(searchQuery, ignoreCase = true) ||
+                            note.note.contains(searchQuery, ignoreCase = true)
+                }
             }
         }
     }
 
-    LaunchedEffect(key1 = loadingState.value) {
-        loadingDialog.value = (loadingState.value == true)
+    // Dialog states
+    var showLoadingDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // Bottom sheet states
+    var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val skipPartiallyExpanded by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded
+    )
+
+    // Effects
+    LaunchedEffect(Unit) {
+        viewModel.observeNotes()
     }
 
-    val deletedMessage = stringResource(id = R.string.note_is_successfully_deleted)
+    LaunchedEffect(noteListState) {
+        noteListState?.onFailure { error ->
+            snackBarHostState.showSnackbar(
+                message = error.message.orEmpty(),
+                withDismissAction = true
+            )
+        }
+    }
 
-    fun deleteNoteList() {
-        scope.launch {
-            viewModel.deleteNoteList()
-                .onSuccess {
-                    deleteDialog.value = false
-                    viewModel.unMarkAllNote()
-                    viewModel.closeMarkingEvent()
+    LaunchedEffect(loadingState) {
+        showLoadingDialog = loadingState == true
+    }
 
-                    snackBarHostState.showSnackbar(
-                        message = deletedMessage,
-                        withDismissAction = true
-                    )
-                }
-                .onFailure {
-                    deleteDialog.value = false
+    val noteIsDeletedText = stringResource(R.string.note_is_successfully_deleted)
 
-                    snackBarHostState.showSnackbar(
-                        message = it.message ?: "",
-                        withDismissAction = true
-                    )
-                }
+    // Memoized callbacks
+    val deleteNoteList = remember {
+        {
+            scope.launch {
+                viewModel.deleteNoteList()
+                    .onSuccess {
+                        showDeleteDialog = false
+                        viewModel.unMarkAllNote()
+                        viewModel.closeMarkingEvent()
+
+                        snackBarHostState.showSnackbar(
+                            message = noteIsDeletedText,
+                            withDismissAction = true
+                        )
+                    }
+                    .onFailure { error ->
+                        showDeleteDialog = false
+                        snackBarHostState.showSnackbar(
+                            message = error.message.orEmpty(),
+                            withDismissAction = true
+                        )
+                    }
+            }
+        }
+    }
+
+    val onNoteClick = remember {
+        { note: NoteModel ->
+            if (isMarking) {
+                viewModel.addToMarkedNoteList(note)
+            } else {
+                viewModel.closeMarkingEvent()
+                navigationActions.navigateToDetailPage(note.id)
+            }
+        }
+    }
+
+    val onNoteLongClick = remember {
+        { note: NoteModel ->
+            if (!isMarking) {
+                viewModel.isMarking.value = true
+            }
+            viewModel.addToMarkedNoteList(note)
+        }
+    }
+
+    val onNoteCheckClick = remember {
+        { note: NoteModel ->
+            viewModel.addToMarkedNoteList(note)
         }
     }
 
     Scaffold(
         topBar = {
             NotesAppBar(
-                isMarking = viewModel.isMarking.value,
-                markedNoteListSize = viewModel.markedNoteList.size,
-                isSearching = viewModel.isSearching.value,
-                searchedTitle = viewModel.searchedTitleText.value,
-                toggleDrawerCallback = {
-                    openDrawer()
-                },
+                isMarking = isMarking,
+                markedNoteListSize = markedNoteList.size,
+                toggleDrawerCallback = openDrawer,
                 selectAllCallback = {
-                    viewModel.noteList.value?.getOrNull().let {
-                        if (it != null) viewModel.markAllNote(it)
+                    noteListState?.getOrNull()?.let { notes ->
+                        viewModel.markAllNote(notes)
                     }
                 },
-                unSelectAllCallback = {
-                    viewModel.unMarkAllNote()
-                },
-                onSearchValueChange = {
-                    viewModel.searchedTitleText.value = it
-                },
-                closeMarkingCallback = {
-                    viewModel.closeMarkingEvent()
-                },
-                searchCallback = {
-                    viewModel.isSearching.value = true
-                    viewModel.searchedTitleText.value = ""
-                },
-                sortCallback = {
-                    openBottomSheet.value = true
-                },
-                deleteCallback = {
-                    deleteDialog.value = true
-                },
-                closeSearchCallback = {
-                    viewModel.closeSearchEvent()
-                }
+                unSelectAllCallback = viewModel::unMarkAllNote,
+                closeMarkingCallback = viewModel::closeMarkingEvent,
+                sortCallback = { openBottomSheet = true },
+                deleteCallback = { showDeleteDialog = true },
+                totalNotesCount = filteredNotes.size
             )
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    viewModel.closeMarkingEvent()
-                    viewModel.closeSearchEvent()
-
-                    navigationActions.navigateToCreatePage()
-                },
-                modifier = Modifier.semantics {
-                    testTag = TestTags.ADD_NOTE_FAB
-                },
-                text = {
-                    Text(stringResource(R.string.add), fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.fab)
-                    )
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
+            if (!isMarking) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        viewModel.closeMarkingEvent()
+                        navigationActions.navigateToCreatePage()
+                    },
+                    modifier = Modifier.semantics {
+                        testTag = TestTags.ADD_NOTE_FAB
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.add),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(R.string.fab)
+                        )
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         },
         content = { contentPadding ->
-            Box(modifier = Modifier.padding(contentPadding)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        focusManager.clearFocus()
+                    }
+                    .padding(contentPadding)
+            ) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
                         .semantics { testTag = TestTags.NOTE_RV },
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(
-                        top = 24.dp,
-                        bottom = 96.dp
-                    )
+                    contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
-                    items(items = filteredNotes) {
-                        Box(Modifier.padding(start = 16.dp, end = 16.dp)) {
-                            NotesItem(
-                                isMarking = viewModel.isMarking.value,
-                                isMarked = it in viewModel.markedNoteList,
-                                data = it,
-                                onClick = {
-                                    if (viewModel.isMarking.value) {
-                                        viewModel.addToMarkedNoteList(it)
-                                    } else {
-                                        viewModel.closeMarkingEvent()
-                                        viewModel.closeSearchEvent()
-
-                                        navigationActions.navigateToDetailPage(it.id)
-                                    }
-                                },
-                                onLongClick = {
-                                    if (!viewModel.isMarking.value) {
-                                        viewModel.isMarking.value = true
-                                    }
-                                    viewModel.addToMarkedNoteList(it)
-                                },
-                                onCheckClick = {
-                                    viewModel.addToMarkedNoteList(it)
+                    item(key = "search_bar") {
+                        Box(
+                            modifier = Modifier
+                                .onGloballyPositioned { coords ->
+                                    searchBarHeightPx = coords.size.height.toFloat()
+                                    scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
                                 }
+                                .graphicsLayer {
+                                    translationY = scrollBehavior.state.heightOffset
+                                }
+                                .fillMaxWidth()
+                                .padding(16.dp, 24.dp, 16.dp, 8.dp)
+                        ) {
+                            SearchBar(
+                                query = searchQuery,
+                                onQueryChange = { newQuery ->
+                                    viewModel.searchedTitleText.value = newQuery
+                                }
+                            )
+                        }
+                    }
+
+                    items(
+                        items = filteredNotes,
+                        key = { note -> note.id }
+                    ) { note ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .animateItem()
+                        ) {
+                            NotesItem(
+                                isMarking = isMarking,
+                                isMarked = note in markedNoteList,
+                                data = note,
+                                onClick = { onNoteClick(note) },
+                                onLongClick = { onNoteLongClick(note) },
+                                onCheckClick = { onNoteCheckClick(note) }
                             )
                         }
                     }
@@ -239,17 +305,32 @@ fun NotesPage(
         modifier = Modifier.semantics { testTag = TestTags.NOTES_PAGE }
     )
 
-    LoadingDialog(isOpened = loadingDialog.value, onDismissCallback = { loadingDialog.value = false },
-        modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG })
+    if (showLoadingDialog) {
+        LoadingDialog(
+            isOpened = true,
+            onDismissCallback = { showLoadingDialog = false },
+            modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG }
+        )
+    }
 
-    TextDialog(isOpened = deleteDialog.value,
-        onDismissCallback = { deleteDialog.value = false },
-        onConfirmCallback = { deleteNoteList() },
-        modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
+    if (showDeleteDialog) {
+        TextDialog(
+            isOpened = true,
+            onDismissCallback = { showDeleteDialog = false },
+            onConfirmCallback = { deleteNoteList() },
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
+        )
+    }
 
-
-    FilterSheet(openBottomSheet, bottomSheetState, onDismiss = { openBottomSheet.value = false } ) {
-        sortBy, orderBy -> viewModel.sortAndOrder(sortBy, orderBy)
+    if (openBottomSheet) {
+        FilterSheet(
+            openBottomSheet = openBottomSheet,
+            bottomSheetState = bottomSheetState,
+            onDismiss = { openBottomSheet = false },
+            sortAndOrderData = viewModel.sortAndOrderData.value
+        ) { sortBy, orderBy ->
+            viewModel.sortAndOrder(sortBy, orderBy)
+        }
     }
 }
 

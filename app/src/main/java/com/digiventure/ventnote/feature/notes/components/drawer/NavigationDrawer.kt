@@ -1,7 +1,6 @@
 package com.digiventure.ventnote.feature.notes.components.drawer
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -55,6 +54,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.digiventure.ventnote.BuildConfig
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.ColorPalletName
@@ -84,7 +84,7 @@ fun NavDrawer(
     fun openPlayStore(appURL: String) {
         val playIntent: Intent = Intent().apply {
             action = Intent.ACTION_VIEW
-            data = Uri.parse(appURL)
+            data = appURL.toUri()
         }
         try {
             context.startActivity(playIntent)
@@ -94,7 +94,7 @@ fun NavDrawer(
     }
 
     val appPath = "https://play.google.com/store/apps/details?id=com.digiventure.ventnote"
-    val devPagePath = "https://play.google.com/store/apps/developer?id=DigiVenture"
+    val devPagePath = "https://play.google.com/store/apps/developer?id=Mattrmost"
 
     val dataStore = NoteDataStore(LocalContext.current)
 
@@ -134,7 +134,7 @@ fun NavDrawer(
             NavDrawerItem(leftIcon = Icons.Filled.Star,
                 title = stringResource(id = R.string.rate_app),
                 subtitle = stringResource(id = R.string.rate_app_description),
-                testTagName = "",
+                testTagName = TestTags.RATE_APP_TILE,
                 onClick = { openPlayStore(appPath) })
 
             NavDrawerItem(leftIcon = Icons.Filled.Shop,
@@ -245,16 +245,18 @@ fun NavDrawerItem(
         ) {
             Text(
                 text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 2.dp)
+                modifier = Modifier.padding(bottom = 2.dp),
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             )
             Text(
                 text = subtitle,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             )
         }
     }

@@ -28,7 +28,7 @@ class NotesPageVM @Inject constructor(
         Pair(Constants.UPDATED_AT, Constants.DESCENDING)
     )
 
-    val defaultException = Exception("Unknown error")
+    private val defaultException = Exception("Unknown error")
 
     override val noteList: LiveData<Result<List<NoteModel>>>
         get() = _noteList
@@ -38,7 +38,6 @@ class NotesPageVM @Inject constructor(
         sortAndOrderData.value = Pair(sortBy, orderBy)
     }
 
-    override val isSearching = mutableStateOf(false)
     override val searchedTitleText = mutableStateOf("")
 
     override val isMarking = mutableStateOf(false)
@@ -78,11 +77,6 @@ class NotesPageVM @Inject constructor(
     override fun closeMarkingEvent() {
         isMarking.value = false
         markedNoteList.clear()
-    }
-
-    override fun closeSearchEvent() {
-        isSearching.value = false
-        searchedTitleText.value = ""
     }
 
     override fun observeNotes() {

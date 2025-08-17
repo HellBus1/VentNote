@@ -31,7 +31,6 @@ interface NotesPageBaseVM {
      * 1. Toggle search field
      * 2. SearchField value
      */
-    val isSearching: MutableState<Boolean>
     val searchedTitleText: MutableState<String>
 
     /**
@@ -67,11 +66,6 @@ interface NotesPageBaseVM {
      * Close marking event
      * */
     fun closeMarkingEvent()
-
-    /**
-     * Close search event
-     * */
-    fun closeSearchEvent()
 
     fun observeNotes()
 }

@@ -8,10 +8,19 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
 class AuthMockVM: ViewModel(), AuthBaseVM {
-    override val uiState: State<AuthVM.AuthPageState>
-        get() = mutableStateOf(AuthVM.AuthPageState(AuthVM.AuthState.SignedIn))
+    private val _uiState = mutableStateOf(AuthVM.AuthPageState(AuthVM.AuthState.SignedIn))
+    override val uiState: State<AuthVM.AuthPageState> = _uiState
+
     override val eventFlow: SharedFlow<AuthVM.AuthState>
         get() = MutableSharedFlow()
+
+    init {
+        _uiState.value = _uiState.value.copy(
+            authState = AuthVM.AuthState.SignedIn
+//            authState = AuthVM.AuthState.Loading
+//            authState = AuthVM.AuthState.SignedOut
+        )
+    }
 
     override fun signOut(onCompleteSignOutCallback: () -> Unit) {
 

@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.remember
@@ -20,10 +22,12 @@ import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
 import com.digiventure.ventnote.navigation.NavGraph
 import com.digiventure.ventnote.navigation.PageNavigation
 import com.digiventure.ventnote.ui.theme.VentNoteTheme
+import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallStateUpdatedListener
-import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.AppUpdateType.FLEXIBLE
 import com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
@@ -35,21 +39,12 @@ class MainActivity : ComponentActivity() {
     private lateinit var installStateUpdatedListener: InstallStateUpdatedListener
     private lateinit var appUpdateManager: AppUpdateManager
     private var isDialogShowed = false
-
-    companion object {
-        const val REQUEST_UPDATE_CODE = 1
-    }
+    private lateinit var updateLauncher: ActivityResultLauncher<IntentSenderRequest>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Check in-app update
-        appUpdateManager = AppUpdateManagerFactory.create(this)
-        addUpdateStatusListener()
-        checkUpdate()
-
+        startInAppUpdateCheck()
         enableEdgeToEdge()
-
         setContent {
             VentNoteTheme {
                 val navController = rememberNavController()
@@ -60,8 +55,6 @@ class MainActivity : ComponentActivity() {
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
 
                 val coroutineScope = rememberCoroutineScope()
-
-                val snackBarHostState = remember { SnackbarHostState() }
 
                 Surface(
                     modifier = Modifier.safeDrawingPadding(),
@@ -100,78 +93,90 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Initializes the in-app update process by creating an AppUpdateManager,
+     * registering an activity result launcher for handling update confirmations,
+     * setting up an update status listener, and initiating the update check.
+     */
+    private fun startInAppUpdateCheck() {
+        appUpdateManager = AppUpdateManagerFactory.create(this)
+        updateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode != RESULT_OK) {
+                checkUpdate()
+            }
+        }
+        addUpdateStatusListener()
+        checkUpdate()
+    }
+
+    /**
+     * Adds a listener to handle app update installation status changes.
+     * 1. After the update is downloaded, show a dialog and request user confirmation to restart the app.
+     */
     private fun addUpdateStatusListener() {
         installStateUpdatedListener = InstallStateUpdatedListener { installState ->
-            when (installState.installStatus()) {
-                InstallStatus.DOWNLOADED -> {
-                    // After the update is downloaded, show a notification
-                    // and request user confirmation to restart the app.
-                    showDialogForCompleteUpdate()
-                }
-
-                InstallStatus.INSTALLED -> {
-                    appUpdateManager.unregisterListener(installStateUpdatedListener)
-                }
-
-                else -> {}
+            if (installState.installStatus() == InstallStatus.DOWNLOADED) {
+                showDialogForCompleteUpdate()
+            } else if (installState.installStatus() == InstallStatus.INSTALLED) {
+                appUpdateManager.unregisterListener(installStateUpdatedListener)
             }
         }
     }
 
+    /**
+     * Checks for available app updates and initiates the update flow if an update is available and allowed.
+     * 1. Before starting an update, register a listener for updates.
+     */
     private fun checkUpdate() {
-        // Before starting an update, register a listener for updates.
         appUpdateManager.registerListener(installStateUpdatedListener)
-
-        // Returns an intent object that you use to check for an update.
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-
-        // Check that the platform will allow the specified type of update.
-        appUpdateInfoTask.addOnSuccessListener {
-            when (it.updateAvailability()) {
-                UpdateAvailability.UPDATE_AVAILABLE -> {
-                    val updateTypes = arrayOf(AppUpdateType.FLEXIBLE, IMMEDIATE)
-                    for (type in updateTypes) {
-                        if (it.isUpdateTypeAllowed(type)) {
-                            appUpdateManager.startUpdateFlowForResult(
-                                it,
-                                type,
-                                this,
-                                REQUEST_UPDATE_CODE
-                            )
-                            break
-                        }
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                when {
+                    appUpdateInfo.isUpdateTypeAllowed(IMMEDIATE) -> {
+                        startUpdateFlow(appUpdateInfo, IMMEDIATE)
+                        return@addOnSuccessListener
+                    }
+                    appUpdateInfo.isUpdateTypeAllowed(FLEXIBLE) -> {
+                        startUpdateFlow(appUpdateInfo, FLEXIBLE)
+                        return@addOnSuccessListener
                     }
                 }
-
-                else -> {}
             }
         }
     }
 
+    /**
+     * On resuming the activity, check for 2 scenarios:
+     * 1. If a flexible update has been downloaded and is awaiting installation,
+     *    show a dialog prompting the user to complete the update.
+     * 2. If a developer-triggered immediate update is already in progress,
+     *    resume the update flow.
+     */
     override fun onResume() {
         super.onResume()
 
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo != null) { // Check if appUpdateInfo is not null
-                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-                    if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+            if (appUpdateInfo != null) {
+                when {
+                    appUpdateInfo.isUpdateTypeAllowed(FLEXIBLE) &&
+                            appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED -> {
                         showDialogForCompleteUpdate()
                     }
-                } else {
-                    if (appUpdateInfo.updateAvailability() ==
-                        UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
-                    ) {
-                        // If an in-app update is already running, resume the update.
-                        appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            IMMEDIATE,
-                            this,
-                            REQUEST_UPDATE_CODE
-                        )
+                    appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                        startUpdateFlow(appUpdateInfo, IMMEDIATE)
                     }
                 }
             }
         }
+    }
+
+    private fun startUpdateFlow(updateInfo: AppUpdateInfo, updateType:Int) {
+        appUpdateManager.startUpdateFlowForResult(
+            updateInfo,
+            updateLauncher,
+            AppUpdateOptions.newBuilder(updateType).build()
+        )
     }
 
     private fun showDialogForCompleteUpdate() {
