@@ -154,7 +154,7 @@ private fun SelectionTitle(
                     }
                     withStyle(
                         style = SpanStyle(
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         append(" of $totalNotesCount selected")

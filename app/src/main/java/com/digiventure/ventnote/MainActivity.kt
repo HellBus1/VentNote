@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
+import com.digiventure.ventnote.feature.drawer.NavDrawer
 import com.digiventure.ventnote.navigation.NavGraph
 import com.digiventure.ventnote.navigation.PageNavigation
-import com.digiventure.ventnote.ui.theme.VentNoteTheme
+import com.digiventure.ventnote.ui.theme.components.VentNoteTheme
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -63,9 +63,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavDrawer(
                         drawerState = drawerState,
-                        onError = {
-
-                        },
+                        onError = {},
                         onBackupPressed = {
                             navigationActions.navigateToBackupPage()
                         },

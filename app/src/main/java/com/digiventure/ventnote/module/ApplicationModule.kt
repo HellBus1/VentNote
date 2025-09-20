@@ -1,8 +1,11 @@
 package com.digiventure.ventnote.module
 
+import android.content.Context
+import com.digiventure.ventnote.data.local.NoteDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
@@ -21,4 +24,10 @@ class ApplicationModule {
     @Provides
     @Singleton
     fun provideExecutorCoroutineDispatcher(): ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+
+    @Provides
+    @Singleton
+    fun provideNoteDataStore(@ApplicationContext context: Context): NoteDataStore {
+        return NoteDataStore(context)
+    }
 }

@@ -1,6 +1,6 @@
 package com.digiventure.ventnote.feature.note_creation
 
-import android.content.pm.ActivityInfo
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +33,6 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.Constants.EMPTY_STRING
 import com.digiventure.ventnote.commons.TestTags
-import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.note_creation.components.navbar.EnhancedBottomAppBar
@@ -51,8 +50,6 @@ fun NoteCreationPage(
     navHostController: NavHostController,
     viewModel: NoteCreationPageBaseVM = hiltViewModel<NoteCreationPageVM>()
 ) {
-    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
     val titleTextFieldText = stringResource(R.string.title_textField)
     val bodyTextFieldText = stringResource(R.string.body_textField)
 
@@ -193,6 +190,7 @@ fun NoteCreationPage(
 
 @Preview
 @Composable
+@SuppressLint("ViewModelConstructorInComposable")
 fun NoteCreationPagePreview() {
     NoteCreationPage(
         navHostController = rememberNavController(),
