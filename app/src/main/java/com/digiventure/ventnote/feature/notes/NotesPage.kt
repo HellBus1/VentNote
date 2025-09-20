@@ -264,9 +264,6 @@ fun NotesPage(
                                     searchBarHeightPx = coords.size.height.toFloat()
                                     scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
                                 }
-                                .graphicsLayer {
-                                    translationY = scrollBehavior.state.heightOffset
-                                }
                                 .fillMaxWidth()
                                 .padding(16.dp, 24.dp, 16.dp, 8.dp)
                         ) {
