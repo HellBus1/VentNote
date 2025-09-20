@@ -1,6 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
-import android.content.pm.ActivityInfo
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +35,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
@@ -50,7 +49,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
-import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
@@ -74,8 +72,6 @@ fun NotesPage(
     val focusManager = LocalFocusManager.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var searchBarHeightPx by remember { mutableFloatStateOf(0f) }
-
-    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     val navigationActions = remember(navHostController) {
         PageNavigation(navHostController)
@@ -333,11 +329,10 @@ fun NotesPage(
 
 @Preview
 @Composable
+@SuppressLint("ViewModelConstructorInComposable")
 fun NotesPagePreview() {
     NotesPage(
         navHostController = rememberNavController(),
         viewModel = NotesPageMockVM()
-    ) {
-
-    }
+    ) { }
 }
