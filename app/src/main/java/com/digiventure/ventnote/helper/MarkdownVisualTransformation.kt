@@ -135,15 +135,11 @@ class MarkdownVisualTransformation : VisualTransformation {
 
             // Apply all collected styles
             styleRanges.forEach { range ->
-                try {
-                    addStyle(
-                        style = range.style,
-                        start = range.start.coerceAtLeast(0),
-                        end = range.end.coerceAtMost(originalText.length)
-                    )
-                } catch (e: Exception) {
-                    // Silently skip invalid ranges to prevent crashes
-                }
+                addStyle(
+                    style = range.style,
+                    start = range.start.coerceAtLeast(0),
+                    end = range.end.coerceAtMost(originalText.length)
+                )
             }
         }
     }

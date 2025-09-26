@@ -9,6 +9,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.digiventure.ventnote.commons.Constants.EMPTY_STRING
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,10 +26,10 @@ class NoteCreationPageVM @Inject constructor(
 ) : ViewModel(), NoteCreationPageBaseVM {
 
     override val loader: MutableLiveData<Boolean> = MutableLiveData(false)
-    override val titleText: MutableState<String> = mutableStateOf("")
+    override val titleText: MutableState<String> = mutableStateOf(EMPTY_STRING)
 
     // Main text field state
-    override val textFieldValue = mutableStateOf(TextFieldValue(""))
+    override val textFieldValue = mutableStateOf(TextFieldValue(EMPTY_STRING))
 
     // Computed property that stays in sync with textFieldValue
     override val descriptionText: MutableState<String> = derivedStateOf {
@@ -44,7 +45,6 @@ class NoteCreationPageVM @Inject constructor(
     // Formatting states
     val isBoldActive = mutableStateOf(false)
     val isItalicActive = mutableStateOf(false)
-    val isListActive = mutableStateOf(false)
 
     init {
         // Update formatting toggles when selection changes
@@ -65,8 +65,6 @@ class NoteCreationPageVM @Inject constructor(
             Result.failure(e)
         }
     }
-
-    // --- Markdown Formatting Logic ---
 
     override fun toggleBold() {
         val currentTFV = textFieldValue.value
@@ -121,13 +119,6 @@ class NoteCreationPageVM @Inject constructor(
 
         isBoldActive.value = context.isBold
         isItalicActive.value = context.isItalic
-
-        // Check if current line is a list item
-        val lines = currentTFV.text.split('\n')
-        val currentLineIndex = currentTFV.text.substring(0, cursorPos).count { it == '\n' }
-        isListActive.value = if (currentLineIndex < lines.size) {
-            lines[currentLineIndex].trimStart().startsWith("- ")
-        } else false
     }
 
     private fun insertMarkdownAtCursor(prefix: String, suffix: String) {
@@ -183,50 +174,6 @@ class NoteCreationPageVM @Inject constructor(
         }
     }
 
-    private fun toggleListItemsInSelection(tfv: TextFieldValue): TextFieldValue {
-        val selection = tfv.selection
-        val lines = tfv.text.lines().toMutableList()
-        val startLineIndex = tfv.text.substring(0, selection.start).count { it == '\n' }
-        val endLineIndex = tfv.text.substring(0, selection.end).count { it == '\n' }
-
-        val listMarker = "- "
-        var selectionShift = 0
-
-        // Check if we should add or remove markers
-        val shouldAddMarkers = (startLineIndex..minOf(endLineIndex, lines.lastIndex))
-            .any { i -> !lines[i].trimStart().startsWith(listMarker) }
-
-        for (i in startLineIndex..minOf(endLineIndex, lines.lastIndex)) {
-            val line = lines[i]
-            val trimmedLine = line.trimStart()
-
-            if (shouldAddMarkers && trimmedLine.isNotEmpty()) {
-                if (!trimmedLine.startsWith(listMarker)) {
-                    val leadingWhitespace = line.takeWhile { it.isWhitespace() }
-                    lines[i] = leadingWhitespace + listMarker + trimmedLine
-                    if (i == startLineIndex) selectionShift += listMarker.length
-                }
-            } else if (!shouldAddMarkers && trimmedLine.startsWith(listMarker)) {
-                val leadingWhitespace = line.takeWhile { it.isWhitespace() }
-                lines[i] = leadingWhitespace + trimmedLine.substring(listMarker.length)
-                if (i == startLineIndex) selectionShift -= listMarker.length
-            }
-        }
-
-        val newText = lines.joinToString("\n")
-        val newSelectionStart = (selection.start + selectionShift).coerceIn(0, newText.length)
-        val newSelectionEnd = if (selection.collapsed) {
-            newSelectionStart
-        } else {
-            (selection.end + selectionShift).coerceIn(newSelectionStart, newText.length)
-        }
-
-        return TextFieldValue(
-            text = newText,
-            selection = TextRange(newSelectionStart, newSelectionEnd)
-        )
-    }
-
     private fun getMarkdownContextAtPosition(text: String, position: Int): MarkdownContext {
         if (position == 0 || text.isEmpty()) return MarkdownContext()
 
@@ -260,7 +207,6 @@ class NoteCreationPageVM @Inject constructor(
     private fun resetFormatToggleStates() {
         isBoldActive.value = false
         isItalicActive.value = false
-        isListActive.value = false
     }
 
     private data class MarkdownContext(
