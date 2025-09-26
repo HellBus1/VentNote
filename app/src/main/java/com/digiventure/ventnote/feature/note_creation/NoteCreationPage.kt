@@ -4,15 +4,20 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -37,7 +42,8 @@ import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.note_creation.components.navbar.EnhancedBottomAppBar
 import com.digiventure.ventnote.feature.note_creation.components.navbar.NoteCreationAppBar
-import com.digiventure.ventnote.feature.note_creation.components.section.NoteSection
+import com.digiventure.ventnote.feature.note_creation.components.section.RichTextField
+import com.digiventure.ventnote.feature.note_creation.components.section.StyleControls
 import com.digiventure.ventnote.feature.note_creation.components.section.TitleSection
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageBaseVM
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageMockVM
@@ -140,7 +146,53 @@ fun NoteCreationPage(
                     TitleSection(viewModel, titleTextField, titleInput)
                 }
                 item {
-                    NoteSection(viewModel, bodyTextField, bodyInput)
+//                    NoteSection(viewModel, bodyTextField, bodyInput)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Rich Text Editor Preview",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+
+                        StyleControls(viewModel = viewModel)
+
+                        RichTextField(
+                            viewModel = viewModel,
+                            bodyTextFieldSemantic = "Note content field",
+                            bodyInputPlaceholder = "Enter your note here..."
+                        )
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    println("Markdown Output: ${viewModel.descriptionText.value}")
+                                }
+                            ) {
+                                Text("Log Markdown")
+                            }
+
+                            OutlinedButton(
+                                onClick = {
+                                    viewModel.loadFromMarkdown("**New bold text** and *italic text*")
+                                }
+                            ) {
+                                Text("Load Sample")
+                            }
+                        }
+
+                        // Show current text length
+                        Text(
+                            text = "Characters: ${viewModel.textFieldValue.value.text.length}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         },
