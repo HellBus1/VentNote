@@ -85,8 +85,6 @@ fun ImprovedDescriptionTextField(
         label = label
     )
 
-    val interactionSource = remember { MutableInteractionSource() }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
