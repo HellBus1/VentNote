@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.feature.backup.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -49,6 +50,10 @@ class BackupPageVM @Inject constructor(
                             getDatabaseNameWithTimestamps(),
                             drive
                         ).onEach {
+                            // Clean up old backups first (seamlessly)
+                            cleanupOldBackups(drive)
+                            
+                            // Then update UI state and fetch final list
                             _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
                             getBackupFileList()
                         }.last()
@@ -181,5 +186,39 @@ class BackupPageVM @Inject constructor(
         val timestamp = dateFormat.format(Calendar.getInstance().time)
         val jsonFormat = ".json"
         return Constants.BACKUP_FILE_NAME + "_" + timestamp + jsonFormat
+    }
+
+    /**
+     * Cleans up old backup files, keeping only the last 5 most recent backups.
+     * This prevents unlimited growth of backup files in Google Drive.
+     */
+    private suspend fun cleanupOldBackups(drive: Drive?) {
+        try {
+            // Fetch latest list directly to determine what to delete
+            // This runs in the background within the existing scope
+            repository.getBackupFileList(drive).collect { result ->
+                if (result.isSuccess) {
+                    val backupFiles = result.getOrNull() ?: emptyList()
+                    
+                    // Keep only last 5 backups
+                    val maxBackups = 10
+                    
+                    if (backupFiles.size > maxBackups) {
+                        // Sort by creation time (newest first)
+                        val sortedFiles = backupFiles.sortedByDescending { it.createdTime?.value ?: 0L }
+                        
+                        // Get files to delete (all except the first 5)
+                        val filesToDelete = sortedFiles.drop(maxBackups)
+                        
+                        // Delete old backup files
+                        filesToDelete.forEach { file ->
+                            repository.deleteFile(file.id, drive).last()
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("BackupPageVM", "Cleanup failed: ${e.message}")
+        }
     }
 }

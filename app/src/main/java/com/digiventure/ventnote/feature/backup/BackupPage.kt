@@ -167,7 +167,6 @@ fun BackupPage(
                                 deleteConfirmationDialogState.value = true
                             },
                             successfullyRestoredRequest = {
-                                Log.e("hehe event", "restored")
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = restoredMessage,
@@ -176,7 +175,6 @@ fun BackupPage(
                                 }
                             },
                             successfullyDeletedRequest = {
-                                Log.e("hehe event", "deleted")
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = deletedMessage,
