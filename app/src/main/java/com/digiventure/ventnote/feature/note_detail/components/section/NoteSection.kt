@@ -4,8 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,11 +25,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -91,21 +86,11 @@ fun ImprovedDescriptionTextField(
         label = label
     )
 
-    val focusRequester = remember { FocusRequester() }
-    val interactionSource = remember { MutableInteractionSource() }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
-            .heightIn(min = 200.dp)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = {
-                    focusRequester.requestFocus()
-                }
-            ),
+            .heightIn(min = 200.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isEditingState) {
                 MaterialTheme.colorScheme.surface
@@ -142,8 +127,7 @@ fun ImprovedDescriptionTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .semantics { contentDescription = bodyTextField }
-                .focusRequester(focusRequester),
+                .semantics { contentDescription = bodyTextField },
             placeholder = {
                 if (isEditingState) {
                     Text(

@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.backup
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -167,7 +166,6 @@ fun BackupPage(
                                 deleteConfirmationDialogState.value = true
                             },
                             successfullyRestoredRequest = {
-                                Log.e("hehe event", "restored")
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = restoredMessage,
@@ -176,7 +174,6 @@ fun BackupPage(
                                 }
                             },
                             successfullyDeletedRequest = {
-                                Log.e("hehe event", "deleted")
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = deletedMessage,
