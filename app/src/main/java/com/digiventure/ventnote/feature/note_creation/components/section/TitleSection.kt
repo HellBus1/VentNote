@@ -23,11 +23,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -78,7 +75,6 @@ fun ImprovedTitleTextField(
     titleInput: String
 ) {
     val label = "border_color"
-    val focusRequester = remember { FocusRequester() }
     val borderColor by animateColorAsState(
         targetValue = MaterialTheme.colorScheme.primary,
         animationSpec = tween(300),
@@ -119,8 +115,7 @@ fun ImprovedTitleTextField(
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .semantics { contentDescription = titleTextField }
-                .focusRequester(focusRequester),
+                .semantics { contentDescription = titleTextField },
             placeholder = {
                 Text(
                     text = titleInput,
