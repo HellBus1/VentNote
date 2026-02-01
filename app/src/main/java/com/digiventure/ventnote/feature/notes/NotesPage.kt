@@ -84,19 +84,28 @@ fun NotesPage(
     val isMarking by viewModel.isMarking
     val markedNoteList = viewModel.markedNoteList
 
+    // Debounced search query
+    var debouncedSearchQuery by remember { mutableStateOf("") }
+
+    // Debounce search input
+    LaunchedEffect(searchQuery) {
+        kotlinx.coroutines.delay(300) // 300ms debounce delay
+        debouncedSearchQuery = searchQuery
+    }
+
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    // Memoized filtered notes with proper dependencies
+    // Memoized filtered notes with proper dependencies - using debounced query
     val filteredNotes by remember {
         derivedStateOf {
             val notes = noteListState?.getOrNull() ?: emptyList()
-            if (searchQuery.isBlank()) {
+            if (debouncedSearchQuery.isBlank()) {
                 notes
             } else {
                 notes.filter { note ->
-                    note.title.contains(searchQuery, ignoreCase = true) ||
-                            note.note.contains(searchQuery, ignoreCase = true)
+                    note.title.contains(debouncedSearchQuery, ignoreCase = true) ||
+                            note.note.contains(debouncedSearchQuery, ignoreCase = true)
                 }
             }
         }
