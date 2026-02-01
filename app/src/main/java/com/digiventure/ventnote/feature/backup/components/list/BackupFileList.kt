@@ -341,7 +341,8 @@ fun BackupListContainer(
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Text(
-                        text = file.name.substringBefore("."),
+                        text = file.name.substringBefore(".")
+                            .substringAfter("backup_"),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleMedium,
