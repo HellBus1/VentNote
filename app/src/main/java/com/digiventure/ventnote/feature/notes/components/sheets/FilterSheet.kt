@@ -100,7 +100,10 @@ fun FilterSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
-                    items(sortOptions) { option ->
+                    items(
+                        items = sortOptions,
+                        key = { it.value }
+                    ) { option ->
                         CompactFilterChip(
                             label = stringResource(option.labelRes),
                             icon = option.icon,

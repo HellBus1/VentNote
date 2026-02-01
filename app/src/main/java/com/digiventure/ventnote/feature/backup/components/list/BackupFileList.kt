@@ -297,7 +297,10 @@ fun BackupListContainer(
             }
         }
 
-        items(items = backupFiles) { file ->
+        items(
+            items = backupFiles,
+            key = { it.id }
+        ) { file ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
