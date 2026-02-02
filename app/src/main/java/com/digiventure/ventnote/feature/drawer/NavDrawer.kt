@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bedtime
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.Shop
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ThumbUp
+
 import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -98,18 +99,18 @@ fun NavDrawer(
             ) {
                 SectionTitle(title = stringResource(id = R.string.about_us))
 
-                NavDrawerItem(leftIcon = Icons.Filled.Star,
+                NavDrawerItem(leftIcon = Icons.Filled.ThumbUp,
                     title = stringResource(id = R.string.rate_app),
                     subtitle = stringResource(id = R.string.rate_app_description),
                     testTagName = TestTags.RATE_APP_TILE,
                     onClick = { openPlayStore(context, appPath, onError) })
 
-                NavDrawerItem(leftIcon = Icons.Filled.Shop,
+                NavDrawerItem(leftIcon = Icons.Filled.Search,
                     title = stringResource(id = R.string.more_apps),
                     subtitle = stringResource(id = R.string.more_apps_description),
                     onClick = { openPlayStore(context, devPagePath, onError) })
 
-                NavDrawerItem(leftIcon = Icons.Filled.Update,
+                NavDrawerItem(leftIcon = Icons.Filled.Info,
                     title = stringResource(id = R.string.app_version),
                     subtitle = BuildConfig.VERSION_NAME,
                     onClick = { })
@@ -117,14 +118,14 @@ fun NavDrawer(
                 SectionTitle(title = stringResource(id = R.string.preferences))
 
                 NavDrawerColorPicker(
-                    leftIcon = Icons.Filled.ColorLens,
+                    leftIcon = Icons.Filled.Settings,
                     title = stringResource(id = R.string.theme_color),
                 ) {
                     themeViewModel.updateColorPallet(it.second)
                 }
 
                 NavDrawerItemColorSchemeSwitch(
-                    leftIcon = Icons.Filled.Bedtime,
+                    leftIcon = Icons.Filled.Person,
                     title = stringResource(id = R.string.theme_setting),
                     currentScheme = currentSchemeName,
                 ) {
@@ -134,7 +135,7 @@ fun NavDrawer(
                 SectionTitle(title = stringResource(id = R.string.settings))
 
                 NavDrawerItem(
-                    leftIcon = Icons.Filled.CloudUpload,
+                    leftIcon = Icons.Filled.Share,
                     title = stringResource(id = R.string.backup),
                     subtitle = stringResource(id = R.string.backup_description),
                     onClick = { onBackupPressed() })

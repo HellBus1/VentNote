@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.filled.Share
+
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,7 +52,7 @@ fun EnhancedBottomAppBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 EnhancedBottomBarButton(
-                    icon = Icons.Rounded.Share,
+                    icon = Icons.Filled.Share,
                     label = stringResource(R.string.share_note),
                     onClick = onCancelClick,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,

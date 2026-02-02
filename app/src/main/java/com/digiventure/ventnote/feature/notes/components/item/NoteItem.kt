@@ -13,7 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Check
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +65,7 @@ fun NotesItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isMarked) {
                     TopNavBarIcon(
-                        image = Icons.Filled.CheckCircle,
+                        image = Icons.Filled.Check,
                         "",
                         modifier = Modifier
                             .padding(start = 12.dp)

@@ -6,9 +6,9 @@ plugins {
     id 'kotlin-parcelize'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.2.10'
 
-    // disabled for internal purpose (if you want to enable, you must create firebase project first)
-//    id 'com.google.gms.google-services'
-//    id 'com.google.firebase.crashlytics'
+    // Google Services & Firebase
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -37,13 +37,17 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
         debug {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
         }
     }
 
@@ -73,7 +77,15 @@ android {
     packaging {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
-            excludes += 'META-INF/*'
+            excludes += 'META-INF/DEPENDENCIES'
+            excludes += 'META-INF/LICENSE'
+            excludes += 'META-INF/LICENSE.txt'
+            excludes += 'META-INF/license.txt'
+            excludes += 'META-INF/NOTICE'
+            excludes += 'META-INF/NOTICE.txt'
+            excludes += 'META-INF/notice.txt'
+            excludes += 'META-INF/ASL2.0'
+            excludes += 'META-INF/*.kotlin_module'
         }
     }
 
@@ -121,9 +133,6 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$dagger_version"
     implementation "androidx.hilt:hilt-navigation-compose:$hilt_navigation_compose_version"
 
-    // Material Icon Extension
-    implementation "androidx.compose.material:material-icons-extended:$material_icons_version"
-
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation "com.google.android.play:app-update:$play_app_update_version"
     // For Kotlin users also import the Kotlin extensions library for Play In-App Update:
@@ -168,7 +177,6 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebase_bom_version")
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
-    implementation "com.google.firebase:firebase-analytics"
     implementation "com.google.firebase:firebase-crashlytics"
 
     //Google Drive API

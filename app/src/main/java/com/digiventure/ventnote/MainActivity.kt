@@ -31,6 +31,7 @@ import com.google.android.play.core.install.model.AppUpdateType.FLEXIBLE
 import com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -45,6 +46,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         startInAppUpdateCheck()
         enableEdgeToEdge()
+
+        if (BuildConfig.ENABLE_CRASHLYTICS) {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
+        }
+
         setContent {
             VentNoteTheme {
                 val navController = rememberNavController()
