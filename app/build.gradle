@@ -19,8 +19,8 @@ android {
         applicationId "com.digiventure.ventnote"
         minSdk 23
         targetSdk 36
-        versionCode 43
-        versionName "1.1.1"
+        versionCode 44
+        versionName "1.2.0"
 
         testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
         vectorDrawables {
@@ -86,6 +86,7 @@ android {
             excludes += 'META-INF/notice.txt'
             excludes += 'META-INF/ASL2.0'
             excludes += 'META-INF/*.kotlin_module'
+            excludes += 'META-INF/services/org.jetbrains.kotlin.*'
         }
     }
 
