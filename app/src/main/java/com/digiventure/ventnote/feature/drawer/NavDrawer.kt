@@ -74,6 +74,7 @@ fun NavDrawer(
     content: @Composable () -> Unit,
     onError: (String) -> Unit,
     onBackupPressed: () -> Unit,
+    onUpdateCheckPressed: () -> Unit,
     themeViewModel: ThemeBaseVM = hiltViewModel<ThemeVM>()
 ) {
     val context = LocalContext.current
@@ -113,7 +114,7 @@ fun NavDrawer(
                 NavDrawerItem(leftIcon = Icons.Filled.Info,
                     title = stringResource(id = R.string.app_version),
                     subtitle = BuildConfig.VERSION_NAME,
-                    onClick = { })
+                    onClick = { onUpdateCheckPressed() })
 
                 SectionTitle(title = stringResource(id = R.string.preferences))
 
@@ -154,6 +155,7 @@ fun DrawerPreview() {
         content = { },
         onError = {},
         onBackupPressed = {},
+        onUpdateCheckPressed = {},
         themeViewModel = ThemeMockVM()
     )
 }

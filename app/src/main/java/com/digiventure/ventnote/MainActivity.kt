@@ -1,6 +1,7 @@
 package com.digiventure.ventnote
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -44,7 +45,20 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startInAppUpdateCheck()
+
+        // Initialize AppUpdate components early (must register launcher before STARTED)
+        appUpdateManager = AppUpdateManagerFactory.create(this)
+        updateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode != RESULT_OK) {
+                // If update fails or is cancelled, we don't force a re-check here
+                // unless it was an IMMEDIATE update, but usually, we just let it be.
+            }
+        }
+        addUpdateStatusListener()
+
+        // Check for updates automatically on startup
+        checkUpdate(isManual = false)
+
         enableEdgeToEdge()
 
         if (BuildConfig.ENABLE_CRASHLYTICS) {
@@ -73,6 +87,9 @@ class MainActivity : ComponentActivity() {
                         onBackupPressed = {
                             navigationActions.navigateToBackupPage()
                         },
+                        onUpdateCheckPressed = {
+                            checkUpdate(isManual = true)
+                        },
                         content = {
                             NavGraph(navHostController = navController, openDrawer = {
                                 coroutineScope.launch { drawerState.open() }
@@ -98,22 +115,6 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Initializes the in-app update process by creating an AppUpdateManager,
-     * registering an activity result launcher for handling update confirmations,
-     * setting up an update status listener, and initiating the update check.
-     */
-    private fun startInAppUpdateCheck() {
-        appUpdateManager = AppUpdateManagerFactory.create(this)
-        updateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            if (result.resultCode != RESULT_OK) {
-                checkUpdate()
-            }
-        }
-        addUpdateStatusListener()
-        checkUpdate()
-    }
-
-    /**
      * Adds a listener to handle app update installation status changes.
      * 1. After the update is downloaded, show a dialog and request user confirmation to restart the app.
      */
@@ -131,7 +132,7 @@ class MainActivity : ComponentActivity() {
      * Checks for available app updates and initiates the update flow if an update is available and allowed.
      * 1. Before starting an update, register a listener for updates.
      */
-    private fun checkUpdate() {
+    private fun checkUpdate(isManual: Boolean = false) {
         appUpdateManager.registerListener(installStateUpdatedListener)
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
@@ -146,6 +147,13 @@ class MainActivity : ComponentActivity() {
                         return@addOnSuccessListener
                     }
                 }
+            } else if (isManual) {
+                android.widget.Toast.makeText(this, "No update available", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+        if (isManual) {
+            appUpdateInfoTask.addOnFailureListener {
+                android.widget.Toast.makeText(this, "Failed to check for update", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
