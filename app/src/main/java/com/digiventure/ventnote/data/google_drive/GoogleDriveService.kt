@@ -64,7 +64,7 @@ class GoogleDriveService @Inject constructor(
                 Gson().fromJson(it, Array<NoteModel>::class.java).toList()
             } ?: emptyList()
 
-            proxy.dao().upsertNotesWithTimestamp(notes)
+            proxy.dao().upsertNotes(notes)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
