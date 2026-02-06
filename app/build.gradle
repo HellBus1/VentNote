@@ -19,7 +19,7 @@ android {
         applicationId "com.digiventure.ventnote"
         minSdk 23
         targetSdk 36
-        versionCode 44
+        versionCode 45
         versionName "1.2.0"
 
         testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
@@ -43,8 +43,9 @@ android {
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
         debug {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
