@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -13,12 +15,12 @@ plugins {
 
 android {
     namespace 'com.digiventure.ventnote'
-    compileSdk 36
+    compileSdk = 36
 
     defaultConfig {
         applicationId "com.digiventure.ventnote"
         minSdk 23
-        targetSdk 36
+        targetSdk = 36
         versionCode 45
         versionName "1.2.0"
 
@@ -57,8 +59,10 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 
     buildFeatures {
@@ -70,24 +74,20 @@ android {
         kotlinCompilerExtensionVersion '1.5.15'
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
 
     packaging {
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-            excludes += 'META-INF/DEPENDENCIES'
-            excludes += 'META-INF/LICENSE'
-            excludes += 'META-INF/LICENSE.txt'
-            excludes += 'META-INF/license.txt'
-            excludes += 'META-INF/NOTICE'
-            excludes += 'META-INF/NOTICE.txt'
-            excludes += 'META-INF/notice.txt'
-            excludes += 'META-INF/ASL2.0'
-            excludes += 'META-INF/*.kotlin_module'
-            excludes += 'META-INF/services/org.jetbrains.kotlin.*'
+            excludes.add('/META-INF/{AL2.0,LGPL2.1}')
+            excludes.add('META-INF/DEPENDENCIES')
+            excludes.add('META-INF/LICENSE')
+            excludes.add('META-INF/LICENSE.txt')
+            excludes.add('META-INF/license.txt')
+            excludes.add('META-INF/NOTICE')
+            excludes.add('META-INF/NOTICE.txt')
+            excludes.add('META-INF/notice.txt')
+            excludes.add('META-INF/ASL2.0')
+            excludes.add('META-INF/*.kotlin_module')
+            excludes.add('META-INF/services/org.jetbrains.kotlin.*')
         }
     }
 

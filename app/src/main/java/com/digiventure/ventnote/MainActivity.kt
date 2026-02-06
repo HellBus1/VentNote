@@ -47,12 +47,7 @@ class MainActivity : ComponentActivity() {
 
         // Initialize AppUpdate components early (must register launcher before STARTED)
         appUpdateManager = AppUpdateManagerFactory.create(this)
-        updateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            if (result.resultCode != RESULT_OK) {
-                // If update fails or is cancelled, we don't force a re-check here
-                // unless it was an IMMEDIATE update, but usually, we just let it be.
-            }
-        }
+        updateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {}
         addUpdateStatusListener()
 
         // Check for updates automatically on startup
