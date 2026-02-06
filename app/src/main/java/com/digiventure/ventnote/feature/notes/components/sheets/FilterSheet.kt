@@ -11,13 +11,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Sort
-import androidx.compose.material.icons.outlined.ArrowDownward
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.SwapVert
-import androidx.compose.material.icons.outlined.Title
-import androidx.compose.material.icons.outlined.Update
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Refresh
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,16 +62,16 @@ fun FilterSheet(
     // Memoized sort options with constants mapping
     val sortOptions = remember {
         listOf(
-            SortOption(R.string.sort_title, Constants.TITLE, Icons.Outlined.Title),
-            SortOption(R.string.sort_created_date, Constants.CREATED_AT, Icons.Outlined.DateRange),
-            SortOption(R.string.sort_modified_date, Constants.UPDATED_AT, Icons.Outlined.Update)
+            SortOption(R.string.sort_title, Constants.TITLE, Icons.Filled.Info),
+            SortOption(R.string.sort_created_date, Constants.CREATED_AT, Icons.Filled.DateRange),
+            SortOption(R.string.sort_modified_date, Constants.UPDATED_AT, Icons.Filled.Refresh)
         )
     }
 
     val orderOptions = remember {
         listOf(
-            OrderOption(R.string.order_ascending, Constants.ASCENDING, Icons.Outlined.ArrowUpward),
-            OrderOption(R.string.order_descending, Constants.DESCENDING, Icons.Outlined.ArrowDownward)
+            OrderOption(R.string.order_ascending, Constants.ASCENDING, Icons.Filled.KeyboardArrowUp),
+            OrderOption(R.string.order_descending, Constants.DESCENDING, Icons.Filled.KeyboardArrowDown)
         )
     }
 
@@ -94,7 +94,7 @@ fun FilterSheet(
         ) {
             FilterSection(
                 title = stringResource(R.string.sort_by),
-                icon = Icons.AutoMirrored.Outlined.Sort
+                icon = Icons.AutoMirrored.Filled.List
             ) {
                 LazyRow (
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -117,7 +117,7 @@ fun FilterSheet(
             // Order By Section
             FilterSection(
                 title = stringResource(R.string.order_by),
-                icon = Icons.Outlined.SwapVert
+                icon = Icons.AutoMirrored.Filled.List
             ) {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),

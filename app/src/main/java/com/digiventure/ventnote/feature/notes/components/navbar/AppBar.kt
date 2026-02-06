@@ -14,15 +14,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Sort
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -134,7 +132,7 @@ private fun SelectionTitle(
                 }
         ) {
             Icon(
-                imageVector = Icons.Default.CheckCircle,
+                imageVector = Icons.Filled.Check,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
@@ -217,7 +215,7 @@ private fun EnhancedDropdownMenu(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        imageVector = if (allSelected) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
+                        imageVector = if (allSelected) Icons.Filled.Check else Icons.Filled.Check,
                         contentDescription = null,
                         tint = if (allSelected) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -270,7 +268,7 @@ private fun EnhancedDropdownMenu(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        imageVector = Icons.Default.RadioButtonUnchecked,
+                        imageVector = Icons.Filled.Close,
                         contentDescription = null,
                         tint = if (noneSelected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -385,7 +383,7 @@ fun TrailingMenuIcons(
             modifier = Modifier.semantics { testTag = TestTags.SORT_ICON_BUTTON }
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Outlined.Sort,
+                imageVector = Icons.AutoMirrored.Filled.List,
                 contentDescription = stringResource(R.string.sort_nav_icon),
                 tint = MaterialTheme.colorScheme.onSurface
             )

@@ -2,7 +2,7 @@ package com.digiventure.ventnote.feature.share_preview.components.navbar
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +43,7 @@ fun SharePreviewAppBar(
             }
         },
         actions = {
-            TopNavBarIcon(Icons.AutoMirrored.Filled.Help, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
+            TopNavBarIcon(Icons.Filled.Info, stringResource(R.string.menu_nav_icon), Modifier.semantics {  }) {
                 onHelpPressed()
             }
         },
