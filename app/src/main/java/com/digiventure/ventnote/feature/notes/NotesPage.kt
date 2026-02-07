@@ -137,7 +137,11 @@ fun NotesPage(
     }
 
     LaunchedEffect(loadingState) {
-        showLoadingDialog = loadingState == true
+        // Only show loading dialog if there's already some data or if it's a long operation
+        // For initial load, we prefer a non-blocking experience
+        if (filteredNotes.isNotEmpty()) {
+            showLoadingDialog = loadingState == true
+        }
     }
 
     val noteIsDeletedText = stringResource(R.string.note_is_successfully_deleted)

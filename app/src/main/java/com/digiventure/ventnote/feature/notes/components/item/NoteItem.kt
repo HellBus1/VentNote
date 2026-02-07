@@ -109,10 +109,7 @@ fun NotesItem(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = DateUtil.convertDateString(
-                            "EEEE, MMMM d h:mm a",
-                            data.updatedAt.toString()
-                        ),
+                        text = DateUtil.formatNoteDate(data.updatedAt),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodySmall.copy(

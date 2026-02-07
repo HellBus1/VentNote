@@ -1,14 +1,18 @@
 package com.digiventure.ventnote.data.persistence
 
+import android.app.Application
 import com.digiventure.ventnote.commons.ErrorMessage
+import com.digiventure.ventnote.feature.widget.NoteWidgetProvider
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class NoteLocalService @Inject constructor(
+    private val app: Application,
     private val proxy: DatabaseProxy
 ) {
     fun getNoteList(sortBy: String, order: String): Flow<Result<List<NoteModel>>> {
@@ -23,6 +27,8 @@ class NoteLocalService @Inject constructor(
         flow {
             val result = (proxy.dao().deleteNotes(*notes) == notes.size)
             emit(Result.success(result))
+        }.onEach {
+            if (it.isSuccess) NoteWidgetProvider.refreshWidgets(app)
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_DELETE_ROOM)))
         }
@@ -39,6 +45,8 @@ class NoteLocalService @Inject constructor(
         flow {
             val result = proxy.dao().updateWithTimestamp(note) >= 1
             emit(Result.success(result))
+        }.onEach {
+            if (it.isSuccess) NoteWidgetProvider.refreshWidgets(app)
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPDATE_NOTE_ROOM)))
         }
@@ -47,6 +55,8 @@ class NoteLocalService @Inject constructor(
         flow {
             val result = proxy.dao().insertWithTimestamp(note) != -1L
             emit(Result.success(result))
+        }.onEach {
+            if (it.isSuccess) NoteWidgetProvider.refreshWidgets(app)
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_INSERT_NOTE_ROOM)))
         }
