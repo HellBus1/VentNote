@@ -2,6 +2,9 @@ package com.digiventure.ventnote.module
 
 import android.content.Context
 import com.digiventure.ventnote.data.local.NoteDataStore
+import com.digiventure.ventnote.feature.widget.NoteWidgetRefresher
+import com.digiventure.ventnote.feature.widget.WidgetRefresher
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,18 +19,24 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class ApplicationModule {
-    @Provides
+abstract class ApplicationModule {
+    @Binds
     @Singleton
-    fun provideCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob())
+    abstract fun bindWidgetRefresher(refresher: NoteWidgetRefresher): WidgetRefresher
 
-    @Provides
-    @Singleton
-    fun provideExecutorCoroutineDispatcher(): ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    companion object {
+        @Provides
+        @Singleton
+        fun provideCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob())
 
-    @Provides
-    @Singleton
-    fun provideNoteDataStore(@ApplicationContext context: Context): NoteDataStore {
-        return NoteDataStore(context)
+        @Provides
+        @Singleton
+        fun provideExecutorCoroutineDispatcher(): ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+
+        @Provides
+        @Singleton
+        fun provideNoteDataStore(@ApplicationContext context: Context): NoteDataStore {
+            return NoteDataStore(context)
+        }
     }
 }

@@ -1,8 +1,10 @@
 package com.digiventure.ventnote.data.google_drive
 
+import android.app.Application
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.ventnote.data.persistence.NoteDAO
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.feature.widget.WidgetRefresher
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
@@ -20,8 +22,10 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class GoogleDriveServiceShould: BaseUnitTest() {
+    private val app: Application = mock()
     private val proxy: DatabaseProxy = mock()
     private val dao: NoteDAO = mock()
+    private val refresher: WidgetRefresher = mock()
     private val noteList: List<NoteModel> = listOf()
     private val fileName: String = "backup.json"
     private val fileId: String = "1"
@@ -31,7 +35,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
 
     @Before
     fun setup() {
-        service = GoogleDriveService(proxy)
+        service = GoogleDriveService(app, proxy, refresher)
     }
 
     @Test
@@ -72,13 +76,14 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.get(fileId)).thenReturn(getMock)
         whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
-        whenever(dao.upsertNotesWithTimestamp(any())).thenAnswer { }
+        whenever(dao.upsertNotes(any())).thenAnswer { }
         whenever(proxy.dao()).thenReturn(dao)
 
         val result = service.readFile(fileId, drive)
 
         assertTrue(result.isSuccess)
-        verify(proxy.dao(), times(1)).upsertNotesWithTimestamp(any())
+        verify(proxy.dao(), times(1)).upsertNotes(any())
+        verify(refresher, times(1)).refresh(app)
     }
 
     @Test
@@ -103,7 +108,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.get(fileId)).thenReturn(getMock)
         whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
-        whenever(dao.upsertNotesWithTimestamp(any())).thenAnswer {
+        whenever(dao.upsertNotes(any())).thenAnswer {
             throw exception
         }
         whenever(proxy.dao()).thenReturn(dao)

@@ -8,10 +8,15 @@ plugins {
     id 'kotlin-parcelize'
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.10'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.2.10'
+}
 
-    // Google Services & Firebase
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
+// Apply Google Services and Crashlytics only if google-services.json exists
+if (file('google-services.json').exists()) {
+    apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'com.google.firebase.crashlytics'
+    println 'Google Services and Crashlytics plugins applied'
+} else {
+    println 'google-services.json not found. Skipping Google Services and Crashlytics plugins'
 }
 
 android {

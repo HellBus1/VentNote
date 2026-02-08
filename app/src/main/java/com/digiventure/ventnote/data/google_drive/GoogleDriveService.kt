@@ -2,7 +2,7 @@ package com.digiventure.ventnote.data.google_drive
 
 import android.app.Application
 import com.digiventure.ventnote.data.persistence.NoteModel
-import com.digiventure.ventnote.feature.widget.NoteWidgetProvider
+import com.digiventure.ventnote.feature.widget.WidgetRefresher
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.google.api.client.http.ByteArrayContent
 import com.google.api.services.drive.Drive
@@ -16,6 +16,7 @@ import javax.inject.Inject
 class GoogleDriveService @Inject constructor(
     private val app: Application,
     private val proxy: DatabaseProxy,
+    private val refresher: WidgetRefresher
 ) {
     companion object {
         private const val FILE_MIME_TYPE = "application/json"
@@ -70,7 +71,7 @@ class GoogleDriveService @Inject constructor(
             proxy.dao().upsertNotes(notes)
             
             // Refresh widget after restore
-            NoteWidgetProvider.refreshWidgets(app)
+            refresher.refresh(app)
             
             Result.success(Unit)
         } catch (e: Exception) {

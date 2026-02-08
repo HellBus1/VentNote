@@ -1,7 +1,9 @@
 package com.digiventure.ventnote.data.persistence
 
+import android.app.Application
 import com.digiventure.utils.BaseUnitTest
 import com.digiventure.ventnote.commons.Constants
+import com.digiventure.ventnote.feature.widget.WidgetRefresher
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -16,8 +18,10 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class NoteLocalServiceShould: BaseUnitTest() {
+    private val app: Application = mock()
     private val proxy: DatabaseProxy = mock()
     private val dao: NoteDAO = mock()
+    private val refresher: WidgetRefresher = mock()
     private val noteList = mock<List<NoteModel>>()
     private val note = mock<NoteModel>()
     private val sortBy = Constants.CREATED_AT
@@ -36,7 +40,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
     @Before
     fun setup() {
         whenever(proxy.dao()).thenReturn(dao)
-        service = NoteLocalService(proxy)
+        service = NoteLocalService(app, proxy, refresher)
     }
 
     /**
@@ -142,9 +146,11 @@ class NoteLocalServiceShould: BaseUnitTest() {
      * */
     @Test
     fun deleteNoteListFromDAO() = runTest {
+        runBlocking { whenever(dao.deleteNotes(note)).thenReturn(1) }
         service.deleteNoteList(note).first()
 
         verify(dao, times(1)).deleteNotes(note)
+        verify(refresher, times(1)).refresh(app)
     }
 
     @Test
@@ -173,9 +179,11 @@ class NoteLocalServiceShould: BaseUnitTest() {
      * */
     @Test
     fun updateNoteFromDAO() = runTest {
+        runBlocking { whenever(dao.updateWithTimestamp(note)).thenReturn(1) }
         service.updateNoteList(note).first()
 
         verify(dao, times(1)).updateWithTimestamp(note)
+        verify(refresher, times(1)).refresh(app)
     }
 
     @Test
@@ -204,9 +212,11 @@ class NoteLocalServiceShould: BaseUnitTest() {
      * */
     @Test
     fun insertNoteFromDAO() = runTest {
+        runBlocking { whenever(dao.insertWithTimestamp(note)).thenReturn(1L) }
         service.insertNote(note).first()
 
         verify(dao, times(1)).insertWithTimestamp(note)
+        verify(refresher, times(1)).refresh(app)
     }
 
     @Test

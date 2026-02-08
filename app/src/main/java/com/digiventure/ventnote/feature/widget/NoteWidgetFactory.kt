@@ -5,17 +5,20 @@ import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.digiventure.ventnote.R
-import com.digiventure.ventnote.config.NoteDatabase
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.digiventure.ventnote.data.persistence.NoteModel
 
-class NoteWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
+class NoteWidgetFactory(
+    private val context: Context,
+    private val proxy: DatabaseProxy
+) : RemoteViewsService.RemoteViewsFactory {
     private var notes: List<NoteModel> = emptyList()
 
     override fun onCreate() {}
 
     override fun onDataSetChanged() {
         // Fetch notes from database
-        notes = NoteDatabase.getInstance(context).dao().getSyncNotes()
+        notes = proxy.dao().getSyncNotes()
     }
 
     override fun onDestroy() {
