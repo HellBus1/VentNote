@@ -12,6 +12,6 @@ class NoteCreationPageMockVM: ViewModel(), NoteCreationPageBaseVM {
     override val descriptionText: MutableState<String> = mutableStateOf("")
 
     override suspend fun addNote(note: NoteModel): Result<Boolean> {
-        TODO("Not yet implemented")
+        return Result.success(true)
     }
 }

@@ -54,30 +54,13 @@
    void traceEventEnd();
 }
 
-# Google Play Services Auth
--keep class com.google.android.gms.auth.** { *; }
--keep class com.google.android.gms.common.** { *; }
--keep class com.google.api.client.** { *; }
--keep class com.google.oauth.client.** { *; }
--keep class com.google.http.client.** { *; }
--keep class com.google.api.client.json.** { *; }
--keep class com.google.api.client.http.** { *; }
--keep class com.google.api.client.googleapis.** { *; }
+# Google API Client & Auth (Targeted)
+-keep class * extends com.google.api.client.json.GenericJson { *; }
+-keep class com.google.api.client.util.** { *; }
 
-# Google Drive API
--keep class com.google.api.services.drive.** { *; }
--keep class com.google.api.client.googleapis.services.** { *; }
-
-# Google API Client for Android
--keep class com.google.api.client.googleapis.extensions.android.** { *; }
--keep class com.google.api.client.extensions.android.** { *; }
-
-# Keep all classes related to Google Auth API
--keep class com.google.api.services.** { *; }
--keep class com.google.auth.** { *; }
--keep class com.google.api.client.auth.** { *; }
--keep class com.google.http.client.auth.** { *; }
--keep class com.google.oauth.client.auth.** { *; }
+# Google Drive API Models
+-keep class com.google.api.services.drive.model.** { *; }
+-keep class com.google.api.services.drive.Drive$Files$** { *; }
 
 -keep class com.google.android.gms.auth.api.signin.GoogleSignInClient {
     *;
@@ -98,8 +81,8 @@
   @com.google.api.client.util.Value *;
 }
 
-# Room database
--keep class androidx.room.** { *; }
+# Room database (Targeted)
+# -keep class androidx.room.** { *; } # Broad rule removed
 -keep class * extends androidx.room.RoomDatabase {
     <init>(...);
 }
@@ -125,13 +108,7 @@
 # If NoteModel has inner classes, keep them too
 -keep class com.digiventure.ventnote.data.persistence.NoteModel$* { *; }
 
-# Keep the GoogleDriveService class and all its methods
--keep class com.digiventure.ventnote.data.google_drive.GoogleDriveService { *; }
 
-# Prevent obfuscation of the DatabaseProxy class as it is used within GoogleDriveService
--keep class com.digiventure.ventnote.module.proxy.DatabaseProxy { *; }
-
--keep class com.digiventure.ventnote.feature.backup.viewmodel.AuthVM
 
 # Keep any classes that are used in Gson serialization
 -keep class * implements com.google.gson.TypeAdapterFactory

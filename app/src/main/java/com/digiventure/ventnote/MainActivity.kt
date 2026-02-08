@@ -1,5 +1,6 @@
 package com.digiventure.ventnote
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,16 +13,22 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.components.dialog.TextDialog
-import com.digiventure.ventnote.feature.notes.components.drawer.NavDrawer
+import com.digiventure.ventnote.feature.drawer.NavDrawer
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.digiventure.ventnote.navigation.NavGraph
 import com.digiventure.ventnote.navigation.PageNavigation
-import com.digiventure.ventnote.ui.theme.VentNoteTheme
+import com.digiventure.ventnote.ui.theme.components.VentNoteTheme
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -31,8 +38,11 @@ import com.google.android.play.core.install.model.AppUpdateType.FLEXIBLE
 import com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -40,11 +50,34 @@ class MainActivity : ComponentActivity() {
     private lateinit var appUpdateManager: AppUpdateManager
     private var isDialogShowed = false
     private lateinit var updateLauncher: ActivityResultLauncher<IntentSenderRequest>
+    private var currentIntent by mutableStateOf<Intent?>(null)
+
+    @Inject
+    lateinit var databaseProxy: DatabaseProxy
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startInAppUpdateCheck()
+
+        if (BuildConfig.ENABLE_CRASHLYTICS) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
+            }
+        }
+
+        // Pre-warm the database in the background to avoid main-thread blockage on first access
+        lifecycleScope.launch(Dispatchers.IO) {
+            databaseProxy.getObject()
+        }
+
+        currentIntent = intent
+
+        // Initialize AppUpdate components early (must register launcher before STARTED)
+        appUpdateManager = AppUpdateManagerFactory.create(this)
+        updateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {}
+        addUpdateStatusListener()
+
         enableEdgeToEdge()
+
         setContent {
             VentNoteTheme {
                 val navController = rememberNavController()
@@ -53,8 +86,30 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
-
                 val coroutineScope = rememberCoroutineScope()
+
+                // Handle intent from Widget
+                androidx.compose.runtime.LaunchedEffect(currentIntent) {
+                    currentIntent?.let { intent ->
+                        val noteId = intent.getStringExtra("noteId")
+                        val actionCreate = intent.getBooleanExtra("action_create", false)
+
+                        if (noteId != null) {
+                            navigationActions.navigateToDetailPage(noteId.toInt())
+                            clearIntent()
+                            currentIntent = null
+                        } else if (actionCreate) {
+                            navigationActions.navigateToCreatePage()
+                            clearIntent()
+                            currentIntent = null
+                        }
+                    }
+                }
+
+                // Check for updates automatically on startup without blocking initial frame
+                LaunchedEffect(Unit) {
+                    checkUpdate(isManual = false)
+                }
 
                 Surface(
                     modifier = Modifier.safeDrawingPadding(),
@@ -63,11 +118,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavDrawer(
                         drawerState = drawerState,
-                        onError = {
-
-                        },
+                        onError = {},
                         onBackupPressed = {
                             navigationActions.navigateToBackupPage()
+                        },
+                        onUpdateCheckPressed = {
+                            checkUpdate(isManual = true)
                         },
                         content = {
                             NavGraph(navHostController = navController, openDrawer = {
@@ -94,22 +150,6 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Initializes the in-app update process by creating an AppUpdateManager,
-     * registering an activity result launcher for handling update confirmations,
-     * setting up an update status listener, and initiating the update check.
-     */
-    private fun startInAppUpdateCheck() {
-        appUpdateManager = AppUpdateManagerFactory.create(this)
-        updateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            if (result.resultCode != RESULT_OK) {
-                checkUpdate()
-            }
-        }
-        addUpdateStatusListener()
-        checkUpdate()
-    }
-
-    /**
      * Adds a listener to handle app update installation status changes.
      * 1. After the update is downloaded, show a dialog and request user confirmation to restart the app.
      */
@@ -127,7 +167,7 @@ class MainActivity : ComponentActivity() {
      * Checks for available app updates and initiates the update flow if an update is available and allowed.
      * 1. Before starting an update, register a listener for updates.
      */
-    private fun checkUpdate() {
+    private fun checkUpdate(isManual: Boolean = false) {
         appUpdateManager.registerListener(installStateUpdatedListener)
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
@@ -142,6 +182,13 @@ class MainActivity : ComponentActivity() {
                         return@addOnSuccessListener
                     }
                 }
+            } else if (isManual) {
+                android.widget.Toast.makeText(this, "No update available", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+        if (isManual) {
+            appUpdateInfoTask.addOnFailureListener {
+                android.widget.Toast.makeText(this, "Failed to check for update", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -181,5 +228,16 @@ class MainActivity : ComponentActivity() {
 
     private fun showDialogForCompleteUpdate() {
         isDialogShowed = true
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        currentIntent = intent
+    }
+
+    private fun clearIntent() {
+        intent?.removeExtra("noteId")
+        intent?.removeExtra("action_create")
     }
 }

@@ -1,6 +1,6 @@
 package com.digiventure.ventnote.feature.notes
 
-import android.content.pm.ActivityInfo
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +35,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
@@ -50,7 +49,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
-import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
@@ -75,8 +73,6 @@ fun NotesPage(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var searchBarHeightPx by remember { mutableFloatStateOf(0f) }
 
-    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
     val navigationActions = remember(navHostController) {
         PageNavigation(navHostController)
     }
@@ -88,19 +84,28 @@ fun NotesPage(
     val isMarking by viewModel.isMarking
     val markedNoteList = viewModel.markedNoteList
 
+    // Debounced search query
+    var debouncedSearchQuery by remember { mutableStateOf("") }
+
+    // Debounce search input
+    LaunchedEffect(searchQuery) {
+        kotlinx.coroutines.delay(300) // 300ms debounce delay
+        debouncedSearchQuery = searchQuery
+    }
+
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    // Memoized filtered notes with proper dependencies
+    // Memoized filtered notes with proper dependencies - using debounced query
     val filteredNotes by remember {
         derivedStateOf {
             val notes = noteListState?.getOrNull() ?: emptyList()
-            if (searchQuery.isBlank()) {
+            if (debouncedSearchQuery.isBlank()) {
                 notes
             } else {
                 notes.filter { note ->
-                    note.title.contains(searchQuery, ignoreCase = true) ||
-                            note.note.contains(searchQuery, ignoreCase = true)
+                    note.title.contains(debouncedSearchQuery, ignoreCase = true) ||
+                            note.note.contains(debouncedSearchQuery, ignoreCase = true)
                 }
             }
         }
@@ -132,7 +137,11 @@ fun NotesPage(
     }
 
     LaunchedEffect(loadingState) {
-        showLoadingDialog = loadingState == true
+        // Only show loading dialog if there's already some data or if it's a long operation
+        // For initial load, we prefer a non-blocking experience
+        if (filteredNotes.isNotEmpty()) {
+            showLoadingDialog = loadingState == true
+        }
     }
 
     val noteIsDeletedText = stringResource(R.string.note_is_successfully_deleted)
@@ -264,9 +273,6 @@ fun NotesPage(
                                     searchBarHeightPx = coords.size.height.toFloat()
                                     scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
                                 }
-                                .graphicsLayer {
-                                    translationY = scrollBehavior.state.heightOffset
-                                }
                                 .fillMaxWidth()
                                 .padding(16.dp, 24.dp, 16.dp, 8.dp)
                         ) {
@@ -336,11 +342,10 @@ fun NotesPage(
 
 @Preview
 @Composable
+@SuppressLint("ViewModelConstructorInComposable")
 fun NotesPagePreview() {
     NotesPage(
         navHostController = rememberNavController(),
         viewModel = NotesPageMockVM()
-    ) {
-
-    }
+    ) { }
 }

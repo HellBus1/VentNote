@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWidgetBackground"
+    android:orientation="vertical"
+    android:padding="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_widget_background"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="VentNote"
+            android:textColor="@color/colorWidgetHeaderText"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:letterSpacing="0.01" />
+
+        <ImageButton
+            android:id="@+id/widget_add_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_add"
+            android:scaleType="centerInside"
+            android:tint="@color/colorWidgetHeaderText" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/widget_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="4dp"
+        android:layout_marginHorizontal="6dp"
+        android:scrollbars="none" />
+
+    <TextView
+        android:id="@+id/widget_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="No notes found"
+        android:textColor="@color/colorWidgetTextSecondary"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+</LinearLayout>

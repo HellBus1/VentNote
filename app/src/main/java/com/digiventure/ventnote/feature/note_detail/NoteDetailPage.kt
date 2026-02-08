@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.note_detail
 
-import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -40,7 +39,6 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.Constants.EMPTY_STRING
 import com.digiventure.ventnote.commons.TestTags
-import com.digiventure.ventnote.components.LockScreenOrientation
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.feature.note_detail.components.navbar.EnhancedBottomAppBar
@@ -61,8 +59,6 @@ fun NoteDetailPage(
     viewModel: NoteDetailPageBaseVM = hiltViewModel<NoteDetailPageVM>(),
     id: String
 ) {
-    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
     val navigationActions = remember(navHostController) {
         PageNavigation(navHostController)
     }
@@ -178,12 +174,6 @@ fun NoteDetailPage(
 
     LaunchedEffect(noteDetailState) {
         initData()
-    }
-
-    LaunchedEffect(isEditingState) {
-        if (!isEditingState) {
-            focusManager.clearFocus()
-        }
     }
 
     LaunchedEffect(loadingState) {

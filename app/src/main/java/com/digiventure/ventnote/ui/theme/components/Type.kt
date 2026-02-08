@@ -1,4 +1,4 @@
-package com.digiventure.ventnote.ui.theme
+package com.digiventure.ventnote.ui.theme.components
 
 import androidx.compose.material3.Typography
 

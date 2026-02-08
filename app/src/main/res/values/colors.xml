@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorWidgetBackground">#f2f5fa</color>
+    <color name="colorWidgetItemBackground">#FFFFFF</color>
+    <color name="colorWidgetTextPrimary">#484b51</color>
+    <color name="colorWidgetTextSecondary">#777777</color>
+    <color name="colorWidgetHeader">#2559bd</color>
+    <color name="colorWidgetHeaderText">#FFFFFF</color>
 </resources>

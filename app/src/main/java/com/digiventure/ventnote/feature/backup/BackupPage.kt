@@ -1,6 +1,5 @@
 package com.digiventure.ventnote.feature.backup
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -167,7 +166,6 @@ fun BackupPage(
                                 deleteConfirmationDialogState.value = true
                             },
                             successfullyRestoredRequest = {
-                                Log.e("hehe event", "restored")
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = restoredMessage,
@@ -176,7 +174,6 @@ fun BackupPage(
                                 }
                             },
                             successfullyDeletedRequest = {
-                                Log.e("hehe event", "deleted")
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
                                         message = deletedMessage,
@@ -284,7 +281,7 @@ private fun SignedOutStateContent(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.CloudOff,
+                    imageVector = Icons.Filled.Lock,
                     contentDescription = null,
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
