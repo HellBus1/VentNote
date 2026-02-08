@@ -176,12 +176,6 @@ fun NoteDetailPage(
         initData()
     }
 
-    LaunchedEffect(isEditingState) {
-        if (!isEditingState) {
-            focusManager.clearFocus()
-        }
-    }
-
     LaunchedEffect(loadingState) {
         openLoadingDialog.value = loadingState == true
     }

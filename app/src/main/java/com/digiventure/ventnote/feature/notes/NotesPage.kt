@@ -84,19 +84,28 @@ fun NotesPage(
     val isMarking by viewModel.isMarking
     val markedNoteList = viewModel.markedNoteList
 
+    // Debounced search query
+    var debouncedSearchQuery by remember { mutableStateOf("") }
+
+    // Debounce search input
+    LaunchedEffect(searchQuery) {
+        kotlinx.coroutines.delay(300) // 300ms debounce delay
+        debouncedSearchQuery = searchQuery
+    }
+
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    // Memoized filtered notes with proper dependencies
+    // Memoized filtered notes with proper dependencies - using debounced query
     val filteredNotes by remember {
         derivedStateOf {
             val notes = noteListState?.getOrNull() ?: emptyList()
-            if (searchQuery.isBlank()) {
+            if (debouncedSearchQuery.isBlank()) {
                 notes
             } else {
                 notes.filter { note ->
-                    note.title.contains(searchQuery, ignoreCase = true) ||
-                            note.note.contains(searchQuery, ignoreCase = true)
+                    note.title.contains(debouncedSearchQuery, ignoreCase = true) ||
+                            note.note.contains(debouncedSearchQuery, ignoreCase = true)
                 }
             }
         }
@@ -128,7 +137,11 @@ fun NotesPage(
     }
 
     LaunchedEffect(loadingState) {
-        showLoadingDialog = loadingState == true
+        // Only show loading dialog if there's already some data or if it's a long operation
+        // For initial load, we prefer a non-blocking experience
+        if (filteredNotes.isNotEmpty()) {
+            showLoadingDialog = loadingState == true
+        }
     }
 
     val noteIsDeletedText = stringResource(R.string.note_is_successfully_deleted)

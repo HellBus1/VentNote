@@ -13,7 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Check
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +65,7 @@ fun NotesItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isMarked) {
                     TopNavBarIcon(
-                        image = Icons.Filled.CheckCircle,
+                        image = Icons.Filled.Check,
                         "",
                         modifier = Modifier
                             .padding(start = 12.dp)
@@ -108,10 +109,7 @@ fun NotesItem(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = DateUtil.convertDateString(
-                            "EEEE, MMMM d h:mm a",
-                            data.updatedAt.toString()
-                        ),
+                        text = DateUtil.formatNoteDate(data.updatedAt),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodySmall.copy(

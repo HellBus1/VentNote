@@ -1,26 +1,29 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.10'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.2.10'
 
-    // disabled for internal purpose (if you want to enable, you must create firebase project first)
-//    id 'com.google.gms.google-services'
-//    id 'com.google.firebase.crashlytics'
+    // Google Services & Firebase
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
     namespace 'com.digiventure.ventnote'
-    compileSdk 36
+    compileSdk = 36
 
     defaultConfig {
         applicationId "com.digiventure.ventnote"
         minSdk 23
-        targetSdk 36
-        versionCode 43
-        versionName "1.1.1"
+        targetSdk = 36
+        versionCode 45
+        versionName "1.2.0"
 
         testInstrumentationRunner "com.digiventure.utils.CustomTestRunner"
         vectorDrawables {
@@ -37,23 +40,31 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "true"
         }
         debug {
             minifyEnabled false
+            shrinkResources false
+            debuggable true
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
         }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 
     buildFeatures {
@@ -65,20 +76,29 @@ android {
         kotlinCompilerExtensionVersion '1.5.15'
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
 
     packaging {
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-            excludes += 'META-INF/*'
+            excludes.add('/META-INF/{AL2.0,LGPL2.1}')
+            excludes.add('META-INF/DEPENDENCIES')
+            excludes.add('META-INF/LICENSE')
+            excludes.add('META-INF/LICENSE.txt')
+            excludes.add('META-INF/license.txt')
+            excludes.add('META-INF/NOTICE')
+            excludes.add('META-INF/NOTICE.txt')
+            excludes.add('META-INF/notice.txt')
+            excludes.add('META-INF/ASL2.0')
+            excludes.add('META-INF/*.kotlin_module')
+            excludes.add('META-INF/services/org.jetbrains.kotlin.*')
         }
     }
 
     lint {
         abortOnError false
+    }
+
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 }
 
@@ -112,6 +132,8 @@ dependencies {
 
     // Compose Navigation
     implementation "androidx.navigation:navigation-compose:$navigation_compose_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0"
 
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_version"
@@ -120,9 +142,6 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$dagger_version"
     kapt "com.google.dagger:hilt-android-compiler:$dagger_version"
     implementation "androidx.hilt:hilt-navigation-compose:$hilt_navigation_compose_version"
-
-    // Material Icon Extension
-    implementation "androidx.compose.material:material-icons-extended:$material_icons_version"
 
     // So, make sure you also include that repository in your project's build.gradle file.
     implementation "com.google.android.play:app-update:$play_app_update_version"
@@ -158,6 +177,8 @@ dependencies {
     testImplementation "org.mockito:mockito-inline:$mockito_inline_version"
 
     androidTestImplementation "androidx.test.ext:junit-ktx:$junit_ktx_version"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0"
 
     testImplementation "androidx.arch.core:core-testing:$core_testing_version"
 
@@ -168,13 +189,14 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebase_bom_version")
     // When using the BoM, you don't specify versions in Firebase library dependencies
     // Add the dependency for the Firebase SDK for Google Analytics
-    implementation "com.google.firebase:firebase-analytics"
     implementation "com.google.firebase:firebase-crashlytics"
 
     //Google Drive API
     implementation "com.google.http-client:google-http-client-gson:$http_client_gson_version"
     implementation "com.google.apis:google-api-services-drive:$google_drive_service_version"
     implementation "com.google.api-client:google-api-client-android:$google_api_client_version"
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
 
 kapt {
