@@ -21,6 +21,9 @@ interface NoteDAO {
             "        CASE WHEN :sortBy = 'updated_at' AND :orderBy = 'DESC' THEN updated_at END DESC")
     fun getNotes(sortBy: String, orderBy: String): Flow<List<NoteModel>>
 
+    @Query("SELECT * FROM note_table ORDER BY created_at DESC")
+    fun getSyncNotes(): List<NoteModel>
+
     @Query("SELECT * FROM note_table WHERE id = :id")
     fun getNoteDetail(id: Int): Flow<NoteModel>
 
