@@ -60,9 +60,9 @@ private fun openPlayStore(context: Context, appURL: String, onError: (String) ->
     }
     try {
         context.startActivity(playIntent)
-    } catch (e: ActivityNotFoundException) {
+    } catch (_: ActivityNotFoundException) {
         onError("Cannot open URL: Play Store not found or no app can handle this action.")
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         onError("Cannot open URL")
     }
 }

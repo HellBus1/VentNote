@@ -110,7 +110,7 @@ class NavDrawerFeature : BaseAcceptanceTest() {
         val isInitiallyLight = try {
             composeTestRule.onNodeWithText(darkModeText, ignoreCase = true).assertIsDisplayed()
             true // It says "switch to dark", so it is currently light
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             false
         }
         

@@ -22,7 +22,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.TimeZone
 import javax.inject.Inject
 
@@ -59,7 +58,7 @@ class SharePreviewFeature : BaseAcceptanceTest() {
             try {
                 composeTestRule.onNodeWithText("Test Title").assertIsDisplayed()
                 true
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 false
             }
         }
