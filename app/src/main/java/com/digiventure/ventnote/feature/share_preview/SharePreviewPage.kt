@@ -180,6 +180,7 @@ fun SharePreviewPage(
                                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
                                         fontWeight = FontWeight.Medium
                                     ),
+                                    modifier = Modifier.semantics { testTag = TestTags.DATE_TEXT }
                                 )
                             }
                         }
@@ -193,7 +194,9 @@ fun SharePreviewPage(
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface,
                                 ),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .semantics { testTag = TestTags.TITLE_TEXT }
                             )
                         }
                     }
@@ -214,7 +217,9 @@ fun SharePreviewPage(
                                         fontWeight = FontWeight.Normal,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
                                     ),
-                                    modifier = Modifier.padding(20.dp)
+                                    modifier = Modifier
+                                        .padding(20.dp)
+                                        .semantics { testTag = TestTags.BODY_TEXT }
                                 )
                             }
                         }
@@ -235,7 +240,7 @@ fun SharePreviewPage(
             description = stringResource(R.string.share_note_information),
             isOpened = true,
             onDismissCallback = { shareNoteDialogState.value = false },
-            modifier = Modifier.semantics { }
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
         )
     }
 

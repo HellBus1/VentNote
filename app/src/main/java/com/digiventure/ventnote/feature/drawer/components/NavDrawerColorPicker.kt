@@ -31,6 +31,13 @@ import com.digiventure.ventnote.ui.theme.components.CadmiumGreenLightPrimary
 import com.digiventure.ventnote.ui.theme.components.CobaltBlueLightPrimary
 import com.digiventure.ventnote.ui.theme.components.CrimsonLightPrimary
 import com.digiventure.ventnote.ui.theme.components.PurpleLightPrimary
+import com.digiventure.ventnote.commons.TestTags
+
+data class ColorPickerOption(
+    val color: Color,
+    val name: String,
+    val tag: String
+)
 
 @Composable
 fun NavDrawerColorPicker(
@@ -40,10 +47,10 @@ fun NavDrawerColorPicker(
     onColorPicked: (color: Pair<Color, String>) -> Unit
 ) {
     val colorList = listOf(
-        Pair(PurpleLightPrimary, ColorPalletName.PURPLE),
-        Pair(CrimsonLightPrimary, ColorPalletName.CRIMSON),
-        Pair(CadmiumGreenLightPrimary, ColorPalletName.CADMIUM_GREEN),
-        Pair(CobaltBlueLightPrimary, ColorPalletName.COBALT_BLUE)
+        ColorPickerOption(PurpleLightPrimary, ColorPalletName.PURPLE, TestTags.THEME_COLOR_PURPLE),
+        ColorPickerOption(CrimsonLightPrimary, ColorPalletName.CRIMSON, TestTags.THEME_COLOR_CRIMSON),
+        ColorPickerOption(CadmiumGreenLightPrimary, ColorPalletName.CADMIUM_GREEN, TestTags.THEME_COLOR_CADMIUM_GREEN),
+        ColorPickerOption(CobaltBlueLightPrimary, ColorPalletName.COBALT_BLUE, TestTags.THEME_COLOR_COBALT_BLUE)
     )
 
     Row(
@@ -80,14 +87,15 @@ fun NavDrawerColorPicker(
                 modifier = Modifier.padding(bottom = 2.dp)
             )
             Row {
-                colorList.forEach {
+                for (option in colorList) {
                     Box(modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
                         .width(24.dp)
                         .height(24.dp)
-                        .background(it.first)
+                        .background(option.color)
+                        .semantics { testTag = option.tag }
                         .clickable {
-                            onColorPicked(it)
+                            onColorPicked(Pair(option.color, option.name))
                         })
                     Box(modifier = Modifier.padding(start = 2.dp, end = 2.dp))
                 }

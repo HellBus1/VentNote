@@ -44,6 +44,7 @@ import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPage
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +83,7 @@ fun NoteCreationPage(
                         note = viewModel.descriptionText.value
                     )
                 ).onSuccess {
-                    launch(Dispatchers.Main) {
+                    withContext(Dispatchers.Main) {
                         navHostController.popBackStack()
                         snackBarHostState.showSnackbar(
                             message = noteIsSuccessfullyAddedText,
@@ -90,7 +91,7 @@ fun NoteCreationPage(
                         )
                     }
                 }.onFailure {
-                    launch(Dispatchers.Main) {
+                    withContext(Dispatchers.Main) {
                         snackBarHostState.showSnackbar(
                             message = it.message ?: EMPTY_STRING,
                             withDismissAction = true
