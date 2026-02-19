@@ -42,6 +42,7 @@ import com.digiventure.ventnote.feature.note_creation.components.section.TitleSe
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageBaseVM
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageMockVM
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageVM
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,25 +70,27 @@ fun NoteCreationPage(
 
     // Extracted and optimized addNote function
     val noteIsSuccessfullyAddedText = stringResource(R.string.successfully_added)
-    val addNote = remember {
-        {
-            if (viewModel.titleText.value.isEmpty() || viewModel.descriptionText.value.isEmpty()) {
-                requiredDialogState.value = true
-            } else {
-                scope.launch {
-                    viewModel.addNote(
-                        NoteModel(
-                            id = 0,
-                            title = viewModel.titleText.value,
-                            note = viewModel.descriptionText.value
-                        )
-                    ).onSuccess {
+    fun addNote() {
+        if (viewModel.titleText.value.isEmpty() || viewModel.descriptionText.value.isEmpty()) {
+            requiredDialogState.value = true
+        } else {
+            scope.launch {
+                viewModel.addNote(
+                    NoteModel(
+                        id = 0,
+                        title = viewModel.titleText.value,
+                        note = viewModel.descriptionText.value
+                    )
+                ).onSuccess {
+                    launch(Dispatchers.Main) {
                         navHostController.popBackStack()
                         snackBarHostState.showSnackbar(
                             message = noteIsSuccessfullyAddedText,
                             withDismissAction = true
                         )
-                    }.onFailure {
+                    }
+                }.onFailure {
+                    launch(Dispatchers.Main) {
                         snackBarHostState.showSnackbar(
                             message = it.message ?: EMPTY_STRING,
                             withDismissAction = true
@@ -172,7 +175,8 @@ fun NoteCreationPage(
             description = stringResource(R.string.required_confirmation_text, missingFieldName),
             isOpened = requiredDialogState.value,
             onDismissCallback = { requiredDialogState.value = false },
-            onConfirmCallback = { requiredDialogState.value = false })
+            onConfirmCallback = { requiredDialogState.value = false },
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
     }
 
     if (cancelDialogState.value) {
@@ -184,7 +188,8 @@ fun NoteCreationPage(
             onConfirmCallback = {
                 navHostController.popBackStack()
                 cancelDialogState.value = false
-            })
+            },
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
     }
 }
 

@@ -31,9 +31,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageBaseVM
 
 @Composable
@@ -119,7 +121,10 @@ fun ImprovedDescriptionTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .semantics { contentDescription = bodyTextField },
+                .semantics { 
+                    contentDescription = bodyTextField
+                    testTag = TestTags.BODY_TEXT_FIELD
+                },
             placeholder = {
                 Text(
                     text = bodyInput,
