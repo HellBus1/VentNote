@@ -58,7 +58,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           arch: arm64-v8a
           target: google_apis
-          force-avd-creation: false
+          force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           disable-animations: true
           script: ./gradlew connectedDebugAndroidTest --stacktrace
