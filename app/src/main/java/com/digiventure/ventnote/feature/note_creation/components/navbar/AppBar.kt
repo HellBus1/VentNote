@@ -12,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,11 +38,11 @@ fun NoteCreationAppBar(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         navigationIcon = {
-            TopNavBarIcon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back_nav_icon), Modifier.semantics {  }) {
+            TopNavBarIcon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back_nav_icon), Modifier.semantics { testTag = TestTags.BACK_ICON_BUTTON }) {
                 onBackPressed()
             }
         },
         scrollBehavior = scrollBehavior,
-        modifier = Modifier.semantics {  },
+        modifier = Modifier.semantics { testTag = TestTags.TOP_APPBAR },
     )
 }

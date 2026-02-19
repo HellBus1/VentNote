@@ -60,9 +60,9 @@ private fun openPlayStore(context: Context, appURL: String, onError: (String) ->
     }
     try {
         context.startActivity(playIntent)
-    } catch (e: ActivityNotFoundException) {
+    } catch (_: ActivityNotFoundException) {
         onError("Cannot open URL: Play Store not found or no app can handle this action.")
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         onError("Cannot open URL")
     }
 }
@@ -109,11 +109,13 @@ fun NavDrawer(
                 NavDrawerItem(leftIcon = Icons.Filled.Search,
                     title = stringResource(id = R.string.more_apps),
                     subtitle = stringResource(id = R.string.more_apps_description),
+                    testTagName = TestTags.MORE_APPS_TILE,
                     onClick = { openPlayStore(context, devPagePath, onError) })
 
                 NavDrawerItem(leftIcon = Icons.Filled.Info,
                     title = stringResource(id = R.string.app_version),
                     subtitle = BuildConfig.VERSION_NAME,
+                    testTagName = TestTags.APP_VERSION_TILE,
                     onClick = { onUpdateCheckPressed() })
 
                 SectionTitle(title = stringResource(id = R.string.preferences))
@@ -121,6 +123,7 @@ fun NavDrawer(
                 NavDrawerColorPicker(
                     leftIcon = Icons.Filled.Settings,
                     title = stringResource(id = R.string.theme_color),
+                    testTagName = TestTags.THEME_TILE
                 ) {
                     themeViewModel.updateColorPallet(it.second)
                 }
@@ -129,6 +132,7 @@ fun NavDrawer(
                     leftIcon = Icons.Filled.Person,
                     title = stringResource(id = R.string.theme_setting),
                     currentScheme = currentSchemeName,
+                    testTagName = TestTags.COLOR_MODE_TILE
                 ) {
                     themeViewModel.updateColorScheme(it)
                 }
@@ -139,6 +143,7 @@ fun NavDrawer(
                     leftIcon = Icons.Filled.Share,
                     title = stringResource(id = R.string.backup),
                     subtitle = stringResource(id = R.string.backup_description),
+                    testTagName = TestTags.BACKUP_TILE,
                     onClick = { onBackupPressed() })
             }
         }

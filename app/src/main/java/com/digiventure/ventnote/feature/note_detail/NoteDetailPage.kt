@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.note_detail
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -51,6 +52,7 @@ import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageVM
 import com.digiventure.ventnote.navigation.PageNavigation
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,7 +113,9 @@ fun NoteDetailPage(
                     viewModel.deleteNoteList(noteData)
                         .onSuccess {
                             deleteDialogState.value = false
-                            navHostController.navigateUp()
+                            scope.launch(Dispatchers.Main) {
+                                navigationActions.navigateToNotesPage()
+                            }
                         }
                         .onFailure { error ->
                             deleteDialogState.value = false
@@ -277,7 +281,8 @@ fun NoteDetailPage(
             description = stringResource(R.string.required_confirmation_text, missingFieldName),
             isOpened = requiredDialogState.value,
             onDismissCallback = { requiredDialogState.value = false },
-            onConfirmCallback = { requiredDialogState.value = false }
+            onConfirmCallback = { requiredDialogState.value = false },
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
         )
     }
 
@@ -291,7 +296,8 @@ fun NoteDetailPage(
                 viewModel.isEditing.value = false
                 cancelDialogState.value = false
                 initData()
-            }
+            },
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
         )
     }
 
@@ -299,14 +305,16 @@ fun NoteDetailPage(
         TextDialog(
             isOpened = deleteDialogState.value,
             onDismissCallback = { deleteDialogState.value = false },
-            onConfirmCallback = { deleteNote() }
+            onConfirmCallback = { deleteNote() },
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
         )
     }
 
     if (openLoadingDialog.value) {
         LoadingDialog(
             isOpened = openLoadingDialog.value,
-            onDismissCallback = { openLoadingDialog.value = false }
+            onDismissCallback = { openLoadingDialog.value = false },
+            modifier = Modifier.semantics { testTag = TestTags.LOADING_DIALOG }
         )
     }
 
@@ -319,6 +327,7 @@ fun NoteDetailPage(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun NoteDetailPagePreview() {

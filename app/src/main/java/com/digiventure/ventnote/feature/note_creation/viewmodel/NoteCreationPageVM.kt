@@ -8,7 +8,7 @@ import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class NoteCreationPageVM @Inject constructor(
         try {
             repository.insertNote(note).onEach {
                 loader.postValue(false)
-            }.last()
+            }.first()
         } catch (e: Exception) {
             loader.postValue(false)
             Result.failure(e)

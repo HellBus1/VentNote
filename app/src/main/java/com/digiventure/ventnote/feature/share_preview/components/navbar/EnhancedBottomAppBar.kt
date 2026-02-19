@@ -32,9 +32,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +59,8 @@ fun EnhancedBottomAppBar(
                     label = stringResource(R.string.share_note),
                     onClick = onCancelClick,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.semantics { testTag = TestTags.SHARE_ICON_BUTTON }
                 )
             }
         }
@@ -70,6 +74,7 @@ private fun EnhancedBottomBarButton(
     onClick: () -> Unit,
     containerColor: Color,
     contentColor: Color,
+    modifier: Modifier = Modifier,
     isProminent: Boolean = false
 ) {
     val haptics = LocalHapticFeedback.current
@@ -82,7 +87,7 @@ private fun EnhancedBottomBarButton(
     Row (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
+        modifier = modifier
             .scale(scale)
             .clip(RoundedCornerShape(16.dp))
             .background(

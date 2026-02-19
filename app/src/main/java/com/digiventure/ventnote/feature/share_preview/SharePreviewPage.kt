@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.share_preview.components.navbar.EnhancedBottomAppBar
@@ -78,7 +80,7 @@ fun SharePreviewPage(
                 "EEE, MMM dd HH:mm yyyy",
                 note?.createdAt?.toString() ?: Date().toString()
             )
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DateUtil.convertDateString("EEE, MMM dd HH:mm yyyy", Date().toString())
         }
     }
@@ -114,7 +116,7 @@ fun SharePreviewPage(
             coroutineScope.launch {
                 try {
                     shareText(joinedText, context)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     snackBarHostState.showSnackbar(
                         message = context.getString(R.string.failed_to_share_note),
                         duration = SnackbarDuration.Short
@@ -140,6 +142,7 @@ fun SharePreviewPage(
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         modifier = Modifier
+            .semantics { testTag = TestTags.SHARE_PAGE }
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.surface,
         content = {
@@ -177,6 +180,7 @@ fun SharePreviewPage(
                                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
                                         fontWeight = FontWeight.Medium
                                     ),
+                                    modifier = Modifier.semantics { testTag = TestTags.DATE_TEXT }
                                 )
                             }
                         }
@@ -190,7 +194,9 @@ fun SharePreviewPage(
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface,
                                 ),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .semantics { testTag = TestTags.TITLE_TEXT }
                             )
                         }
                     }
@@ -211,7 +217,9 @@ fun SharePreviewPage(
                                         fontWeight = FontWeight.Normal,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
                                     ),
-                                    modifier = Modifier.padding(20.dp)
+                                    modifier = Modifier
+                                        .padding(20.dp)
+                                        .semantics { testTag = TestTags.BODY_TEXT }
                                 )
                             }
                         }
@@ -232,7 +240,7 @@ fun SharePreviewPage(
             description = stringResource(R.string.share_note_information),
             isOpened = true,
             onDismissCallback = { shareNoteDialogState.value = false },
-            modifier = Modifier.semantics { }
+            modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
         )
     }
 
