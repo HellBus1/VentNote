@@ -116,8 +116,8 @@ private fun EnhancedBottomBarButton(
     onClick: () -> Unit,
     containerColor: Color,
     contentColor: Color,
+    modifier: Modifier = Modifier,
     isProminent: Boolean = false,
-    modifier: Modifier = Modifier
 ) {
     val haptics = LocalHapticFeedback.current
     val scale by animateFloatAsState(

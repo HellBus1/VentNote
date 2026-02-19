@@ -59,7 +59,7 @@ class NoteDetailFeature : BaseAcceptanceTest() {
             try {
                 composeTestRule.onNodeWithTag(TestTags.NOTE_DETAIL_PAGE).assertIsDisplayed()
                 true
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 false
             }
         }
@@ -232,7 +232,7 @@ class NoteDetailFeature : BaseAcceptanceTest() {
             try {
                 composeTestRule.onNodeWithTag(TestTags.NOTES_PAGE).assertIsDisplayed()
                 true
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 false
             }
         }
@@ -271,7 +271,7 @@ class NoteDetailFeature : BaseAcceptanceTest() {
             try {
                 composeTestRule.onNodeWithTag(TestTags.SHARE_PAGE, useUnmergedTree = true).assertIsDisplayed()
                 true
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 false
             }
         }
@@ -290,7 +290,7 @@ class NoteDetailFeature : BaseAcceptanceTest() {
             try {
                 composeTestRule.onNodeWithTag(TestTags.NOTES_PAGE).assertIsDisplayed()
                 true
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 false
             }
         }

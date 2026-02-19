@@ -1,5 +1,6 @@
 package com.digiventure.ventnote.feature.note_detail
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -326,6 +327,7 @@ fun NoteDetailPage(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun NoteDetailPagePreview() {

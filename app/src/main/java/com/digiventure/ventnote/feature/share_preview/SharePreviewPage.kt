@@ -80,7 +80,7 @@ fun SharePreviewPage(
                 "EEE, MMM dd HH:mm yyyy",
                 note?.createdAt?.toString() ?: Date().toString()
             )
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DateUtil.convertDateString("EEE, MMM dd HH:mm yyyy", Date().toString())
         }
     }
@@ -116,7 +116,7 @@ fun SharePreviewPage(
             coroutineScope.launch {
                 try {
                     shareText(joinedText, context)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     snackBarHostState.showSnackbar(
                         message = context.getString(R.string.failed_to_share_note),
                         duration = SnackbarDuration.Short

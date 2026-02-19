@@ -108,7 +108,7 @@ class NotesFeature : BaseAcceptanceTest() {
                 composeTestRule.onNodeWithTag(TestTags.NOTE_RV, useUnmergedTree = true).assertIsDisplayed()
                 composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
                 true
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 false
             }
         }
@@ -128,7 +128,7 @@ class NotesFeature : BaseAcceptanceTest() {
             try {
                 composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR_TEXT_FIELD).assertIsDisplayed()
                 true
-            } catch (e: Throwable) {
+            } catch (_: Throwable) {
                 false
             }
         }
