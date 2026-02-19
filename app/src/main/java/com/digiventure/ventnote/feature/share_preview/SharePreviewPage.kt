@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
+import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.share_preview.components.navbar.EnhancedBottomAppBar
@@ -140,6 +142,7 @@ fun SharePreviewPage(
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         modifier = Modifier
+            .semantics { testTag = TestTags.SHARE_PAGE }
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.surface,
         content = {

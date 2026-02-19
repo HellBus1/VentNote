@@ -5,6 +5,7 @@ object TestTags {
     const val NOTES_PAGE = "notes_feature"
     const val NOTE_DETAIL_PAGE = "note_detail_page"
     const val NOTE_CREATION_PAGE = "note_creation_page"
+    const val SHARE_PAGE = "share_page"
 
     // Appbar test tags
     const val TOP_APPBAR = "top_appbar"
@@ -36,4 +37,13 @@ object TestTags {
     // Dialog Button
     const val CONFIRM_BUTTON = "confirm_button"
     const val DISMISS_BUTTON = "dismiss_button"
+
+    // Note Detail test tags
+    const val EDIT_ICON_BUTTON = "edit_icon_button"
+    const val SAVE_ICON_BUTTON = "save_icon_button"
+    const val CANCEL_ICON_BUTTON = "cancel_icon_button"
+    const val SHARE_ICON_BUTTON = "share_icon_button"
+    const val BACK_ICON_BUTTON = "back_icon_button"
+    const val TITLE_TEXT_FIELD = "title_text_field"
+    const val BODY_TEXT_FIELD = "body_text_field"
 }

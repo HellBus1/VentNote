@@ -31,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -39,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,9 +69,10 @@ fun EnhancedBottomAppBar(
                         label = stringResource(R.string.cancel),
                         onClick = onCancelClick,
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.semantics { testTag = TestTags.CANCEL_ICON_BUTTON }
                     )
-
+ 
                     // Save button in editing mode
                     EnhancedBottomBarButton(
                         icon = Icons.Filled.Check,
@@ -76,7 +80,8 @@ fun EnhancedBottomAppBar(
                         onClick = onSaveClick,
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        isProminent = true
+                        isProminent = true,
+                        modifier = Modifier.semantics { testTag = TestTags.SAVE_ICON_BUTTON }
                     )
                 } else {
                     // Edit button in view mode
@@ -85,23 +90,25 @@ fun EnhancedBottomAppBar(
                         label = stringResource(R.string.edit),
                         onClick = onEditClick,
                         containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
+                        contentColor = MaterialTheme.colorScheme.onSecondary,
+                        modifier = Modifier.semantics { testTag = TestTags.EDIT_ICON_BUTTON }
                     )
-
+ 
                     // Delete button in view mode
                     EnhancedBottomBarButton(
                         icon = Icons.Filled.Delete,
                         label = stringResource(R.string.delete),
                         onClick = onDeleteClick,
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }
                     )
                 }
             }
         }
     )
 }
-
+ 
 @Composable
 private fun EnhancedBottomBarButton(
     icon: ImageVector,
@@ -109,7 +116,8 @@ private fun EnhancedBottomBarButton(
     onClick: () -> Unit,
     containerColor: Color,
     contentColor: Color,
-    isProminent: Boolean = false
+    isProminent: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     val haptics = LocalHapticFeedback.current
     val scale by animateFloatAsState(
@@ -117,11 +125,11 @@ private fun EnhancedBottomBarButton(
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "button_scale"
     )
-
+ 
     Row (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
+        modifier = modifier
             .scale(scale)
             .clip(RoundedCornerShape(16.dp))
             .background(
