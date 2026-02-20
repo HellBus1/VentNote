@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,8 +19,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-
-
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,73 +41,83 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.commons.richtext.FormattingToolbar
+import com.digiventure.ventnote.commons.richtext.RichTextState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedBottomAppBar(
     isEditing: Boolean,
+    richTextState: RichTextState,
     onEditClick: () -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = 12.dp,
-        actions = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (isEditing) {
-                    // Cancel button in editing mode
-                    EnhancedBottomBarButton(
-                        icon = Icons.Filled.Close,
-                        label = stringResource(R.string.cancel),
-                        onClick = onCancelClick,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.semantics { testTag = TestTags.CANCEL_ICON_BUTTON }
-                    )
- 
-                    // Save button in editing mode
-                    EnhancedBottomBarButton(
-                        icon = Icons.Filled.Check,
-                        label = stringResource(R.string.save),
-                        onClick = onSaveClick,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        isProminent = true,
-                        modifier = Modifier.semantics { testTag = TestTags.SAVE_ICON_BUTTON }
-                    )
-                } else {
-                    // Edit button in view mode
-                    EnhancedBottomBarButton(
-                        icon = Icons.Filled.Edit,
-                        label = stringResource(R.string.edit),
-                        onClick = onEditClick,
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                        modifier = Modifier.semantics { testTag = TestTags.EDIT_ICON_BUTTON }
-                    )
- 
-                    // Delete button in view mode
-                    EnhancedBottomBarButton(
-                        icon = Icons.Filled.Delete,
-                        label = stringResource(R.string.delete),
-                        onClick = onDeleteClick,
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }
-                    )
+    Column {
+        // Show formatting toolbar only when editing
+        if (isEditing) {
+            FormattingToolbar(richTextState = richTextState)
+        }
+
+        BottomAppBar(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 12.dp,
+            actions = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (isEditing) {
+                        // Cancel button in editing mode
+                        EnhancedBottomBarButton(
+                            icon = Icons.Filled.Close,
+                            label = stringResource(R.string.cancel),
+                            onClick = onCancelClick,
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.semantics { testTag = TestTags.CANCEL_ICON_BUTTON }
+                        )
+
+                        // Save button in editing mode
+                        EnhancedBottomBarButton(
+                            icon = Icons.Filled.Check,
+                            label = stringResource(R.string.save),
+                            onClick = onSaveClick,
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            isProminent = true,
+                            modifier = Modifier.semantics { testTag = TestTags.SAVE_ICON_BUTTON }
+                        )
+                    } else {
+                        // Edit button in view mode
+                        EnhancedBottomBarButton(
+                            icon = Icons.Filled.Edit,
+                            label = stringResource(R.string.edit),
+                            onClick = onEditClick,
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                            modifier = Modifier.semantics { testTag = TestTags.EDIT_ICON_BUTTON }
+                        )
+
+                        // Delete button in view mode
+                        EnhancedBottomBarButton(
+                            icon = Icons.Filled.Delete,
+                            label = stringResource(R.string.delete),
+                            onClick = onDeleteClick,
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }
+                        )
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 }
- 
+
 @Composable
 private fun EnhancedBottomBarButton(
     icon: ImageVector,
@@ -125,7 +134,7 @@ private fun EnhancedBottomBarButton(
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "button_scale"
     )
- 
+
     Row (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),

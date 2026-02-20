@@ -3,45 +3,35 @@ package com.digiventure.ventnote.feature.note_detail.components.section
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.TestTags
-import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageBaseVM
+import com.digiventure.ventnote.commons.richtext.RichTextEditor
+import com.digiventure.ventnote.commons.richtext.RichTextState
 
 @Composable
 fun TitleSection(
-    viewModel: NoteDetailPageBaseVM,
+    titleRichTextState: RichTextState,
     isEditingState: Boolean,
     titleTextField: String,
-    titleInput: String
+    titleInput: String,
+    onFocusChanged: (Boolean) -> Unit = {}
 ) {
     Column {
         Row(
@@ -63,83 +53,15 @@ fun TitleSection(
             )
         }
 
-        ImprovedTitleTextField(
-            viewModel = viewModel,
-            isEditingState = isEditingState,
-            titleTextField = titleTextField,
-            titleInput = titleInput
-        )
-    }
-}
-
-@Composable
-fun ImprovedTitleTextField(
-    viewModel: NoteDetailPageBaseVM,
-    isEditingState: Boolean,
-    titleTextField: String,
-    titleInput: String
-) {
-    val label = "border_color"
-    val borderColor by animateColorAsState(
-        targetValue = if (isEditingState) MaterialTheme.colorScheme.primary else Color.Transparent,
-        animationSpec = tween(300),
-        label = label
-    )
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .animateContentSize(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isEditingState) {
-                MaterialTheme.colorScheme.surface
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            }
-        ),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isEditingState) 4.dp else 0.dp
-        ),
-        border = BorderStroke(
-            width = if (isEditingState) 2.dp else 0.dp,
-            color = borderColor
-        )
-    ) {
-        TextField(
-            value = viewModel.titleText.value,
-            onValueChange = { viewModel.titleText.value = it },
-            textStyle = MaterialTheme.typography.titleMedium.copy(
-                color = MaterialTheme.colorScheme.onSurface,
-            ),
-            singleLine = false,
+        RichTextEditor(
+            richTextState = titleRichTextState,
+            isEditing = isEditingState,
             readOnly = !isEditingState,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .semantics { 
-                    contentDescription = titleTextField
-                    testTag = TestTags.TITLE_TEXT_FIELD
-                },
-            placeholder = {
-                if (isEditingState) {
-                    Text(
-                        text = titleInput,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                            fontWeight = FontWeight.Medium,
-                        ),
-                    )
-                }
-            }
+            placeholder = if (isEditingState) titleInput else "",
+            contentDescriptionText = titleTextField,
+            testTagText = TestTags.TITLE_TEXT_FIELD,
+            minHeight = 56.dp,
+            onFocusChanged = onFocusChanged
         )
     }
 }

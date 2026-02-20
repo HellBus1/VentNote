@@ -2,6 +2,7 @@ package com.digiventure.ventnote.feature.note_creation.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.MutableLiveData
+import com.digiventure.ventnote.commons.richtext.RichTextState
 import com.digiventure.ventnote.data.persistence.NoteModel
 
 interface NoteCreationPageBaseVM {
@@ -15,6 +16,12 @@ interface NoteCreationPageBaseVM {
      * */
     val titleText: MutableState<String>
     val descriptionText: MutableState<String>
+
+    /**
+     * Rich text state for the title and body editors
+     * */
+    val titleRichTextState: RichTextState
+    val richTextState: RichTextState
 
     /**
      * create note

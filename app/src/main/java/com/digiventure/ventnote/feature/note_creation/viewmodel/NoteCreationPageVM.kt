@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.digiventure.ventnote.commons.richtext.RichTextState
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,8 @@ class NoteCreationPageVM @Inject constructor(
     override val loader: MutableLiveData<Boolean> = MutableLiveData()
     override val titleText: MutableState<String> = mutableStateOf("")
     override val descriptionText: MutableState<String> = mutableStateOf("")
+    override val titleRichTextState: RichTextState = RichTextState()
+    override val richTextState: RichTextState = RichTextState()
 
     override suspend fun addNote(note: NoteModel): Result<Boolean> = withContext(Dispatchers.IO) {
         loader.postValue(true)

@@ -91,6 +91,9 @@ fun NoteDetailPage(
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
 
+    // Track which field is focused for the formatting toolbar
+    val activeRichTextState = remember { mutableStateOf(viewModel.richTextState) }
+
     // Dialog states - using derivedStateOf where appropriate
     val requiredDialogState = remember { mutableStateOf(false) }
     val deleteDialogState = remember { mutableStateOf(false) }
@@ -103,6 +106,8 @@ fun NoteDetailPage(
         data?.let {
             viewModel.titleText.value = it.title
             viewModel.descriptionText.value = it.note
+            viewModel.titleRichTextState.setFromMarkdown(it.title)
+            viewModel.richTextState.setFromMarkdown(it.note)
         }
     }
 
@@ -137,10 +142,16 @@ fun NoteDetailPage(
         strings["successFullyUpdatedText"]
     ) {
         {
+            // Sync both richTextStates before saving
+            viewModel.titleText.value = viewModel.titleRichTextState.toMarkdown()
+            viewModel.descriptionText.value = viewModel.richTextState.toMarkdown()
+
             val titleText = viewModel.titleText.value
             val descriptionText = viewModel.descriptionText.value
+            val titlePlain = viewModel.titleRichTextState.toPlainText()
+            val bodyPlain = viewModel.richTextState.toPlainText()
 
-            if (titleText.isEmpty() || descriptionText.isEmpty()) {
+            if (titlePlain.isEmpty() || bodyPlain.isEmpty()) {
                 requiredDialogState.value = true
             } else {
                 data?.let { noteData ->
@@ -225,19 +236,25 @@ fun NoteDetailPage(
             ) {
                 item {
                     TitleSection(
-                        viewModel = viewModel,
+                        titleRichTextState = viewModel.titleRichTextState,
                         isEditingState = isEditingState,
                         titleTextField = strings["titleTextField"] ?: EMPTY_STRING,
-                        titleInput = strings["titleInput"] ?: EMPTY_STRING
+                        titleInput = strings["titleInput"] ?: EMPTY_STRING,
+                        onFocusChanged = { focused ->
+                            if (focused) activeRichTextState.value = viewModel.titleRichTextState
+                        }
                     )
                 }
 
                 item {
                     NoteSection(
-                        viewModel = viewModel,
+                        richTextState = viewModel.richTextState,
                         isEditingState = isEditingState,
                         bodyTextField = strings["bodyTextField"] ?: EMPTY_STRING,
-                        bodyInput = strings["bodyInput"] ?: EMPTY_STRING
+                        bodyInput = strings["bodyInput"] ?: EMPTY_STRING,
+                        onFocusChanged = { focused ->
+                            if (focused) activeRichTextState.value = viewModel.richTextState
+                        }
                     )
                 }
             }
@@ -245,6 +262,7 @@ fun NoteDetailPage(
         bottomBar = {
             EnhancedBottomAppBar(
                 isEditing = isEditingState,
+                richTextState = activeRichTextState.value,
                 onEditClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     viewModel.isEditing.value = true
@@ -264,13 +282,15 @@ fun NoteDetailPage(
     val titlePlaceholderText = stringResource(R.string.title_textField_input)
     val notePlaceholderText = stringResource(R.string.body_textField_input)
 
+    val titlePlainText = viewModel.titleRichTextState.toPlainText()
+    val noteBodyText = viewModel.richTextState.toPlainText()
     val missingFieldName = remember(
-        viewModel.titleText.value,
-        viewModel.descriptionText.value
+        titlePlainText,
+        noteBodyText
     ) {
         when {
-            viewModel.titleText.value.isEmpty() -> titlePlaceholderText
-            viewModel.descriptionText.value.isEmpty() -> notePlaceholderText
+            titlePlainText.isEmpty() -> titlePlaceholderText
+            noteBodyText.isEmpty() -> notePlaceholderText
             else -> EMPTY_STRING
         }
     }
