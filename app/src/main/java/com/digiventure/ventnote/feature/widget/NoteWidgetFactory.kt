@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.richtext.MarkdownToSpannable
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.digiventure.ventnote.data.persistence.NoteModel
 
@@ -33,8 +34,12 @@ class NoteWidgetFactory(
         val note = notes[position]
         val views = RemoteViews(context.packageName, R.layout.note_widget_item)
 
-        views.setTextViewText(R.id.widget_item_title, note.title)
-        views.setTextViewText(R.id.widget_item_content, note.note)
+        // Convert markdown to SpannableString for rich text rendering in widget
+        val styledTitle = MarkdownToSpannable.convert(note.title)
+        val styledContent = MarkdownToSpannable.convert(note.note)
+
+        views.setTextViewText(R.id.widget_item_title, styledTitle)
+        views.setTextViewText(R.id.widget_item_content, styledContent)
 
         // Fill in specific data for the click template
         val fillInIntent = Intent().apply {
