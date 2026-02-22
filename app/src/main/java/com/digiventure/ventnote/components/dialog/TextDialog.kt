@@ -53,7 +53,7 @@ fun TextDialog(
                 if (onConfirmCallback != null) {
                     TextButton(
                         onClick = { onConfirmCallback() },
-                        shape = RoundedCornerShape(8.dp),
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.semantics { testTag = TestTags.CONFIRM_BUTTON }
                     ) {
                         Text(
@@ -68,7 +68,7 @@ fun TextDialog(
             dismissButton = {
                 TextButton(
                     onClick = { onDismissCallback() },
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier.semantics { testTag = TestTags.DISMISS_BUTTON }
                 ) {
                     Text(
@@ -80,7 +80,7 @@ fun TextDialog(
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = modifier
         )
     }

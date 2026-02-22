@@ -41,16 +41,16 @@ fun NotesItem(
     onLongClick: () -> Unit,
     onCheckClick: () -> Unit
 ) {
-    val overallItemShape = RoundedCornerShape(16.dp)
-    val titleContainerShape = RoundedCornerShape(12.dp)
-    val descriptionContainerShape = RoundedCornerShape(10.dp)
+    val overallItemShape = MaterialTheme.shapes.medium
+    val titleContainerShape = MaterialTheme.shapes.small
+    val descriptionContainerShape = MaterialTheme.shapes.small
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .semantics { contentDescription = "Note item ${data.id}" }
             .clip(overallItemShape)
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .background(MaterialTheme.colorScheme.surface)
             .combinedClickable(
                 onClick = { if (isMarking) onCheckClick() else onClick() },
                 onLongClick = { onLongClick() }
@@ -59,8 +59,6 @@ fun NotesItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(titleContainerShape)
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                 .padding(2.dp, 12.dp, 2.dp, 2.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -79,8 +77,8 @@ fun NotesItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.SemiBold,
                     ),
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
@@ -91,8 +89,6 @@ fun NotesItem(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(descriptionContainerShape)
-                    .background(MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Column {
