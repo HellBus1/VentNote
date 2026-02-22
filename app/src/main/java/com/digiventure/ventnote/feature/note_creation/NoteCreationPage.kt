@@ -64,6 +64,9 @@ fun NoteCreationPage(
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
 
+    // Track which field is focused for the formatting toolbar
+    val activeRichTextState = remember { mutableStateOf(viewModel.richTextState) }
+
     // Optimized state management - using delegation for better performance
     val requiredDialogState = remember { mutableStateOf(false) }
     val cancelDialogState = remember { mutableStateOf(false) }
@@ -72,7 +75,14 @@ fun NoteCreationPage(
     // Extracted and optimized addNote function
     val noteIsSuccessfullyAddedText = stringResource(R.string.successfully_added)
     fun addNote() {
-        if (viewModel.titleText.value.isEmpty() || viewModel.descriptionText.value.isEmpty()) {
+        // Sync both richTextStates before saving
+        viewModel.titleText.value = viewModel.titleRichTextState.toMarkdown()
+        viewModel.descriptionText.value = viewModel.richTextState.toMarkdown()
+
+        val titlePlain = viewModel.titleRichTextState.toPlainText()
+        val bodyPlain = viewModel.richTextState.toPlainText()
+
+        if (titlePlain.isEmpty() || bodyPlain.isEmpty()) {
             requiredDialogState.value = true
         } else {
             scope.launch {
@@ -141,17 +151,32 @@ fun NoteCreationPage(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    TitleSection(viewModel, titleTextField, titleInput)
+                    TitleSection(
+                        titleRichTextState = viewModel.titleRichTextState,
+                        titleTextField = titleTextField,
+                        titleInput = titleInput,
+                        onFocusChanged = { focused ->
+                            if (focused) activeRichTextState.value = viewModel.titleRichTextState
+                        }
+                    )
                 }
                 item {
-                    NoteSection(viewModel, bodyTextField, bodyInput)
+                    NoteSection(
+                        richTextState = viewModel.richTextState,
+                        bodyTextField = bodyTextField,
+                        bodyInput = bodyInput,
+                        onFocusChanged = { focused ->
+                            if (focused) activeRichTextState.value = viewModel.richTextState
+                        }
+                    )
                 }
             }
         },
         bottomBar = {
-            EnhancedBottomAppBar {
-                addNote()
-            }
+            EnhancedBottomAppBar(
+                richTextState = activeRichTextState.value,
+                onSaveClick = { addNote() }
+            )
         },
         modifier = Modifier
             .semantics { testTag = TestTags.NOTE_CREATION_PAGE }
@@ -162,10 +187,12 @@ fun NoteCreationPage(
     // Optimized missing field calculation
     val emptyTitleText = stringResource(R.string.empty_note_title_placeholder)
     val emptyNoteText = stringResource(R.string.empty_note_placeholder)
-    val missingFieldName = remember(viewModel.titleText.value, viewModel.descriptionText.value) {
+    val titlePlainText = viewModel.titleRichTextState.toPlainText()
+    val noteBodyText = viewModel.richTextState.toPlainText()
+    val missingFieldName = remember(titlePlainText, noteBodyText) {
         when {
-            viewModel.titleText.value.isEmpty() -> emptyTitleText
-            viewModel.descriptionText.value.isEmpty() -> emptyNoteText
+            titlePlainText.isEmpty() -> emptyTitleText
+            noteBodyText.isEmpty() -> emptyNoteText
             else -> EMPTY_STRING
         }
     }

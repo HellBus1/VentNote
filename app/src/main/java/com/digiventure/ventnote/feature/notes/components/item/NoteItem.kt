@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.commons.DateUtil
+import com.digiventure.ventnote.commons.richtext.MarkdownParser
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 import com.digiventure.ventnote.data.persistence.NoteModel
 
@@ -74,7 +75,7 @@ fun NotesItem(
                     }
                 }
                 Text(
-                    text = data.title,
+                    text = MarkdownParser.parseToAnnotatedString(data.title),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium.copy(
@@ -96,7 +97,7 @@ fun NotesItem(
             ) {
                 Column {
                     Text(
-                        text = data.note,
+                        text = MarkdownParser.parseToAnnotatedString(data.note),
                         maxLines = 4,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodyMedium.copy(
