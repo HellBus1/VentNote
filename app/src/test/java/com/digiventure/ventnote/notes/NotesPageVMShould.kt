@@ -4,6 +4,7 @@ import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
 import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.commons.Constants
+import com.digiventure.ventnote.data.local.NoteDataStore
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
@@ -23,6 +24,7 @@ import org.mockito.kotlin.whenever
 
 class NotesPageVMShould: BaseUnitTest() {
     private val repository: NoteRepository = mock()
+    private val noteDataStore: NoteDataStore = mock()
     private val notes = listOf(
         NoteModel(1, "title1", "description1"),
         NoteModel(2, "title2", "description2")
@@ -41,7 +43,12 @@ class NotesPageVMShould: BaseUnitTest() {
 
     @Before
     fun setup() {
-        viewModel = NotesPageVM(repository)
+        runBlocking {
+            whenever(noteDataStore.getStringData(Constants.NOTE_VIEW_MODE)).thenReturn(
+                flowOf(Constants.VIEW_MODE_LIST)
+            )
+        }
+        viewModel = NotesPageVM(repository, noteDataStore)
     }
 
     @Test
@@ -134,6 +141,13 @@ class NotesPageVMShould: BaseUnitTest() {
 
         viewModel.isMarking.value = false
         assertEquals(false, viewModel.isMarking.value)
+    }
+
+    @Test
+    fun verifySetNoteViewModeUpdatesStateAndDataStore() = runTest {
+        viewModel.setNoteViewMode(Constants.VIEW_MODE_STAGGERED)
+        assertEquals(Constants.VIEW_MODE_STAGGERED, viewModel.noteViewMode.value)
+        verify(noteDataStore, times(1)).setStringData(Constants.NOTE_VIEW_MODE, Constants.VIEW_MODE_STAGGERED)
     }
 
     @Test

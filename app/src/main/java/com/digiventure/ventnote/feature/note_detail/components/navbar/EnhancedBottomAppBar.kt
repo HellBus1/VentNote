@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -73,7 +73,7 @@ fun EnhancedBottomAppBar(
                     if (isEditing) {
                         // Cancel button in editing mode
                         EnhancedBottomBarButton(
-                            icon = Icons.Filled.Close,
+                            icon = Icons.Rounded.Close,
                             label = stringResource(R.string.cancel),
                             onClick = onCancelClick,
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -83,7 +83,7 @@ fun EnhancedBottomAppBar(
 
                         // Save button in editing mode
                         EnhancedBottomBarButton(
-                            icon = Icons.Filled.Check,
+                            icon = Icons.Rounded.Check,
                             label = stringResource(R.string.save),
                             onClick = onSaveClick,
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -94,7 +94,7 @@ fun EnhancedBottomAppBar(
                     } else {
                         // Edit button in view mode
                         EnhancedBottomBarButton(
-                            icon = Icons.Filled.Edit,
+                            icon = Icons.Rounded.Edit,
                             label = stringResource(R.string.edit),
                             onClick = onEditClick,
                             containerColor = MaterialTheme.colorScheme.secondary,
@@ -104,7 +104,7 @@ fun EnhancedBottomAppBar(
 
                         // Delete button in view mode
                         EnhancedBottomBarButton(
-                            icon = Icons.Filled.Delete,
+                            icon = Icons.Rounded.Delete,
                             label = stringResource(R.string.delete),
                             onClick = onDeleteClick,
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,

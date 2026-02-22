@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -49,6 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
@@ -204,6 +209,14 @@ fun NotesPage(
             NotesAppBar(
                 isMarking = isMarking,
                 markedNoteListSize = markedNoteList.size,
+                noteViewMode = viewModel.noteViewMode.value,
+                viewModeCallback = {
+                    val nextMode = when (viewModel.noteViewMode.value) {
+                        Constants.VIEW_MODE_LIST -> Constants.VIEW_MODE_STAGGERED
+                        else -> Constants.VIEW_MODE_LIST
+                    }
+                    viewModel.setNoteViewMode(nextMode)
+                },
                 toggleDrawerCallback = openDrawer,
                 selectAllCallback = {
                     noteListState?.getOrNull()?.let { notes ->
@@ -238,7 +251,7 @@ fun NotesPage(
                     },
                     icon = {
                         Icon(
-                            imageVector = Icons.Filled.Add,
+                            imageVector = Icons.Rounded.Add,
                             contentDescription = stringResource(R.string.fab)
                         )
                     },
@@ -261,51 +274,101 @@ fun NotesPage(
                     }
                     .padding(contentPadding)
             ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .semantics { testTag = TestTags.NOTE_RV },
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 96.dp)
-                ) {
-                    item(key = "search_bar") {
-                        Box(
-                            modifier = Modifier
-                                .onGloballyPositioned { coords ->
-                                    searchBarHeightPx = coords.size.height.toFloat()
-                                    scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
-                                }
-                                .fillMaxWidth()
-                                .padding(16.dp, 24.dp, 16.dp, 8.dp)
+                val listModifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .semantics { testTag = TestTags.NOTE_RV }
+                
+                when (viewModel.noteViewMode.value) {
+                    Constants.VIEW_MODE_STAGGERED -> {
+                        LazyVerticalStaggeredGrid(
+                            columns = StaggeredGridCells.Fixed(2),
+                            modifier = listModifier,
+                            verticalItemSpacing = 16.dp,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp)
                         ) {
-                            SearchBar(
-                                query = searchQuery,
-                                onQueryChange = { newQuery ->
-                                    viewModel.searchedTitleText.value = newQuery
+                            item(key = "search_bar", span = StaggeredGridItemSpan.FullLine) {
+                                Box(
+                                    modifier = Modifier
+                                        .onGloballyPositioned { coords ->
+                                            searchBarHeightPx = coords.size.height.toFloat()
+                                            scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
+                                        }
+                                        .fillMaxWidth()
+                                        .padding(top = 24.dp, bottom = 8.dp)
+                                ) {
+                                    SearchBar(
+                                        query = searchQuery,
+                                        onQueryChange = { newQuery ->
+                                            viewModel.searchedTitleText.value = newQuery
+                                        }
+                                    )
                                 }
-                            )
+                            }
+
+                            items(
+                                items = filteredNotes,
+                                key = { note -> note.id }
+                            ) { note ->
+                                NotesItem(
+                                    isMarking = isMarking,
+                                    isMarked = note in markedNoteList,
+                                    data = note,
+                                    noteViewMode = viewModel.noteViewMode.value,
+                                    onClick = { onNoteClick(note) },
+                                    onLongClick = { onNoteLongClick(note) },
+                                    onCheckClick = { onNoteCheckClick(note) }
+                                )
+                            }
                         }
                     }
-
-                    items(
-                        items = filteredNotes,
-                        key = { note -> note.id }
-                    ) { note ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .animateItem()
+                    else -> {
+                        LazyColumn(
+                            modifier = listModifier,
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(bottom = 96.dp)
                         ) {
-                            NotesItem(
-                                isMarking = isMarking,
-                                isMarked = note in markedNoteList,
-                                data = note,
-                                onClick = { onNoteClick(note) },
-                                onLongClick = { onNoteLongClick(note) },
-                                onCheckClick = { onNoteCheckClick(note) }
-                            )
+                            item(key = "search_bar") {
+                                Box(
+                                    modifier = Modifier
+                                        .onGloballyPositioned { coords ->
+                                            searchBarHeightPx = coords.size.height.toFloat()
+                                            scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
+                                        }
+                                        .fillMaxWidth()
+                                        .padding(16.dp, 24.dp, 16.dp, 8.dp)
+                                ) {
+                                    SearchBar(
+                                        query = searchQuery,
+                                        onQueryChange = { newQuery ->
+                                            viewModel.searchedTitleText.value = newQuery
+                                        }
+                                    )
+                                }
+                            }
+
+                            items(
+                                items = filteredNotes,
+                                key = { note -> note.id }
+                            ) { note ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                        .animateItem()
+                                ) {
+                                    NotesItem(
+                                        isMarking = isMarking,
+                                        isMarked = note in markedNoteList,
+                                        data = note,
+                                        noteViewMode = viewModel.noteViewMode.value,
+                                        onClick = { onNoteClick(note) },
+                                        onLongClick = { onNoteLongClick(note) },
+                                        onCheckClick = { onNoteCheckClick(note) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
