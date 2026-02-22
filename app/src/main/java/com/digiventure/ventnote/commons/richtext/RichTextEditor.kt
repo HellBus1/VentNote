@@ -62,12 +62,12 @@ fun RichTextEditor(
                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
             }
         ),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.small,
         elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isEditing) 4.dp else 0.dp
+            defaultElevation = 0.dp
         ),
         border = BorderStroke(
-            width = if (isEditing) 2.dp else 0.dp,
+            width = if (isEditing) 1.dp else 0.dp,
             color = borderColor
         )
     ) {

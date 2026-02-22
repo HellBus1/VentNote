@@ -65,14 +65,14 @@ fun SignInButton(
             launcher.launch(authViewModel.getSignInIntent())
         },
         modifier = Modifier.height(56.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 8.dp
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp
         ),
         enabled = !isLoading
     ) {

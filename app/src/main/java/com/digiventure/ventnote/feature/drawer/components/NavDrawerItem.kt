@@ -35,7 +35,7 @@ fun NavDrawerItem(
     ) {
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             Box(modifier = Modifier.padding(8.dp)) {

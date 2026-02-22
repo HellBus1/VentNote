@@ -274,7 +274,7 @@ private fun SignedOutStateContent(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             ),
-            shape = CircleShape
+            shape = MaterialTheme.shapes.extraLarge
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),

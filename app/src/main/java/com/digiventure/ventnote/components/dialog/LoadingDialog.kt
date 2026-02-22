@@ -30,7 +30,7 @@ fun LoadingDialog(
         BasicAlertDialog(onDismissRequest = { onDismissCallback() },
             modifier = modifier,
             content = {
-                Surface(shape = RoundedCornerShape(8.dp)) {
+                Surface(shape = MaterialTheme.shapes.medium) {
                     Row(
                         modifier = Modifier.padding(16.dp),
                         horizontalArrangement = Arrangement.Center,
