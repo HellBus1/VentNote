@@ -14,13 +14,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -46,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +65,8 @@ fun NotesAppBar(
     closeMarkingCallback: () -> Unit,
     sortCallback: () -> Unit,
     deleteCallback: () -> Unit,
+    noteViewMode: String = Constants.VIEW_MODE_LIST,
+    viewModeCallback: () -> Unit = {}
 ) {
     val expanded = remember { mutableStateOf(false) }
 
@@ -100,7 +107,9 @@ fun NotesAppBar(
                 isMarking = isMarking,
                 markedItemsCount = markedNoteListSize,
                 sortCallback = sortCallback,
-                deleteCallback = deleteCallback
+                deleteCallback = deleteCallback,
+                noteViewMode = noteViewMode,
+                viewModeCallback = viewModeCallback
             )
         },
         modifier = Modifier.semantics {
@@ -108,6 +117,86 @@ fun NotesAppBar(
         }
     )
 }
+
+val ViewAgendaIcon: ImageVector
+    get() = ImageVector.Builder(
+        name = "ViewAgenda",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).apply {
+        path(fill = SolidColor(Color.Black)) {
+            moveTo(20f, 3f)
+            lineTo(3f, 3f)
+            curveTo(2.45f, 3f, 2f, 3.45f, 2f, 4f)
+            verticalLineToRelative(6f)
+            curveToRelative(0f, 0.55f, 0.45f, 1f, 1f, 1f)
+            horizontalLineToRelative(17f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            lineTo(21f, 4f)
+            curveToRelative(0f, -0.55f, -0.45f, -1f, -1f, -1f)
+            close()
+            moveTo(20f, 13f)
+            lineTo(3f, 13f)
+            curveToRelative(-0.55f, 0f, -1f, 0.45f, -1f, 1f)
+            verticalLineToRelative(6f)
+            curveToRelative(0f, 0.55f, 0.45f, 1f, 1f, 1f)
+            horizontalLineToRelative(17f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            verticalLineToRelative(-6f)
+            curveToRelative(0f, -0.55f, -0.45f, -1f, -1f, -1f)
+            close()
+        }
+    }.build()
+
+val ViewListIcon: ImageVector
+    get() = ImageVector.Builder(
+        name = "ViewList",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).apply {
+        path(fill = SolidColor(Color.Black)) {
+            moveTo(3f, 14f)
+            horizontalLineToRelative(4f)
+            verticalLineToRelative(-4f)
+            lineTo(3f, 10f)
+            verticalLineToRelative(4f)
+            close()
+            moveTo(3f, 19f)
+            horizontalLineToRelative(4f)
+            verticalLineToRelative(-4f)
+            lineTo(3f, 15f)
+            verticalLineToRelative(4f)
+            close()
+            moveTo(3f, 9f)
+            horizontalLineToRelative(4f)
+            lineTo(7f, 5f)
+            lineTo(3f, 5f)
+            verticalLineToRelative(4f)
+            close()
+            moveTo(8f, 14f)
+            horizontalLineToRelative(13f)
+            verticalLineToRelative(-4f)
+            lineTo(8f, 10f)
+            verticalLineToRelative(4f)
+            close()
+            moveTo(8f, 19f)
+            horizontalLineToRelative(13f)
+            verticalLineToRelative(-4f)
+            lineTo(8f, 15f)
+            verticalLineToRelative(4f)
+            close()
+            moveTo(8f, 5f)
+            verticalLineToRelative(4f)
+            horizontalLineToRelative(13f)
+            lineTo(21f, 5f)
+            lineTo(8f, 5f)
+            close()
+        }
+    }.build()
 
 @Composable
 private fun SelectionTitle(
@@ -132,7 +221,7 @@ private fun SelectionTitle(
                 }
         ) {
             Icon(
-                imageVector = Icons.Filled.Check,
+                imageVector = Icons.Rounded.Check,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
@@ -164,7 +253,7 @@ private fun SelectionTitle(
             Spacer(modifier = Modifier.width(4.dp))
 
             Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                imageVector = if (expanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
                 contentDescription = stringResource(R.string.dropdown_nav_icon),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
@@ -215,7 +304,7 @@ private fun EnhancedDropdownMenu(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        imageVector = if (allSelected) Icons.Filled.Check else Icons.Filled.Check,
+                        imageVector = if (allSelected) Icons.Rounded.Check else Icons.Rounded.Check,
                         contentDescription = null,
                         tint = if (allSelected) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -268,7 +357,7 @@ private fun EnhancedDropdownMenu(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Close,
+                        imageVector = Icons.Rounded.Close,
                         contentDescription = null,
                         tint = if (noneSelected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -327,14 +416,13 @@ fun LeadingIcon(
     closeMarkingCallback: () -> Unit,
     toggleDrawerCallback: () -> Unit
 ) {
-    // Option 1: Use separate variables (cleaner and more readable)
     if (isMarking) {
         IconButton(
             onClick = closeMarkingCallback,
             modifier = Modifier.semantics { testTag = TestTags.CLOSE_SELECT_ICON_BUTTON }
         ) {
             Icon(
-                imageVector = Icons.Filled.Close,
+                imageVector = Icons.Rounded.Close,
                 contentDescription = stringResource(R.string.close_nav_icon),
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -345,7 +433,7 @@ fun LeadingIcon(
             modifier = Modifier.semantics { testTag = TestTags.MENU_ICON_BUTTON }
         ) {
             Icon(
-                imageVector = Icons.Filled.Menu,
+                imageVector = Icons.Rounded.Menu,
                 contentDescription = stringResource(R.string.drawer_nav_icon),
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -359,6 +447,8 @@ fun TrailingMenuIcons(
     markedItemsCount: Int,
     sortCallback: () -> Unit,
     deleteCallback: () -> Unit,
+    noteViewMode: String,
+    viewModeCallback: () -> Unit
 ) {
     if (isMarking) {
         val deleteEnabled = markedItemsCount > 0
@@ -368,7 +458,7 @@ fun TrailingMenuIcons(
             modifier = Modifier.semantics { testTag = TestTags.DELETE_ICON_BUTTON }
         ) {
             Icon(
-                imageVector = Icons.Filled.Delete,
+                imageVector = Icons.Rounded.Delete,
                 contentDescription = stringResource(R.string.delete_nav_icon),
                 tint = if (deleteEnabled) {
                     MaterialTheme.colorScheme.primary
@@ -379,11 +469,25 @@ fun TrailingMenuIcons(
         }
     } else {
         IconButton(
+            onClick = viewModeCallback,
+            modifier = Modifier.semantics { testTag = "view_mode_icon_button" }
+        ) {
+            val viewIcon = when (noteViewMode) {
+                Constants.VIEW_MODE_STAGGERED -> ViewAgendaIcon
+                else -> ViewListIcon
+            }
+            Icon(
+                imageVector = viewIcon,
+                contentDescription = stringResource(R.string.drawer_nav_icon), // generic placeholder
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        IconButton(
             onClick = sortCallback,
             modifier = Modifier.semantics { testTag = TestTags.SORT_ICON_BUTTON }
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.List,
+                imageVector = Icons.AutoMirrored.Rounded.List,
                 contentDescription = stringResource(R.string.sort_nav_icon),
                 tint = MaterialTheme.colorScheme.onSurface
             )

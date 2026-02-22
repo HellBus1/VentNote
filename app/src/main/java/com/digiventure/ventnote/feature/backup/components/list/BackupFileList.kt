@@ -19,10 +19,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -184,7 +184,7 @@ fun EmptyBackupListContainer(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Warning,
+                    imageVector = Icons.Rounded.Warning,
                     contentDescription = null,
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
@@ -232,7 +232,7 @@ fun EmptyBackupListContainer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Share,
+                    imageVector = Icons.Rounded.Share,
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
                 )
@@ -279,7 +279,7 @@ fun BackupListContainer(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Share,
+                        imageVector = Icons.Rounded.Share,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )
@@ -336,7 +336,7 @@ fun BackupListContainer(
                                 onClick = { onRestoreRequest(file) }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.Refresh,
+                                    imageVector = Icons.Rounded.Refresh,
                                     contentDescription = stringResource(R.string.restore_icon),
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(24.dp)
@@ -347,7 +347,7 @@ fun BackupListContainer(
                                 onClick = { onDeleteRequest(file) }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.Delete,
+                                    imageVector = Icons.Rounded.Delete,
                                     contentDescription = stringResource(R.string.delete_icon),
                                     tint = MaterialTheme.colorScheme.error,
                                     modifier = Modifier.size(24.dp)
@@ -385,7 +385,7 @@ fun BackupFailedContainer(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Warning,
+                    imageVector = Icons.Rounded.Warning,
                     contentDescription = null,
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.error
@@ -417,7 +417,7 @@ fun BackupFailedContainer(
             )
         ) {
             Icon(
-                imageVector = Icons.Filled.Refresh,
+                imageVector = Icons.Rounded.Refresh,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp)
             )

@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.rounded.Check
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.commons.richtext.MarkdownParser
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
@@ -37,6 +38,7 @@ fun NotesItem(
     isMarking: Boolean,
     isMarked: Boolean,
     data: NoteModel,
+    noteViewMode: String = Constants.VIEW_MODE_LIST,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onCheckClick: () -> Unit
@@ -64,7 +66,7 @@ fun NotesItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isMarked) {
                     TopNavBarIcon(
-                        image = Icons.Filled.Check,
+                        image = Icons.Rounded.Check,
                         "",
                         modifier = Modifier
                             .padding(start = 12.dp)
@@ -91,10 +93,11 @@ fun NotesItem(
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
+                val descriptionMaxLines = if (noteViewMode == Constants.VIEW_MODE_STAGGERED) 8 else 4
                 Column {
                     Text(
                         text = MarkdownParser.parseToAnnotatedString(data.note),
-                        maxLines = 4,
+                        maxLines = descriptionMaxLines,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface,

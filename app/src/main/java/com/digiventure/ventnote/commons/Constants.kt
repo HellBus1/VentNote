@@ -11,6 +11,10 @@ object Constants {
     const val COLOR_PALLET = "COLOR_PALLET"
     const val BACKUP_FILE_NAME = "backup"
     const val EMPTY_STRING = ""
+
+    const val VIEW_MODE_LIST = "LIST"
+    const val VIEW_MODE_STAGGERED = "STAGGERED"
+    const val NOTE_VIEW_MODE = "NOTE_VIEW_MODE"
 }
 
 object ColorPalletName {
