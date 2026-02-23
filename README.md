@@ -6,17 +6,18 @@
 
 ## VentNote
 VentNote — Taking notes like a breeze.   
-Note management app built with jetpack compose and newest modern android architecture guide
+Note management app built with Jetpack Compose and the newest modern Android architecture guide
 
 <br />
 
 <p>
-  <img src="assets/screen_one.png" width="200" alt=""/>
-  <img src="assets/screen_two.png" width="200" alt=""/>
-  <img src="assets/screen_three.png" width="200" alt=""/>
-  <img src="assets/screen_four.png" width="200" alt=""/>
-  <img src="assets/screen_five.png" width="200" alt=""/>
-  <img src="assets/screen_six.png" width="200" alt=""/>
+  <img src="assets/screen_one_new.jpg" width="200" alt=""/>
+  <img src="assets/screen_two_new.jpg" width="200" alt=""/>
+  <img src="assets/screen_three_new.jpg" width="200" alt=""/>
+  <img src="assets/screen_four_new.jpg" width="200" alt=""/>
+  <img src="assets/screen_five_new.jpg" width="200" alt=""/>
+  <img src="assets/screen_six_new.jpg" width="200" alt=""/>
+  <img src="assets/screen_seven_new.jpg" width="200" alt=""/>
 </p>
 
 <br />
@@ -27,7 +28,7 @@ Note management app built with jetpack compose and newest modern android archite
 - [v] Search and Find Notes
 - [v] Delete Notes
 - [v] Share Notes
-- [v] Dark Mode & App Color Switch
+- [v] Dark Mode & App Colour Switch
 - [v] In App Update
 - [-] Widget (Waiting for stable version)
 - [v] Google Drive Backup
@@ -50,19 +51,19 @@ Want to see more free, high-quality code and articles? Buy me a coffee and make 
 <br />
 
 ## 📑 Installation Steps
-The binary file consist of 3 file (source codes and debug apk)
+The binary file consists of 3 files (source codes and debug APK)
 1. [Download the app](https://github.com/HellBus1/VentNote/releases) by clicking the green button or this link.
 
 For App :
 
-1. Locate the file and install, you might get a warning (allow install from untrusted source), that's because the app isn't from the playstore, but it's safe to install.
+1. Locate the file and install. You might get a warning (allow install from untrusted source), that's because the app isn't from the playstore, but it's safe to install.
 2. After installing, you should be able to use the app.
 
 For Source Code :
 
-1. Clone the repositoy or download source code.zip / source code.tar.gz
+1. Clone the repository or download source code.zip / source code.tar.gz
 2. Extract the source code
-3. Open with android studio and wait the build until done
+3. Open with Android Studio and wait for the build until done
 
 <br />
 
@@ -82,4 +83,4 @@ You can access the technical documentation here [documentation page](https://fut
 <br />
 
 ## 📑 Contact
-Please feel free to reach out to me via email, Twitter, or LinkedIn if you have anything to discuss. And if you like this project, don't forget to leave a clap to my medium or star to show your support.
+Please feel free to reach out to me via email, Twitter, or LinkedIn if you have anything to discuss. And if you like this project, don't forget to leave a clap on my Medium or a star to show your support.
