@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -97,7 +97,7 @@ fun NavDrawerItemColorSchemeSwitch(
         }
 
         Icon(
-            Icons.AutoMirrored.Filled.ArrowForward,
+            Icons.AutoMirrored.Rounded.ArrowForward,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.size(20.dp)

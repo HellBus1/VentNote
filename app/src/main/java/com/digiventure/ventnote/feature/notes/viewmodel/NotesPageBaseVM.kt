@@ -23,6 +23,12 @@ interface NotesPageBaseVM {
     fun sortAndOrder(sortBy: String, orderBy: String)
 
     /**
+     * Handle note view layout mode
+     */
+    val noteViewMode: MutableState<String>
+    fun setNoteViewMode(mode: String)
+
+    /**
      * Handle NoteList state
      * */
     val noteList: LiveData<Result<List<NoteModel>>>

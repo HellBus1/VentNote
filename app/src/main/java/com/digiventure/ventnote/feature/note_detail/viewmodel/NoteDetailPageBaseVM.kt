@@ -2,6 +2,7 @@ package com.digiventure.ventnote.feature.note_detail.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.MutableLiveData
+import com.digiventure.ventnote.commons.richtext.RichTextState
 import com.digiventure.ventnote.data.persistence.NoteModel
 
 interface NoteDetailPageBaseVM {
@@ -20,6 +21,12 @@ interface NoteDetailPageBaseVM {
      * */
     var titleText: MutableState<String>
     var descriptionText: MutableState<String>
+
+    /**
+     * Rich text state for the title and body editors
+     * */
+    val titleRichTextState: RichTextState
+    val richTextState: RichTextState
 
     /**
      * State for handling isEditing

@@ -2,7 +2,7 @@ package com.digiventure.ventnote.components.dialog
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +32,7 @@ fun TextDialog(
             onDismissRequest = { onDismissCallback() },
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Info,
+                    imageVector = Icons.Rounded.Info,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -53,7 +53,7 @@ fun TextDialog(
                 if (onConfirmCallback != null) {
                     TextButton(
                         onClick = { onConfirmCallback() },
-                        shape = RoundedCornerShape(8.dp),
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.semantics { testTag = TestTags.CONFIRM_BUTTON }
                     ) {
                         Text(
@@ -68,7 +68,7 @@ fun TextDialog(
             dismissButton = {
                 TextButton(
                     onClick = { onDismissCallback() },
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier.semantics { testTag = TestTags.DISMISS_BUTTON }
                 ) {
                     Text(
@@ -80,7 +80,7 @@ fun TextDialog(
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = modifier
         )
     }

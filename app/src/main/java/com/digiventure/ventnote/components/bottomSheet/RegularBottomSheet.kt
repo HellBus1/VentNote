@@ -6,6 +6,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,6 +23,8 @@ fun RegularBottomSheet(
             sheetState = bottomSheetState,
             modifier = modifier ?: Modifier,
             containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 0.dp,
+            shape = MaterialTheme.shapes.large,
         ) {
             content()
         }
