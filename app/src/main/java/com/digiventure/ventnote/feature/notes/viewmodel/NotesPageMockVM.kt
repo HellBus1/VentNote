@@ -15,6 +15,11 @@ class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
         // Mock implementation if needed
     }
 
+    override val noteViewMode = mutableStateOf(com.digiventure.ventnote.commons.Constants.VIEW_MODE_LIST)
+    override fun setNoteViewMode(mode: String) {
+        noteViewMode.value = mode
+    }
+
     // More preview-friendly way to expose a list
     override val noteList: LiveData<Result<List<NoteModel>>> =
         MutableLiveData( // Use MutableLiveData and set its value directly

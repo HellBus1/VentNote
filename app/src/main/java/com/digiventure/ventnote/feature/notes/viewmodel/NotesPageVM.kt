@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.digiventure.ventnote.commons.Constants
+import com.digiventure.ventnote.data.local.NoteDataStore
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NotesPageVM @Inject constructor(
     private val repository: NoteRepository,
+    private val noteDataStore: NoteDataStore
 ): ViewModel(), NotesPageBaseVM {
     override val loader = MutableLiveData<Boolean>()
     override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData(
@@ -39,6 +41,25 @@ class NotesPageVM @Inject constructor(
     }
 
     override val searchedTitleText = mutableStateOf("")
+
+    override val noteViewMode = mutableStateOf(Constants.VIEW_MODE_LIST)
+    
+    init {
+        viewModelScope.launch {
+            noteDataStore.getStringData(Constants.NOTE_VIEW_MODE).collectLatest { mode ->
+                if (mode.isNotEmpty()) {
+                    noteViewMode.value = mode
+                }
+            }
+        }
+    }
+
+    override fun setNoteViewMode(mode: String) {
+        noteViewMode.value = mode
+        viewModelScope.launch {
+            noteDataStore.setStringData(Constants.NOTE_VIEW_MODE, mode)
+        }
+    }
 
     override val isMarking = mutableStateOf(false)
     override val markedNoteList = mutableStateListOf<NoteModel>()

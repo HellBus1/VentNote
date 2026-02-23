@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,36 +32,48 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.R
+import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.commons.richtext.FormattingToolbar
+import com.digiventure.ventnote.commons.richtext.RichTextState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedBottomAppBar(
+    richTextState: RichTextState,
     onSaveClick: () -> Unit,
 ) {
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = 12.dp,
-        actions = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                EnhancedBottomBarButton(
-                    icon = Icons.Filled.Check,
-                    label = stringResource(R.string.save),
-                    onClick = onSaveClick,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    isProminent = true
-                )
+    Column {
+        // Formatting toolbar
+        FormattingToolbar(richTextState = richTextState)
+
+        BottomAppBar(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 12.dp,
+            actions = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    EnhancedBottomBarButton(
+                        icon = Icons.Rounded.Check,
+                        label = stringResource(R.string.save),
+                        onClick = onSaveClick,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        isProminent = true,
+                        modifier = Modifier.semantics { testTag = TestTags.SAVE_ICON_BUTTON }
+                    )
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -70,7 +83,8 @@ private fun EnhancedBottomBarButton(
     onClick: () -> Unit,
     containerColor: Color,
     contentColor: Color,
-    isProminent: Boolean = false
+    isProminent: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     val haptics = LocalHapticFeedback.current
     val scale by animateFloatAsState(
@@ -82,7 +96,7 @@ private fun EnhancedBottomBarButton(
     Row (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
+        modifier = modifier
             .scale(scale)
             .clip(RoundedCornerShape(16.dp))
             .background(
