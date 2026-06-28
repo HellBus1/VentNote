@@ -58,7 +58,15 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.InputChip
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
@@ -306,18 +314,38 @@ fun NoteDetailPage(
                                     )
                                 }
                                 if (isEditingState) {
-                                    InputChip(
-                                        selected = false,
-                                        onClick = { showTagPicker = true },
-                                        label = { Text(if (selectedTagIds.isEmpty()) "Add Tags" else "Edit") },
-                                        leadingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Add,
-                                                contentDescription = "Add tags",
-                                                modifier = Modifier.size(16.dp)
+                                    val tintColor = MaterialTheme.colorScheme.primary
+                                    val chipShape = androidx.compose.foundation.shape.RoundedCornerShape(50)
+                                    Row(
+                                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .height(30.dp)
+                                            .clip(chipShape)
+                                            .background(tintColor.copy(alpha = 0.08f))
+                                            .border(
+                                                width = 1.dp,
+                                                color = tintColor.copy(alpha = 0.4f),
+                                                shape = chipShape
                                             )
-                                        }
-                                    )
+                                            .clickable { showTagPicker = true }
+                                            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Add,
+                                            contentDescription = "Add tags",
+                                            modifier = Modifier.size(12.dp),
+                                            tint = tintColor
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = if (selectedTagIds.isEmpty()) "Add Tags" else "Edit",
+                                            style = MaterialTheme.typography.labelMedium.copy(
+                                                color = tintColor,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 12.sp
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         }

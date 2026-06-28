@@ -17,7 +17,7 @@ interface TagDAO {
     @Query("SELECT * FROM tag_table ORDER BY name ASC")
     suspend fun getAllTagsSync(): List<TagModel>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTag(tag: TagModel): Long
 
     @Update

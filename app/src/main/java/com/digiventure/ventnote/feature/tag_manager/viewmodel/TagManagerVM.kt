@@ -38,6 +38,12 @@ class TagManagerVM @Inject constructor(
 
     override suspend fun insertTag(tag: TagModel): Result<Long> = withContext(Dispatchers.IO) {
         try {
+            val existingTagsResult = tagRepository.getAllTags().first()
+            val existingTags = existingTagsResult.getOrDefault(emptyList())
+            val nameExists = existingTags.any { it.name.equals(tag.name.trim(), ignoreCase = true) }
+            if (nameExists) {
+                return@withContext Result.failure(Exception("Tag name already exists"))
+            }
             tagRepository.insertTag(tag).first()
         } catch (e: Exception) {
             Result.failure(e)
@@ -46,6 +52,14 @@ class TagManagerVM @Inject constructor(
 
     override suspend fun updateTag(tag: TagModel): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
+            val existingTagsResult = tagRepository.getAllTags().first()
+            val existingTags = existingTagsResult.getOrDefault(emptyList())
+            val nameExists = existingTags.any { 
+                it.name.equals(tag.name.trim(), ignoreCase = true) && it.id != tag.id 
+            }
+            if (nameExists) {
+                return@withContext Result.failure(Exception("Tag name already exists"))
+            }
             tagRepository.updateTag(tag).first()
         } catch (e: Exception) {
             Result.failure(e)

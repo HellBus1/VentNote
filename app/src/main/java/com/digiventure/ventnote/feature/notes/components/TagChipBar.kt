@@ -24,6 +24,14 @@ import com.digiventure.ventnote.data.persistence.TagModel
 import com.digiventure.ventnote.feature.tag_manager.components.TagChip
 import com.digiventure.ventnote.feature.tag_manager.components.parseColor
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.sp
+
 /**
  * WhatsApp-style horizontal chip bar for filtering notes by tag.
  *
@@ -74,51 +82,67 @@ fun TagChipBar(
 
 @Composable
 private fun AllChip(isSelected: Boolean, onClick: () -> Unit) {
-    FilterChip(
-        selected = isSelected,
-        onClick = onClick,
-        label = {
-            Text(
-                text = "All",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
-                )
+    val tintColor = MaterialTheme.colorScheme.primary
+    val chipShape = RoundedCornerShape(50)
+    val bgAlpha = if (isSelected) 0.20f else 0.12f
+    val borderAlpha = if (isSelected) 1f else 0.4f
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(chipShape)
+            .background(tintColor.copy(alpha = bgAlpha))
+            .border(
+                width = if (isSelected) 1.5.dp else 1.dp,
+                color = tintColor.copy(alpha = borderAlpha),
+                shape = chipShape
             )
-        },
-        shape = RoundedCornerShape(50),
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.primary,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+            .clickable { onClick() }
+            .padding(start = 12.dp, end = 12.dp, top = 5.dp, bottom = 5.dp)
+    ) {
+        Text(
+            text = "All",
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = tintColor,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                fontSize = 12.sp
+            )
         )
-    )
+    }
 }
 
 @Composable
 private fun AddTagChip(onClick: () -> Unit) {
-    FilterChip(
-        selected = false,
-        onClick = onClick,
-        label = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = "Manage Tags",
-                    modifier = Modifier.size(14.dp),
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-                Text(
-                    text = "Tags",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
-            }
-        },
-        shape = RoundedCornerShape(50),
-        modifier = Modifier.padding(end = 4.dp)
-    )
+    val tintColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    val chipShape = RoundedCornerShape(50)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(chipShape)
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+            .border(
+                width = 1.dp,
+                color = tintColor.copy(alpha = 0.3f),
+                shape = chipShape
+            )
+            .clickable { onClick() }
+            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Add,
+            contentDescription = "Manage Tags",
+            modifier = Modifier.size(12.dp),
+            tint = tintColor
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = "Tags",
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = tintColor,
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp
+            )
+        )
+    }
 }

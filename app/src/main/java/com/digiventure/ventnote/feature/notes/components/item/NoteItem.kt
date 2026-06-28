@@ -123,26 +123,14 @@ fun NotesItem(
                         ),
                     )
 
-                    // Tag chips row — show up to 3 tags, then "+N more"
+                    // Tag chips row — display tags directly (maximum 3 tags)
                     if (tags.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        val visibleTags = tags.take(3)
-                        val overflow = tags.size - visibleTags.size
                         LazyRow(
                             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
                         ) {
-                            items(items = visibleTags, key = { it.id }) { tag ->
+                            items(items = tags, key = { it.id }) { tag ->
                                 TagChip(tag = tag)
-                            }
-                            if (overflow > 0) {
-                                item {
-                                    Text(
-                                        text = "+$overflow",
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                                        )
-                                    )
-                                }
                             }
                         }
                     }
