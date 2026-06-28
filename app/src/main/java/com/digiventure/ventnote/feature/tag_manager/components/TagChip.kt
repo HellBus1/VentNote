@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digiventure.ventnote.data.persistence.TagModel
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 
 /**
  * Reusable tag chip composable.
@@ -60,6 +62,9 @@ fun TagChip(
                 color = tagColor.copy(alpha = borderAlpha),
                 shape = chipShape
             )
+            .semantics {
+                testTag = "tag_chip_${tag.name}"
+            }
             .then(
                 if (onClick != null) Modifier.clickable { onClick() }
                 else Modifier

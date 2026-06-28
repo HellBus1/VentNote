@@ -27,6 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.data.persistence.TagModel
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import com.digiventure.ventnote.commons.TestTags
 
 private const val MAX_TAG_NAME_LENGTH = 20
 
@@ -72,7 +75,7 @@ fun TagEditorDialog(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     supportingText = { Text("${tagName.length}/$MAX_TAG_NAME_LENGTH") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().semantics { testTag = TestTags.TAG_NAME_FIELD }
                 )
 
                 // Color picker

@@ -36,8 +36,10 @@ class NoteDetailFeature : BaseAcceptanceTest() {
         hiltRule.inject()
         Intents.init()
 
-        // Seed the database
+        // Seed the database & clean tag tables
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
             databaseProxy.dao().upsertNotes(listOf(testNote))
         }
 
@@ -68,6 +70,8 @@ class NoteDetailFeature : BaseAcceptanceTest() {
     @After
     fun tearDown() {
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
             val allNotes = databaseProxy.dao().getSyncNotes()
             if (allNotes.isNotEmpty()) {
                 databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())

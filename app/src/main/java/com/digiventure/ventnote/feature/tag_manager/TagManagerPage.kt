@@ -42,6 +42,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import com.digiventure.ventnote.commons.TestTags
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -84,6 +87,7 @@ fun TagManagerPage(
     }
 
     Scaffold(
+        modifier = Modifier.semantics { testTag = TestTags.TAG_MANAGER_PAGE },
         topBar = {
             TopAppBar(
                 title = {

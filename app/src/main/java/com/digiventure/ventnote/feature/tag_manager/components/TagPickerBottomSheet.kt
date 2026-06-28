@@ -22,6 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.digiventure.ventnote.data.persistence.TagModel
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import com.digiventure.ventnote.commons.TestTags
 
 /**
  * A bottom sheet that shows all available tags as chips.
@@ -54,6 +57,7 @@ fun TagPickerBottomSheet(
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp)
                 .verticalScroll(rememberScrollState())
+                .semantics { testTag = TestTags.BOTTOM_SHEET }
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

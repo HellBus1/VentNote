@@ -27,6 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 
 /** Fixed 12-color palette — same palette as Google Keep. */
 val TAG_COLOR_PALETTE = listOf(
@@ -102,6 +104,7 @@ private fun ColorCircle(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 shape = CircleShape
             )
+            .semantics { contentDescription = "Color: $label" }
             .clickable { onClick() }
             .padding(2.dp)
     ) {

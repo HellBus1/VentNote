@@ -65,8 +65,15 @@ class NotesFeature : BaseAcceptanceTest() {
             databaseProxy.dao().upsertNotes(listOf(note1, note2, note3))
         }
 
-        // Wait for the UI to settle after seeding
-        composeTestRule.waitForIdle()
+        // Wait for the main page to launch
+        composeTestRule.waitUntil(15000) {
+            try {
+                composeTestRule.onNodeWithTag(TestTags.NOTES_PAGE).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
     }
 
     @After
@@ -474,8 +481,13 @@ class NotesFeature : BaseAcceptanceTest() {
     @Test
     fun menuButton_click_opensNavDrawer() {
         composeTestRule.onNodeWithTag(TestTags.MENU_ICON_BUTTON).performClick()
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithTag(TestTags.NAV_DRAWER).assertIsDisplayed()
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNodeWithTag(TestTags.NAV_DRAWER, useUnmergedTree = true).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
     }
 }
