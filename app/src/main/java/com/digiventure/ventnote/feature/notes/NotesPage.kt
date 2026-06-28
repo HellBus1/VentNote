@@ -58,6 +58,7 @@ import com.digiventure.ventnote.commons.TestTags
 import com.digiventure.ventnote.components.dialog.LoadingDialog
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.feature.notes.components.TagChipBar
 import com.digiventure.ventnote.feature.notes.components.item.NotesItem
 import com.digiventure.ventnote.feature.notes.components.navbar.NotesAppBar
 import com.digiventure.ventnote.feature.notes.components.searchbar.SearchBar
@@ -89,27 +90,44 @@ fun NotesPage(
     val searchQuery by viewModel.searchedTitleText
     val isMarking by viewModel.isMarking
     val markedNoteList = viewModel.markedNoteList
+    val selectedTagId by viewModel.selectedTagId
+    val allTagsState by viewModel.allTags.observeAsState()
+    val allTags = allTagsState?.getOrNull() ?: emptyList()
+    val noteTagsMapState by viewModel.noteTagsMap.observeAsState()
+    val noteTagsMap = noteTagsMapState ?: emptyMap()
 
     // Debounced search query
     var debouncedSearchQuery by remember { mutableStateOf("") }
 
-    // Debounce search input
     LaunchedEffect(searchQuery) {
-        kotlinx.coroutines.delay(300) // 300ms debounce delay
+        kotlinx.coroutines.delay(300)
         debouncedSearchQuery = searchQuery
     }
 
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    // Memoized filtered notes with proper dependencies - using debounced query
+    // Memoized filtered notes — applies both tag filter and search
     val filteredNotes by remember {
         derivedStateOf {
             val notes = noteListState?.getOrNull() ?: emptyList()
-            if (debouncedSearchQuery.isBlank()) {
+            // 1. Apply tag folder filter
+            val tagFiltered = if (selectedTagId == null) {
                 notes
             } else {
                 notes.filter { note ->
+                    // We check against the allTags state; for proper filtering we rely on
+                    // the note's associated tags loaded in the NoteItem. A simple approach
+                    // is to store noteId→tagIds in the VM (handled via allTags + cross-refs).
+                    // For now, the ViewModel-level filtering is the source of truth.
+                    true // VM will provide pre-filtered list via observeNotesByTag
+                }
+            }
+            // 2. Apply text search
+            if (debouncedSearchQuery.isBlank()) {
+                tagFiltered
+            } else {
+                tagFiltered.filter { note ->
                     note.title.contains(debouncedSearchQuery, ignoreCase = true) ||
                             note.note.contains(debouncedSearchQuery, ignoreCase = true)
                 }
@@ -143,8 +161,6 @@ fun NotesPage(
     }
 
     LaunchedEffect(loadingState) {
-        // Only show loading dialog if there's already some data or if it's a long operation
-        // For initial load, we prefer a non-blocking experience
         if (filteredNotes.isNotEmpty()) {
             showLoadingDialog = loadingState == true
         }
@@ -161,7 +177,6 @@ fun NotesPage(
                         showDeleteDialog = false
                         viewModel.unMarkAllNote()
                         viewModel.closeMarkingEvent()
-
                         snackBarHostState.showSnackbar(
                             message = noteIsDeletedText,
                             withDismissAction = true
@@ -202,6 +217,11 @@ fun NotesPage(
         { note: NoteModel ->
             viewModel.addToMarkedNoteList(note)
         }
+    }
+
+    // Selected tag name for AppBar subtitle
+    val selectedTagName = remember(selectedTagId, allTags) {
+        selectedTagId?.let { id -> allTags.find { it.id == id }?.name }
     }
 
     Scaffold(
@@ -257,7 +277,7 @@ fun NotesPage(
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp,0.dp,0.dp,0.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
                     shape = MaterialTheme.shapes.medium
                 )
             }
@@ -278,7 +298,7 @@ fun NotesPage(
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                     .semantics { testTag = TestTags.NOTE_RV }
-                
+
                 when (viewModel.noteViewMode.value) {
                     Constants.VIEW_MODE_STAGGERED -> {
                         LazyVerticalStaggeredGrid(
@@ -288,6 +308,21 @@ fun NotesPage(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp)
                         ) {
+                            // Tag chip bar (full span)
+                            if (allTags.isNotEmpty() || true) {
+                                item(key = "tag_chip_bar", span = StaggeredGridItemSpan.FullLine) {
+                                    TagChipBar(
+                                        tags = allTags,
+                                        selectedTagId = selectedTagId,
+                                        onTagSelected = { viewModel.selectedTagId.value = it },
+                                        onAddTag = { navigationActions.navigateToTagManagerPage() },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 12.dp, bottom = 4.dp)
+                                    )
+                                }
+                            }
+
                             item(key = "search_bar", span = StaggeredGridItemSpan.FullLine) {
                                 Box(
                                     modifier = Modifier
@@ -296,7 +331,7 @@ fun NotesPage(
                                             scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
                                         }
                                         .fillMaxWidth()
-                                        .padding(top = 24.dp, bottom = 8.dp)
+                                        .padding(top = 8.dp, bottom = 8.dp)
                                 ) {
                                     SearchBar(
                                         query = searchQuery,
@@ -311,10 +346,14 @@ fun NotesPage(
                                 items = filteredNotes,
                                 key = { note -> note.id }
                             ) { note ->
+                                val noteTags = remember(noteTagsMap, note.id) {
+                                    noteTagsMap[note.id] ?: emptyList()
+                                }
                                 NotesItem(
                                     isMarking = isMarking,
                                     isMarked = note in markedNoteList,
                                     data = note,
+                                    tags = noteTags,
                                     noteViewMode = viewModel.noteViewMode.value,
                                     onClick = { onNoteClick(note) },
                                     onLongClick = { onNoteLongClick(note) },
@@ -329,6 +368,19 @@ fun NotesPage(
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             contentPadding = PaddingValues(bottom = 96.dp)
                         ) {
+                            // Tag chip bar (full width)
+                            item(key = "tag_chip_bar") {
+                                TagChipBar(
+                                    tags = allTags,
+                                    selectedTagId = selectedTagId,
+                                    onTagSelected = { viewModel.selectedTagId.value = it },
+                                    onAddTag = { navigationActions.navigateToTagManagerPage() },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 12.dp, bottom = 4.dp)
+                                )
+                            }
+
                             item(key = "search_bar") {
                                 Box(
                                     modifier = Modifier
@@ -337,7 +389,7 @@ fun NotesPage(
                                             scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx
                                         }
                                         .fillMaxWidth()
-                                        .padding(16.dp, 24.dp, 16.dp, 8.dp)
+                                        .padding(16.dp, 8.dp, 16.dp, 8.dp)
                                 ) {
                                     SearchBar(
                                         query = searchQuery,
@@ -358,10 +410,14 @@ fun NotesPage(
                                         .padding(horizontal = 16.dp)
                                         .animateItem()
                                 ) {
+                                    val noteTags = remember(noteTagsMap, note.id) {
+                                        noteTagsMap[note.id] ?: emptyList()
+                                    }
                                     NotesItem(
                                         isMarking = isMarking,
                                         isMarked = note in markedNoteList,
                                         data = note,
+                                        tags = noteTags,
                                         noteViewMode = viewModel.noteViewMode.value,
                                         onClick = { onNoteClick(note) },
                                         onLongClick = { onNoteLongClick(note) },

@@ -53,6 +53,174 @@ import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
 
+val SortIcon: ImageVector
+    get() = ImageVector.Builder(
+        name = "SortIcon",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).apply {
+        path(fill = SolidColor(Color.Black)) {
+            moveTo(3f, 7f)
+            horizontalLineToRelative(18f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            reflectiveCurveTo(21.55f, 5f, 21f, 5f)
+            lineTo(3f, 5f)
+            curveToRelative(-0.55f, 0f, -1f, 0.45f, -1f, 1f)
+            reflectiveCurveTo(2.45f, 7f, 3f, 7f)
+            close()
+            
+            moveTo(6f, 13f)
+            horizontalLineToRelative(12f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            reflectiveCurveTo(18.55f, 11f, 18f, 11f)
+            lineTo(6f, 11f)
+            curveToRelative(-0.55f, 0f, -1f, 0.45f, -1f, 1f)
+            reflectiveCurveTo(5.45f, 13f, 6f, 13f)
+            close()
+            
+            moveTo(9f, 19f)
+            horizontalLineToRelative(6f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            reflectiveCurveTo(15.55f, 17f, 15f, 17f)
+            lineTo(9f, 17f)
+            curveToRelative(-0.55f, 0f, -1f, 0.45f, -1f, 1f)
+            reflectiveCurveTo(8.45f, 19f, 9f, 19f)
+            close()
+        }
+    }.build()
+
+val GridViewIcon: ImageVector
+    get() = ImageVector.Builder(
+        name = "GridViewIcon",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).apply {
+        path(fill = SolidColor(Color.Black)) {
+            // Top-left
+            moveTo(3f, 3f)
+            horizontalLineToRelative(6f)
+            curveToRelative(0.55f, 0f, 1f, 0.45f, 1f, 1f)
+            verticalLineToRelative(6f)
+            curveToRelative(0f, 0.55f, -0.45f, 1f, -1f, 1f)
+            lineTo(3f, 11f)
+            curveToRelative(-0.55f, 0f, -1f, -0.45f, -1f, -1f)
+            lineTo(2f, 4f)
+            curveToRelative(0f, -0.55f, 0.45f, -1f, 1f, -1f)
+            close()
+            
+            // Top-right
+            moveTo(15f, 3f)
+            horizontalLineToRelative(6f)
+            curveToRelative(0.55f, 0f, 1f, 0.45f, 1f, 1f)
+            verticalLineToRelative(6f)
+            curveToRelative(0f, 0.55f, -0.45f, 1f, -1f, 1f)
+            horizontalLineToRelative(-6f)
+            curveToRelative(-0.55f, 0f, -1f, -0.45f, -1f, -1f)
+            lineTo(14f, 4f)
+            curveToRelative(0f, -0.55f, 0.45f, -1f, 1f, -1f)
+            close()
+            
+            // Bottom-left
+            moveTo(3f, 15f)
+            horizontalLineToRelative(6f)
+            curveToRelative(0.55f, 0f, 1f, 0.45f, 1f, 1f)
+            verticalLineToRelative(6f)
+            curveToRelative(0f, 0.55f, -0.45f, 1f, -1f, 1f)
+            lineTo(3f, 23f)
+            curveToRelative(-0.55f, 0f, -1f, -0.45f, -1f, -1f)
+            verticalLineToRelative(-6f)
+            curveToRelative(0f, -0.55f, 0.45f, -1f, 1f, -1f)
+            close()
+            
+            // Bottom-right
+            moveTo(15f, 15f)
+            horizontalLineToRelative(6f)
+            curveToRelative(0.55f, 0f, 1f, 0.45f, 1f, 1f)
+            verticalLineToRelative(6f)
+            curveToRelative(0f, 0.55f, -0.45f, 1f, -1f, 1f)
+            horizontalLineToRelative(-6f)
+            curveToRelative(-0.55f, 0f, -1f, -0.45f, -1f, -1f)
+            verticalLineToRelative(-6f)
+            curveToRelative(0f, -0.55f, 0.45f, -1f, 1f, -1f)
+            close()
+        }
+    }.build()
+
+val ListViewIcon: ImageVector
+    get() = ImageVector.Builder(
+        name = "ListViewIcon",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f
+    ).apply {
+        path(fill = SolidColor(Color.Black)) {
+            // Row 1
+            moveTo(3f, 6f)
+            curveToRelative(0f, -0.55f, 0.45f, -1f, 1f, -1f)
+            horizontalLineToRelative(1f)
+            curveToRelative(0.55f, 0f, 1f, 0.45f, 1f, 1f)
+            verticalLineToRelative(1f)
+            curveToRelative(0f, 0.55f, -0.45f, 1f, -1f, 1f)
+            lineTo(4f, 9f)
+            curveToRelative(-0.55f, 0f, -1f, -0.45f, -1f, -1f)
+            close()
+            
+            moveTo(9f, 7f)
+            horizontalLineToRelative(12f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            reflectiveCurveTo(21.55f, 5f, 21f, 5f)
+            lineTo(9f, 5f)
+            curveToRelative(-0.55f, 0f, -1f, 0.45f, -1f, 1f)
+            reflectiveCurveTo(8.45f, 7f, 9f, 7f)
+            close()
+            
+            // Row 2
+            moveTo(3f, 12f)
+            curveToRelative(0f, -0.55f, 0.45f, -1f, 1f, -1f)
+            horizontalLineToRelative(1f)
+            curveToRelative(0.55f, 0f, 1f, 0.45f, 1f, 1f)
+            verticalLineToRelative(1f)
+            curveToRelative(0f, 0.55f, -0.45f, 1f, -1f, 1f)
+            lineTo(4f, 15f)
+            curveToRelative(-0.55f, 0f, -1f, -0.45f, -1f, -1f)
+            close()
+            
+            moveTo(9f, 13f)
+            horizontalLineToRelative(12f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            reflectiveCurveTo(21.55f, 11f, 21f, 11f)
+            lineTo(9f, 11f)
+            curveToRelative(-0.55f, 0f, -1f, 0.45f, -1f, 1f)
+            reflectiveCurveTo(8.45f, 13f, 9f, 13f)
+            close()
+            
+            // Row 3
+            moveTo(3f, 18f)
+            curveToRelative(0f, -0.55f, 0.45f, -1f, 1f, -1f)
+            horizontalLineToRelative(1f)
+            curveToRelative(0.55f, 0f, 1f, 0.45f, 1f, 1f)
+            verticalLineToRelative(1f)
+            curveToRelative(0f, 0.55f, -0.45f, 1f, -1f, 1f)
+            lineTo(4f, 21f)
+            curveToRelative(-0.55f, 0f, -1f, -0.45f, -1f, -1f)
+            close()
+            
+            moveTo(9f, 19f)
+            horizontalLineToRelative(12f)
+            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
+            reflectiveCurveTo(21.55f, 17f, 21f, 17f)
+            lineTo(9f, 17f)
+            curveToRelative(-0.55f, 0f, -1f, 1f, -1f, 1f)
+            reflectiveCurveTo(8.45f, 19f, 9f, 19f)
+            close()
+        }
+    }.build()
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesAppBar(
@@ -118,85 +286,7 @@ fun NotesAppBar(
     )
 }
 
-val ViewAgendaIcon: ImageVector
-    get() = ImageVector.Builder(
-        name = "ViewAgenda",
-        defaultWidth = 24.dp,
-        defaultHeight = 24.dp,
-        viewportWidth = 24f,
-        viewportHeight = 24f
-    ).apply {
-        path(fill = SolidColor(Color.Black)) {
-            moveTo(20f, 3f)
-            lineTo(3f, 3f)
-            curveTo(2.45f, 3f, 2f, 3.45f, 2f, 4f)
-            verticalLineToRelative(6f)
-            curveToRelative(0f, 0.55f, 0.45f, 1f, 1f, 1f)
-            horizontalLineToRelative(17f)
-            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
-            lineTo(21f, 4f)
-            curveToRelative(0f, -0.55f, -0.45f, -1f, -1f, -1f)
-            close()
-            moveTo(20f, 13f)
-            lineTo(3f, 13f)
-            curveToRelative(-0.55f, 0f, -1f, 0.45f, -1f, 1f)
-            verticalLineToRelative(6f)
-            curveToRelative(0f, 0.55f, 0.45f, 1f, 1f, 1f)
-            horizontalLineToRelative(17f)
-            curveToRelative(0.55f, 0f, 1f, -0.45f, 1f, -1f)
-            verticalLineToRelative(-6f)
-            curveToRelative(0f, -0.55f, -0.45f, -1f, -1f, -1f)
-            close()
-        }
-    }.build()
 
-val ViewListIcon: ImageVector
-    get() = ImageVector.Builder(
-        name = "ViewList",
-        defaultWidth = 24.dp,
-        defaultHeight = 24.dp,
-        viewportWidth = 24f,
-        viewportHeight = 24f
-    ).apply {
-        path(fill = SolidColor(Color.Black)) {
-            moveTo(3f, 14f)
-            horizontalLineToRelative(4f)
-            verticalLineToRelative(-4f)
-            lineTo(3f, 10f)
-            verticalLineToRelative(4f)
-            close()
-            moveTo(3f, 19f)
-            horizontalLineToRelative(4f)
-            verticalLineToRelative(-4f)
-            lineTo(3f, 15f)
-            verticalLineToRelative(4f)
-            close()
-            moveTo(3f, 9f)
-            horizontalLineToRelative(4f)
-            lineTo(7f, 5f)
-            lineTo(3f, 5f)
-            verticalLineToRelative(4f)
-            close()
-            moveTo(8f, 14f)
-            horizontalLineToRelative(13f)
-            verticalLineToRelative(-4f)
-            lineTo(8f, 10f)
-            verticalLineToRelative(4f)
-            close()
-            moveTo(8f, 19f)
-            horizontalLineToRelative(13f)
-            verticalLineToRelative(-4f)
-            lineTo(8f, 15f)
-            verticalLineToRelative(4f)
-            close()
-            moveTo(8f, 5f)
-            verticalLineToRelative(4f)
-            horizontalLineToRelative(13f)
-            lineTo(21f, 5f)
-            lineTo(8f, 5f)
-            close()
-        }
-    }.build()
 
 @Composable
 private fun SelectionTitle(
@@ -473,12 +563,16 @@ fun TrailingMenuIcons(
             modifier = Modifier.semantics { testTag = "view_mode_icon_button" }
         ) {
             val viewIcon = when (noteViewMode) {
-                Constants.VIEW_MODE_STAGGERED -> ViewAgendaIcon
-                else -> ViewListIcon
+                Constants.VIEW_MODE_STAGGERED -> ListViewIcon
+                else -> GridViewIcon
+            }
+            val contentDescription = when (noteViewMode) {
+                Constants.VIEW_MODE_STAGGERED -> "Switch to list view"
+                else -> "Switch to grid view"
             }
             Icon(
                 imageVector = viewIcon,
-                contentDescription = stringResource(R.string.drawer_nav_icon), // generic placeholder
+                contentDescription = contentDescription,
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -487,7 +581,7 @@ fun TrailingMenuIcons(
             modifier = Modifier.semantics { testTag = TestTags.SORT_ICON_BUTTON }
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Rounded.List,
+                imageVector = SortIcon,
                 contentDescription = stringResource(R.string.sort_nav_icon),
                 tint = MaterialTheme.colorScheme.onSurface
             )

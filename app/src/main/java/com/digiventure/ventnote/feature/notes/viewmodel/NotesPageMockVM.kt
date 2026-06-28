@@ -6,23 +6,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.TagModel
 
 class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
-    override val loader = MutableLiveData<Boolean>(false) // Initial value
+    override val loader = MutableLiveData<Boolean>(false)
     override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData()
 
-    override fun sortAndOrder(sortBy: String, orderBy: String) {
-        // Mock implementation if needed
-    }
+    override fun sortAndOrder(sortBy: String, orderBy: String) {}
 
     override val noteViewMode = mutableStateOf(com.digiventure.ventnote.commons.Constants.VIEW_MODE_LIST)
     override fun setNoteViewMode(mode: String) {
         noteViewMode.value = mode
     }
 
-    // More preview-friendly way to expose a list
     override val noteList: LiveData<Result<List<NoteModel>>> =
-        MutableLiveData( // Use MutableLiveData and set its value directly
+        MutableLiveData(
             Result.success(
                 listOf(
                     NoteModel(0, "Title 1", "Note 1"),
@@ -32,6 +30,19 @@ class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
                 )
             )
         )
+
+    override val allTags: LiveData<Result<List<TagModel>>> = MutableLiveData(
+        Result.success(
+            listOf(
+                TagModel(1, "Work", "#EF5350"),
+                TagModel(2, "Ideas", "#42A5F5")
+            )
+        )
+    )
+
+    override val selectedTagId = mutableStateOf<Int?>(null)
+
+    override val noteTagsMap: LiveData<Map<Int, List<TagModel>>> = MutableLiveData(emptyMap())
 
     override val searchedTitleText = mutableStateOf("")
 
@@ -49,8 +60,5 @@ class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
         markedNoteList.clear()
     }
 
-    override fun observeNotes() {
-        // In a real ViewModel, this might trigger the data loading.
-        // For a mock, the data is already set.
-    }
+    override fun observeNotes() {}
 }

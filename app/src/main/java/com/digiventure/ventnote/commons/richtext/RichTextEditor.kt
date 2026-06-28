@@ -76,14 +76,6 @@ fun RichTextEditor(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .padding(16.dp)
-                .semantics {
-                    if (contentDescriptionText.isNotEmpty()) {
-                        contentDescription = contentDescriptionText
-                    }
-                    if (testTagText.isNotEmpty()) {
-                        testTag = testTagText
-                    }
-                }
         ) {
             if (richTextState.toPlainText().isEmpty() && isEditing) {
                 Text(
@@ -111,6 +103,14 @@ fun RichTextEditor(
                     .fillMaxHeight()
                     .onFocusChanged { focusState ->
                         onFocusChanged?.invoke(focusState.isFocused)
+                    }
+                    .semantics {
+                        if (testTagText.isNotEmpty()) {
+                            testTag = testTagText
+                        }
+                        if (contentDescriptionText.isNotEmpty()) {
+                            contentDescription = contentDescriptionText
+                        }
                     }
             )
         }

@@ -90,6 +90,8 @@
     <string name="theme_setting">theme setting</string>
     <string name="backup">Backup notes</string>
     <string name="backup_description">Backup note to google drive</string>
+    <string name="manage_tags">Manage Tags</string>
+    <string name="manage_tags_description">Create and organize note tags</string>
     <string name="switch_to_dark_mode">switch to dark mode</string>
     <string name="switch_to_light_mode">switch to light mode</string>
 

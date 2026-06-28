@@ -31,11 +31,28 @@ class NavDrawerFeature : BaseAcceptanceTest() {
         hiltRule.inject()
         Intents.init()
         
+        // Wait for notes page to load
+        composeTestRule.waitUntil(15000) {
+            try {
+                composeTestRule.onNodeWithTag(TestTags.NOTES_PAGE).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
         // Open the drawer
-        composeTestRule.onNodeWithTag(TestTags.NOTES_PAGE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTags.MENU_ICON_BUTTON).performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag(TestTags.NAV_DRAWER, useUnmergedTree = true).assertIsDisplayed()
+        
+        // Wait for drawer items to slide on screen
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNodeWithTag(TestTags.RATE_APP_TILE).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
     }
 
     @After

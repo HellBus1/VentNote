@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
@@ -31,6 +33,8 @@ import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.commons.richtext.MarkdownParser
 import com.digiventure.ventnote.components.navbar.TopNavBarIcon
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.TagModel
+import com.digiventure.ventnote.feature.tag_manager.components.TagChip
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -38,6 +42,7 @@ fun NotesItem(
     isMarking: Boolean,
     isMarked: Boolean,
     data: NoteModel,
+    tags: List<TagModel> = emptyList(),
     noteViewMode: String = Constants.VIEW_MODE_LIST,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -117,6 +122,18 @@ fun NotesItem(
                             fontWeight = FontWeight.Normal,
                         ),
                     )
+
+                    // Tag chips row — display tags directly (maximum 3 tags)
+                    if (tags.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LazyRow(
+                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
+                        ) {
+                            items(items = tags, key = { it.id }) { tag ->
+                                TagChip(tag = tag)
+                            }
+                        }
+                    }
                 }
             }
         }

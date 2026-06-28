@@ -11,6 +11,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
+import kotlinx.coroutines.runBlocking
 
 @HiltAndroidTest
 class NoteCreationFeature : BaseAcceptanceTest() {
@@ -21,10 +24,23 @@ class NoteCreationFeature : BaseAcceptanceTest() {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Inject
+    lateinit var databaseProxy: DatabaseProxy
+
     @Before
     fun setUp() {
         hiltRule.inject()
         Intents.init()
+
+        // Clean tables
+        runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val notes = databaseProxy.dao().getSyncNotes()
+            if (notes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*notes.toTypedArray())
+            }
+        }
 
         // Wait for list and navigate to creation
         composeTestRule.waitUntil(10000) {
@@ -52,6 +68,14 @@ class NoteCreationFeature : BaseAcceptanceTest() {
 
     @After
     fun tearDown() {
+        runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val notes = databaseProxy.dao().getSyncNotes()
+            if (notes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*notes.toTypedArray())
+            }
+        }
         Intents.release()
     }
 
