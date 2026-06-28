@@ -24,6 +24,14 @@ class NoteLocalService @Inject constructor(
         }
     }
 
+    fun getNotesByTag(tagId: Int, sortBy: String, order: String): Flow<Result<List<NoteModel>>> {
+        return proxy.dao().getNotesByTag(tagId, sortBy, order).map {
+            Result.success(it)
+        }.catch {
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_GET_NOTE_LIST_ROOM)))
+        }
+    }
+
     fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
         flow {
             val result = (proxy.dao().deleteNotes(*notes) == notes.size)
@@ -56,6 +64,19 @@ class NoteLocalService @Inject constructor(
         flow {
             val result = proxy.dao().insertWithTimestamp(note) != -1L
             emit(Result.success(result))
+        }.onEach {
+            if (it.isSuccess) refresher.refresh(app)
+        }.catch {
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_INSERT_NOTE_ROOM)))
+        }
+
+    fun insertNote(note: NoteModel, tagIds: List<Int>): Flow<Result<Long>> =
+        flow {
+            val id = proxy.dao().insertWithTimestamp(note)
+            if (id != -1L && tagIds.isNotEmpty()) {
+                proxy.tagDao().setTagsForNote(id.toInt(), tagIds)
+            }
+            emit(Result.success(id))
         }.onEach {
             if (it.isSuccess) refresher.refresh(app)
         }.catch {

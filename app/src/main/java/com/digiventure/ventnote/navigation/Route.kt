@@ -6,4 +6,5 @@ sealed class Route(val routeName: String) {
     data object NoteCreationPage: Route(routeName = "note_creation_page")
     data object SharePreviewPage: Route(routeName = "share_preview_page")
     data object BackupPage: Route(routeName = "backup_page")
+    data object TagManagerPage: Route(routeName = "tag_manager_page")
 }

@@ -25,3 +25,8 @@ google-services.json
 client_secret.json
 /app/release
 lint-baseline.xml
+/phase 1 v1/
+.agents/
+.gemini/
+GEMINI.md
+.codegraph/

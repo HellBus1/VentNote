@@ -10,13 +10,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.config.DriveAPI
+import com.digiventure.ventnote.data.google_drive.BackupPayload
 import com.digiventure.ventnote.data.google_drive.GoogleDriveRepository
 import com.digiventure.ventnote.data.persistence.NoteRepository
+import com.digiventure.ventnote.data.persistence.TagRepository
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -28,7 +32,9 @@ import javax.inject.Inject
 class BackupPageVM @Inject constructor(
     private val app: Application,
     private val repository: GoogleDriveRepository,
-    private val databaseRepository: NoteRepository
+    private val databaseRepository: NoteRepository,
+    private val tagRepository: TagRepository,
+    private val databaseProxy: DatabaseProxy
 ): ViewModel(), BackupPageBaseVM {
     private val _uiState = mutableStateOf(BackupPageState())
     override val uiState: State<BackupPageState> = _uiState
@@ -43,21 +49,28 @@ class BackupPageVM @Inject constructor(
 
             try {
                 val drive = getDriveInstance()
-                databaseRepository.getNoteList(Constants.UPDATED_AT, Constants.DESCENDING)
-                    .collect {
-                        repository.uploadDatabaseFile(
-                            it.getOrDefault(listOf()),
-                            getDatabaseNameWithTimestamps(),
-                            drive
-                        ).onEach {
-                            // Clean up old backups first (seamlessly)
-                            cleanupOldBackups(drive)
-                            
-                            // Then update UI state and fetch final list
-                            _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
-                            getBackupFileList()
-                        }.last()
-                    }
+                val notesResult = databaseRepository.getNoteList(Constants.UPDATED_AT, Constants.DESCENDING).first()
+                val notes = notesResult.getOrDefault(listOf())
+                val tags = tagRepository.getAllTags().first().getOrDefault(emptyList())
+                val noteTags = databaseProxy.tagDao().getAllNoteTagCrossRefs()
+                val payload = BackupPayload(
+                    version = 1,
+                    notes = notes,
+                    tags = tags,
+                    noteTags = noteTags
+                )
+                repository.uploadDatabaseFile(
+                    payload,
+                    getDatabaseNameWithTimestamps(),
+                    drive
+                ).onEach {
+                    // Clean up old backups first (seamlessly)
+                    cleanupOldBackups(drive)
+
+                    // Then update UI state and fetch final list
+                    _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
+                    getBackupFileList()
+                }.first()
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
                 _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFailed(errorMessage))

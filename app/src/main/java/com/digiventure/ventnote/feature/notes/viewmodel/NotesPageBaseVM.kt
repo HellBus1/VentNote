@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.TagModel
 
 interface NotesPageBaseVM {
     /**
@@ -32,6 +33,21 @@ interface NotesPageBaseVM {
      * Handle NoteList state
      * */
     val noteList: LiveData<Result<List<NoteModel>>>
+
+    /**
+     * All available tags for the chip bar
+     */
+    val allTags: LiveData<Result<List<TagModel>>>
+
+    /**
+     * Currently selected tag ID for folder-style filtering. Null = show all.
+     */
+    val selectedTagId: MutableState<Int?>
+
+    /**
+     * Map of note ID to list of its tags.
+     */
+    val noteTagsMap: LiveData<Map<Int, List<TagModel>>>
 
     /**
      * 1. Toggle search field

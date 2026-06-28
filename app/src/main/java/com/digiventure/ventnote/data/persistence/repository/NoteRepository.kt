@@ -16,6 +16,15 @@ class NoteRepository @Inject constructor(
             }
         }
 
+    fun getNotesByTag(tagId: Int, sortBy: String, order: String): Flow<Result<List<NoteModel>>> =
+        service.getNotesByTag(tagId, sortBy, order).map {
+            if (it.isSuccess) {
+                Result.success(it.getOrNull() ?: listOf())
+            } else {
+                Result.failure(it.exceptionOrNull()!!)
+            }
+        }
+
     fun deleteNoteList(vararg notes: NoteModel): Flow<Result<Boolean>> =
         service.deleteNoteList(*notes).map {
             if (it.isSuccess) {
@@ -47,6 +56,15 @@ class NoteRepository @Inject constructor(
         service.insertNote(note).map {
             if (it.isSuccess) {
                 Result.success(it.getOrNull() ?: false)
+            } else {
+                Result.failure(it.exceptionOrNull()!!)
+            }
+        }
+
+    fun insertNote(note: NoteModel, tagIds: List<Int>): Flow<Result<Long>> =
+        service.insertNote(note, tagIds).map {
+            if (it.isSuccess) {
+                Result.success(it.getOrNull() ?: -1L)
             } else {
                 Result.failure(it.exceptionOrNull()!!)
             }

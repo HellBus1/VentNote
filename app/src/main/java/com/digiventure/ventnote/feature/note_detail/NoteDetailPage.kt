@@ -53,6 +53,20 @@ import com.digiventure.ventnote.navigation.PageNavigation
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.setValue
+import com.digiventure.ventnote.feature.tag_manager.components.TagChip
+import com.digiventure.ventnote.feature.tag_manager.components.TagPickerBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,6 +115,13 @@ fun NoteDetailPage(
     val openLoadingDialog = remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val allTagsState by viewModel.allTags.observeAsState()
+    val allTags = allTagsState?.getOrNull() ?: emptyList()
+    val noteTagsState by viewModel.noteTags.observeAsState()
+    val noteTags = noteTagsState?.getOrNull() ?: emptyList()
+    var selectedTagIds by viewModel.selectedTagIds
+    var showTagPicker by remember { mutableStateOf(false) }
+
     // Memoized functions to prevent unnecessary recompositions
     val initData = {
         data?.let {
@@ -139,7 +160,8 @@ fun NoteDetailPage(
         scope,
         focusManager,
         snackBarHostState,
-        strings["successFullyUpdatedText"]
+        strings["successFullyUpdatedText"],
+        selectedTagIds
     ) {
         {
             // Sync both richTextStates before saving
@@ -164,6 +186,10 @@ fun NoteDetailPage(
                         )
                         viewModel.updateNote(updatedNote)
                             .onSuccess {
+                                scope.launch {
+                                    viewModel.setTagsForNote(noteData.id, selectedTagIds.toList())
+                                    viewModel.loadTagsForNote(noteData.id)
+                                }
                                 viewModel.isEditing.value = false
                                 snackBarHostState.showSnackbar(
                                     message = strings["successFullyUpdatedText"] ?: "",
@@ -185,6 +211,10 @@ fun NoteDetailPage(
     // Effects
     LaunchedEffect(id) {
         viewModel.getNoteDetail(id.toInt())
+    }
+
+    LaunchedEffect(id) {
+        viewModel.loadTagsForNote(id.toInt())
     }
 
     LaunchedEffect(noteDetailState) {
@@ -244,6 +274,54 @@ fun NoteDetailPage(
                             if (focused) activeRichTextState.value = viewModel.titleRichTextState
                         }
                     )
+                }
+
+                item {
+                    val currentTags = if (isEditingState) {
+                        allTags.filter { it.id in selectedTagIds }
+                    } else {
+                        noteTags
+                    }
+                    if (currentTags.isNotEmpty() || isEditingState) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "Tags",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            )
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                currentTags.forEach { tag ->
+                                    TagChip(
+                                        tag = tag,
+                                        onRemove = if (isEditingState) {
+                                            { selectedTagIds = selectedTagIds - tag.id }
+                                        } else {
+                                            null
+                                        }
+                                    )
+                                }
+                                if (isEditingState) {
+                                    InputChip(
+                                        selected = false,
+                                        onClick = { showTagPicker = true },
+                                        label = { Text(if (selectedTagIds.isEmpty()) "Add Tags" else "Edit") },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Add,
+                                                contentDescription = "Add tags",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 item {
@@ -316,6 +394,9 @@ fun NoteDetailPage(
                 viewModel.isEditing.value = false
                 cancelDialogState.value = false
                 initData()
+                scope.launch {
+                    viewModel.loadTagsForNote(id.toInt())
+                }
             },
             modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }
         )
@@ -344,6 +425,21 @@ fun NoteDetailPage(
         } else {
             navHostController.navigateUp()
         }
+    }
+
+    if (showTagPicker) {
+        TagPickerBottomSheet(
+            allTags = allTags,
+            selectedTagIds = selectedTagIds,
+            onTagToggle = { tag ->
+                selectedTagIds = if (tag.id in selectedTagIds) {
+                    selectedTagIds - tag.id
+                } else {
+                    selectedTagIds + tag.id
+                }
+            },
+            onDismiss = { showTagPicker = false }
+        )
     }
 }
 

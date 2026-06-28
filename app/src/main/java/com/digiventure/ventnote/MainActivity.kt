@@ -122,6 +122,10 @@ class MainActivity : ComponentActivity() {
                         onBackupPressed = {
                             navigationActions.navigateToBackupPage()
                         },
+                        onTagsPressed = {
+                            navigationActions.navigateToTagManagerPage()
+                            coroutineScope.launch { drawerState.close() }
+                        },
                         onUpdateCheckPressed = {
                             checkUpdate(isManual = true)
                         },

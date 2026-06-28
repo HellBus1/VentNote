@@ -33,6 +33,7 @@ object TestTags {
     const val THEME_TILE = "theme_tile"
     const val COLOR_MODE_TILE = "color_mode_tile"
     const val BACKUP_TILE = "backup_tile"
+    const val TAGS_TILE = "tags_tile"
     
     // Theme color tags
     const val THEME_COLOR_PURPLE = "theme_color_purple"

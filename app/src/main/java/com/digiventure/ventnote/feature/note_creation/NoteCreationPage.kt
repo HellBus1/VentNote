@@ -45,6 +45,22 @@ import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
+import com.digiventure.ventnote.feature.tag_manager.components.TagChip
+import com.digiventure.ventnote.feature.tag_manager.components.TagPickerBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +87,11 @@ fun NoteCreationPage(
     val requiredDialogState = remember { mutableStateOf(false) }
     val cancelDialogState = remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
+
+    val allTagsState by viewModel.allTags.observeAsState()
+    val allTags = allTagsState?.getOrNull() ?: emptyList()
+    var selectedTagIds by viewModel.selectedTagIds
+    var showTagPicker by remember { mutableStateOf(false) }
 
     // Extracted and optimized addNote function
     val noteIsSuccessfullyAddedText = stringResource(R.string.successfully_added)
@@ -161,6 +182,44 @@ fun NoteCreationPage(
                     )
                 }
                 item {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Tags",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            val selectedTags = allTags.filter { it.id in selectedTagIds }
+                            selectedTags.forEach { tag ->
+                                TagChip(
+                                    tag = tag,
+                                    onRemove = {
+                                        selectedTagIds = selectedTagIds - tag.id
+                                    }
+                                )
+                            }
+                            // Add/edit tag button
+                            InputChip(
+                                selected = false,
+                                onClick = { showTagPicker = true },
+                                label = { Text(if (selectedTagIds.isEmpty()) "Add Tags" else "Edit") },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Add,
+                                        contentDescription = "Add tags",
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+                item {
                     NoteSection(
                         richTextState = viewModel.richTextState,
                         bodyTextField = bodyTextField,
@@ -218,6 +277,21 @@ fun NoteCreationPage(
                 cancelDialogState.value = false
             },
             modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
+    }
+
+    if (showTagPicker) {
+        TagPickerBottomSheet(
+            allTags = allTags,
+            selectedTagIds = selectedTagIds,
+            onTagToggle = { tag ->
+                selectedTagIds = if (tag.id in selectedTagIds) {
+                    selectedTagIds - tag.id
+                } else {
+                    selectedTagIds + tag.id
+                }
+            },
+            onDismiss = { showTagPicker = false }
+        )
     }
 }
 
