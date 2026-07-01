@@ -2,8 +2,10 @@ package com.digiventure.ventnote.data.google_drive
 
 import android.app.Application
 import com.digiventure.utils.BaseUnitTest
+import com.digiventure.ventnote.data.google_drive.BackupPayload
 import com.digiventure.ventnote.data.persistence.NoteDAO
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.TagDAO
 import com.digiventure.ventnote.feature.widget.WidgetRefresher
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.google.api.services.drive.Drive
@@ -25,8 +27,9 @@ class GoogleDriveServiceShould: BaseUnitTest() {
     private val app: Application = mock()
     private val proxy: DatabaseProxy = mock()
     private val dao: NoteDAO = mock()
+    private val tagDao: TagDAO = mock()
     private val refresher: WidgetRefresher = mock()
-    private val noteList: List<NoteModel> = listOf()
+    private val payload: BackupPayload = BackupPayload(notes = listOf(NoteModel(1, "title", "note")))
     private val fileName: String = "backup.json"
     private val fileId: String = "1"
     private val drive: Drive = mock()
@@ -47,7 +50,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         whenever(filesMock.create(any(), any())).thenReturn(createMock)
         whenever(createMock.execute()).thenReturn(driveFile)
 
-        val result = service.uploadDatabaseFile(noteList, fileName, drive)
+        val result = service.uploadDatabaseFile(payload, fileName, drive)
 
         assertTrue(result.isSuccess)
         assertEquals(driveFile, result.getOrNull())
@@ -62,7 +65,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.create(any(), any())).thenThrow(exception)
 
-        val result = service.uploadDatabaseFile(noteList, fileName, drive)
+        val result = service.uploadDatabaseFile(payload, fileName, drive)
 
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
@@ -72,15 +75,18 @@ class GoogleDriveServiceShould: BaseUnitTest() {
     fun returnResultSuccess_whenReadFileProcessIsSuccess() = runTest {
         val filesMock = mock<Drive.Files>()
         val getMock = mock<Drive.Files.Get>()
-        val inputStream = this::class.java.classLoader?.getResourceAsStream("/src/test/res/backup.json")
+        val inputStream = "[]".byteInputStream()
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.get(fileId)).thenReturn(getMock)
         whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
         whenever(dao.upsertNotes(any())).thenAnswer { }
         whenever(proxy.dao()).thenReturn(dao)
-
         val result = service.readFile(fileId, drive)
 
+        if (result.isFailure) {
+            println("Exception was: ${result.exceptionOrNull()}")
+            result.exceptionOrNull()?.printStackTrace()
+        }
         assertTrue(result.isSuccess)
         verify(proxy.dao(), times(1)).upsertNotes(any())
         verify(refresher, times(1)).refresh(app)
@@ -104,7 +110,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         val filesMock = mock<Drive.Files>()
         val getMock = mock<Drive.Files.Get>()
         val exception = Exception()
-        val inputStream = this::class.java.classLoader?.getResourceAsStream("/src/test/res/backup.json")
+        val inputStream = "[]".byteInputStream()
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.get(fileId)).thenReturn(getMock)
         whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)

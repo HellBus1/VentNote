@@ -161,8 +161,10 @@ fun NotesPage(
     }
 
     LaunchedEffect(loadingState) {
-        if (filteredNotes.isNotEmpty()) {
-            showLoadingDialog = loadingState == true
+        if (loadingState == false) {
+            showLoadingDialog = false
+        } else if (filteredNotes.isNotEmpty()) {
+            showLoadingDialog = true
         }
     }
 
@@ -309,18 +311,16 @@ fun NotesPage(
                             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp)
                         ) {
                             // Tag chip bar (full span)
-                            if (allTags.isNotEmpty() || true) {
-                                item(key = "tag_chip_bar", span = StaggeredGridItemSpan.FullLine) {
-                                    TagChipBar(
-                                        tags = allTags,
-                                        selectedTagId = selectedTagId,
-                                        onTagSelected = { viewModel.selectedTagId.value = it },
-                                        onAddTag = { navigationActions.navigateToTagManagerPage() },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 12.dp, bottom = 4.dp)
-                                    )
-                                }
+                            item(key = "tag_chip_bar", span = StaggeredGridItemSpan.FullLine) {
+                                TagChipBar(
+                                    tags = allTags,
+                                    selectedTagId = selectedTagId,
+                                    onTagSelected = { viewModel.selectedTagId.value = it },
+                                    onAddTag = { navigationActions.navigateToTagManagerPage() },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 12.dp, bottom = 4.dp)
+                                )
                             }
 
                             item(key = "search_bar", span = StaggeredGridItemSpan.FullLine) {
@@ -357,7 +357,12 @@ fun NotesPage(
                                     noteViewMode = viewModel.noteViewMode.value,
                                     onClick = { onNoteClick(note) },
                                     onLongClick = { onNoteLongClick(note) },
-                                    onCheckClick = { onNoteCheckClick(note) }
+                                    onCheckClick = { onNoteCheckClick(note) },
+                                    onPinClick = {
+                                        scope.launch {
+                                            viewModel.toggleNotePin(note.id, !note.isPinned)
+                                        }
+                                    }
                                 )
                             }
                         }
@@ -421,7 +426,12 @@ fun NotesPage(
                                         noteViewMode = viewModel.noteViewMode.value,
                                         onClick = { onNoteClick(note) },
                                         onLongClick = { onNoteLongClick(note) },
-                                        onCheckClick = { onNoteCheckClick(note) }
+                                        onCheckClick = { onNoteCheckClick(note) },
+                                        onPinClick = {
+                                            scope.launch {
+                                                viewModel.toggleNotePin(note.id, !note.isPinned)
+                                            }
+                                        }
                                     )
                                 }
                             }

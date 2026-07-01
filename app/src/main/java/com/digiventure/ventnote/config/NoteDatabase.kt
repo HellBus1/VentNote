@@ -30,7 +30,7 @@ object DateConverters {
 
 @Database(
     entities = [NoteModel::class, TagModel::class, NoteTagCrossRef::class],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(DateConverters::class)
@@ -81,6 +81,19 @@ abstract class NoteDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Add is_pinned column; existing notes default to 0 (false)
+                db.execSQL(
+                    "ALTER TABLE `note_table` ADD COLUMN `is_pinned` INTEGER NOT NULL DEFAULT 0"
+                )
+                // Index for fast pinned-first ORDER BY
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_note_table_is_pinned` ON `note_table` (`is_pinned`)"
+                )
+            }
+        }
+
         fun getInstance(context: Context): NoteDatabase {
             if (instance == null) {
                 synchronized(this) {
@@ -89,7 +102,7 @@ abstract class NoteDatabase : RoomDatabase() {
                         NoteDatabase::class.java,
                         Constants.BACKUP_FILE_NAME
                     )
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                         .build()
                 }
             }

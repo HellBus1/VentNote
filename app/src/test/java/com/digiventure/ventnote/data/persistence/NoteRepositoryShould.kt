@@ -262,4 +262,48 @@ class NoteRepositoryShould: BaseUnitTest() {
             )
         }
     }
+
+    /**
+     * Test suite for toggleNotePin
+     */
+    private val pinException = RuntimeException("Failed to update list of notes")
+
+    @Test
+    fun toggleNotePin_delegatesToService() = runTest {
+        runBlocking {
+            whenever(service.toggleNotePin(1, true)).thenReturn(
+                flowOf(Result.success(true))
+            )
+        }
+
+        repository.toggleNotePin(1, true).first()
+
+        verify(service, times(1)).toggleNotePin(1, true)
+    }
+
+    @Test
+    fun toggleNotePin_emitsSuccessFromService() = runTest {
+        runBlocking {
+            whenever(service.toggleNotePin(1, true)).thenReturn(
+                flowOf(Result.success(true))
+            )
+        }
+
+        val result = repository.toggleNotePin(1, true).first()
+
+        assertEquals(Result.success(true), result)
+    }
+
+    @Test
+    fun toggleNotePin_emitsErrorFromService() = runTest {
+        runBlocking {
+            whenever(service.toggleNotePin(1, true)).thenReturn(
+                flowOf(Result.failure(pinException))
+            )
+        }
+
+        val result = repository.toggleNotePin(1, true).first()
+
+        assertEquals(pinException, result.exceptionOrNull())
+    }
 }

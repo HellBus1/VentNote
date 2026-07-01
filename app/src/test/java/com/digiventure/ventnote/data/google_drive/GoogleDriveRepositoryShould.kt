@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.data.google_drive
 
 import com.digiventure.utils.BaseUnitTest
+import com.digiventure.ventnote.data.google_drive.BackupPayload
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
@@ -17,7 +18,7 @@ import org.mockito.kotlin.whenever
 
 class GoogleDriveRepositoryShould: BaseUnitTest() {
     private val service: GoogleDriveService = mock()
-    private val noteList: List<NoteModel> = listOf()
+    private val payload: BackupPayload = BackupPayload(notes = listOf(NoteModel(1, "title", "note")))
     private val fileName: String = "backup.json"
     private val fileId: String = "1"
     private val drive: Drive = mock()
@@ -34,25 +35,25 @@ class GoogleDriveRepositoryShould: BaseUnitTest() {
     @Test
     fun emitsResultSuccess_whenUploadDatabaseIsSuccess() = runTest {
         val file = File()
-        whenever(service.uploadDatabaseFile(noteList, fileName, drive)).thenReturn(
+        whenever(service.uploadDatabaseFile(payload, fileName, drive)).thenReturn(
             Result.success(file)
         )
 
-        val actualResult = repository.uploadDatabaseFile(noteList, fileName, drive).first()
+        val actualResult = repository.uploadDatabaseFile(payload, fileName, drive).first()
 
-        verify(service, times(1)).uploadDatabaseFile(noteList, fileName, drive)
+        verify(service, times(1)).uploadDatabaseFile(payload, fileName, drive)
         assertEquals(Result.success(file), actualResult)
     }
 
     @Test
     fun emitsResultFailure_whenUploadDatabaseIsThrowingException() = runTest {
-        whenever(service.uploadDatabaseFile(noteList, fileName, drive)).thenReturn(
+        whenever(service.uploadDatabaseFile(payload, fileName, drive)).thenReturn(
             Result.failure(exception)
         )
 
-        val actualResult = repository.uploadDatabaseFile(noteList, fileName, drive).first()
+        val actualResult = repository.uploadDatabaseFile(payload, fileName, drive).first()
 
-        verify(service, times(1)).uploadDatabaseFile(noteList, fileName, drive)
+        verify(service, times(1)).uploadDatabaseFile(payload, fileName, drive)
         val expectedResultMessage = Result.failure<RuntimeException>(exception).exceptionOrNull()?.message
         val actualResultMessage = actualResult.exceptionOrNull()?.message
         assertEquals(expectedResultMessage, actualResultMessage)

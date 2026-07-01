@@ -14,7 +14,8 @@ import java.util.Date
     indices = [
         Index(value = ["title"]),
         Index(value = ["created_at"]),
-        Index(value = ["updated_at"])
+        Index(value = ["updated_at"]),
+        Index(value = ["is_pinned"])
     ]
 )
 data class NoteModel(
@@ -23,4 +24,5 @@ data class NoteModel(
     @ColumnInfo(name = "note") val note: String,
     @ColumnInfo(name = "created_at") var createdAt: Date = Date(System.currentTimeMillis()),
     @ColumnInfo(name = "updated_at") var updatedAt: Date = Date(System.currentTimeMillis()),
+    @ColumnInfo(name = "is_pinned") val isPinned: Boolean = false,
 ): Parcelable

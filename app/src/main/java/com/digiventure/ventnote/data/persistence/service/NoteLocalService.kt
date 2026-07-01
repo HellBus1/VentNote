@@ -82,4 +82,12 @@ class NoteLocalService @Inject constructor(
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_INSERT_NOTE_ROOM)))
         }
+
+    fun toggleNotePin(noteId: Int, isPinned: Boolean): Flow<Result<Boolean>> =
+        flow {
+            proxy.dao().setPinned(noteId, isPinned)
+            emit(Result.success(true))
+        }.catch {
+            emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPDATE_NOTE_ROOM)))
+        }
 }

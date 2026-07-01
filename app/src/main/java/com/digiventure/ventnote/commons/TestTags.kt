@@ -47,6 +47,7 @@ object TestTags {
     const val NOTE_RV = "note_rv"
     const val LOADING_DIALOG = "loading_dialog"
     const val CONFIRMATION_DIALOG = "confirmation_dialog"
+    const val PIN_ICON_BUTTON = "pin_icon_button"
 
     // Dialog Button
     const val CONFIRM_BUTTON = "confirm_button"

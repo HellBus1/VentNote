@@ -61,4 +61,7 @@ class NotesPageMockVM : ViewModel(), NotesPageBaseVM {
     }
 
     override fun observeNotes() {}
+
+    override suspend fun toggleNotePin(noteId: Int, isPinned: Boolean): Result<Boolean> =
+        Result.success(true)
 }

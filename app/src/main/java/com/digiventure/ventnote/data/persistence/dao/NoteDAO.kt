@@ -14,6 +14,7 @@ import com.digiventure.ventnote.data.persistence.NoteWithTags
 @Dao
 interface NoteDAO {
     @Query("SELECT * FROM note_table ORDER BY " +
+            "        is_pinned DESC, " +
             "        CASE WHEN :sortBy = 'title' AND :orderBy = 'ASC' THEN title END ASC, " +
             "        CASE WHEN :sortBy = 'title' AND :orderBy = 'DESC' THEN title END DESC, " +
             "        CASE WHEN :sortBy = 'created_at' AND :orderBy = 'ASC' THEN created_at END ASC, " +
@@ -34,6 +35,7 @@ interface NoteDAO {
         "INNER JOIN note_tag_table ON note_table.id = note_tag_table.noteId " +
         "WHERE note_tag_table.tagId = :tagId " +
         "ORDER BY " +
+        "is_pinned DESC, " +
         "CASE WHEN :sortBy = 'title' AND :orderBy = 'ASC' THEN title END ASC, " +
         "CASE WHEN :sortBy = 'title' AND :orderBy = 'DESC' THEN title END DESC, " +
         "CASE WHEN :sortBy = 'created_at' AND :orderBy = 'ASC' THEN created_at END ASC, " +
@@ -84,4 +86,7 @@ interface NoteDAO {
         }
         upsertNotes(notes)
     }
+
+    @Query("UPDATE note_table SET is_pinned = :isPinned WHERE id = :noteId")
+    fun setPinned(noteId: Int, isPinned: Boolean)
 }

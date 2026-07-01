@@ -4,6 +4,7 @@ import com.digiventure.utils.BaseUnitTest
 import com.digiventure.utils.captureValues
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
+import com.digiventure.ventnote.data.persistence.TagRepository
 import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPageVM
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -18,16 +19,21 @@ import org.mockito.kotlin.whenever
 
 class NoteCreationPageVMShould: BaseUnitTest() {
     private val repository: NoteRepository = mock()
+    private val tagRepository: TagRepository = mock()
     private val note = mock<NoteModel>()
 
     private lateinit var viewModel: NoteCreationPageVM
 
     private val expected = Result.success(true)
+    private val expectedId = Result.success(1L)
     private val exception = RuntimeException("Failed to insert list of notes")
 
     @Before
     fun setup() {
-        viewModel = NoteCreationPageVM(repository)
+        runBlocking {
+            whenever(tagRepository.getAllTags()).thenReturn(flowOf(Result.success(emptyList())))
+        }
+        viewModel = NoteCreationPageVM(repository, tagRepository)
     }
 
     /**
@@ -39,7 +45,7 @@ class NoteCreationPageVMShould: BaseUnitTest() {
 
         viewModel.addNote(note)
 
-        verify(repository, times(1)).insertNote(note)
+        verify(repository, times(1)).insertNote(note, emptyList())
     }
 
     @Test
@@ -95,15 +101,15 @@ class NoteCreationPageVMShould: BaseUnitTest() {
 
     private fun mockSuccessfulAddNoteCase() {
         runBlocking {
-            whenever(repository.insertNote(note)).thenReturn(
-                flowOf(expected)
+            whenever(repository.insertNote(note, emptyList())).thenReturn(
+                flowOf(expectedId)
             )
         }
     }
 
     private fun mockErrorAddNoteCase() {
         runBlocking {
-            whenever(repository.insertNote(note)).thenReturn(
+            whenever(repository.insertNote(note, emptyList())).thenReturn(
                 flowOf(Result.failure(exception))
             )
         }
