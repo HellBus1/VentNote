@@ -32,13 +32,17 @@ class NotesPageVM @Inject constructor(
     private val noteDataStore: NoteDataStore,
     private val databaseProxy: DatabaseProxy
 ): ViewModel(), NotesPageBaseVM {
+    // Manages the visibility of the loading dialog during asynchronous operations
     override val loader = MutableLiveData<Boolean>()
+    
+    // Holds the current sorting criteria (e.g. By Title, By Date) and ordering (Ascending/Descending)
     override val sortAndOrderData: MutableLiveData<Pair<String, String>> = MutableLiveData(
         Pair(Constants.UPDATED_AT, Constants.DESCENDING)
     )
 
     private val defaultException = Exception("Unknown error")
 
+    // The primary list of notes currently displayed on the screen
     override val noteList: LiveData<Result<List<NoteModel>>>
         get() = _noteList
     private val _noteList = MutableLiveData<Result<List<NoteModel>>>()
@@ -54,12 +58,15 @@ class NotesPageVM @Inject constructor(
     private val _noteTagsMap = MutableLiveData<Map<Int, List<TagModel>>>(emptyMap())
     override val noteTagsMap: LiveData<Map<Int, List<TagModel>>> = _noteTagsMap
 
+    // Updates the sorting and ordering preferences, triggering a reactive reload of the notes list
     override fun sortAndOrder(sortBy: String, orderBy: String) {
         sortAndOrderData.value = Pair(sortBy, orderBy)
     }
 
+    // Holds the current search query entered by the user in the top app bar
     override val searchedTitleText = mutableStateOf("")
 
+    // Tracks the current layout style of the notes list (e.g., List View vs. Staggered Grid View)
     override val noteViewMode = mutableStateOf(Constants.VIEW_MODE_LIST)
 
     init {
@@ -93,6 +100,7 @@ class NotesPageVM @Inject constructor(
         }
     }
 
+    // Updates the view mode state and persists it to the DataStore for future sessions
     override fun setNoteViewMode(mode: String) {
         noteViewMode.value = mode
         viewModelScope.launch {
@@ -100,17 +108,22 @@ class NotesPageVM @Inject constructor(
         }
     }
 
+    // Indicates whether the UI is currently in "selection mode" (e.g., long-pressing notes to delete them)
     override val isMarking = mutableStateOf(false)
+    // Maintains the list of notes currently selected by the user while in marking mode
     override val markedNoteList = mutableStateListOf<NoteModel>()
 
+    // Selects all given notes, adding them to the marked list (preventing duplicates)
     override fun markAllNote(notes: List<NoteModel>) {
         markedNoteList.addAll(notes.minus((markedNoteList).toSet()))
     }
 
+    // Clears the current selection without exiting marking mode
     override fun unMarkAllNote() {
         markedNoteList.clear()
     }
 
+    // Toggles the selection state of a specific note
     override fun addToMarkedNoteList(note: NoteModel) {
         if (note in markedNoteList) {
             markedNoteList.remove(note)
@@ -119,6 +132,8 @@ class NotesPageVM @Inject constructor(
         }
     }
 
+    // Deletes the specified notes (or the currently marked notes if none are passed).
+    // Automatically triggers a list refresh (observeNotes) upon successful deletion.
     override suspend fun deleteNoteList(vararg notes: NoteModel): Result<Boolean> =
         withContext(Dispatchers.IO) {
         loader.postValue(true)
@@ -134,11 +149,14 @@ class NotesPageVM @Inject constructor(
         }
     }
 
+    // Exits the marking mode and clears all current selections
     override fun closeMarkingEvent() {
         isMarking.value = false
         markedNoteList.clear()
     }
 
+    // Sets up reactive observation of the database. Automatically fetches and updates 
+    // the notes list whenever the sort order or selected tag filter changes.
     override fun observeNotes() {
         viewModelScope.launch {
             combine(
@@ -167,4 +185,19 @@ class NotesPageVM @Inject constructor(
             }
         }
     }
+
+    // Updates the pinned state of a specific note, forcing it to the top of the list 
+    // or unpinning it to return it to normal chronological/alphabetical order.
+    override suspend fun toggleNotePin(noteId: Int, isPinned: Boolean): Result<Boolean> =
+        withContext(Dispatchers.IO) {
+            loader.postValue(true)
+            try {
+                repository.toggleNotePin(noteId, isPinned).onEach {
+                    loader.postValue(false)
+                }.last()
+            } catch (e: Exception) {
+                loader.postValue(false)
+                Result.failure(e)
+            }
+        }
 }

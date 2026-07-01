@@ -5,9 +5,14 @@ import com.digiventure.utils.captureValues
 import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.data.local.NoteDataStore
+import com.digiventure.ventnote.data.persistence.NoteDAO
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
+import com.digiventure.ventnote.data.persistence.NoteTagCrossRef
+import com.digiventure.ventnote.data.persistence.TagDAO
+import com.digiventure.ventnote.data.persistence.TagRepository
 import com.digiventure.ventnote.feature.notes.viewmodel.NotesPageVM
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -22,9 +27,14 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class NotesPageVMShould: BaseUnitTest() {
+class NotesPageVMShould : BaseUnitTest() {
     private val repository: NoteRepository = mock()
+    private val tagRepository: TagRepository = mock()
     private val noteDataStore: NoteDataStore = mock()
+    private val databaseProxy: DatabaseProxy = mock()
+    private val tagDao: TagDAO = mock()
+    private val noteDao: NoteDAO = mock()
+
     private val notes = listOf(
         NoteModel(1, "title1", "description1"),
         NoteModel(2, "title2", "description2")
@@ -39,6 +49,8 @@ class NotesPageVMShould: BaseUnitTest() {
     private val expectedDeletion = Result.success(true)
     private val exceptionDeletion = RuntimeException("Failed to delete list of notes")
 
+    private val pinException = RuntimeException("Failed to update list of notes")
+
     private lateinit var viewModel: NotesPageVM
 
     @Before
@@ -47,8 +59,12 @@ class NotesPageVMShould: BaseUnitTest() {
             whenever(noteDataStore.getStringData(Constants.NOTE_VIEW_MODE)).thenReturn(
                 flowOf(Constants.VIEW_MODE_LIST)
             )
+            // Provide empty flows so the init {} coroutines don't throw
+            whenever(tagRepository.getAllTags()).thenReturn(flowOf(Result.success(emptyList())))
+            whenever(databaseProxy.tagDao()).thenReturn(tagDao)
+            whenever(tagDao.getAllNoteTagCrossRefsFlow()).thenReturn(flowOf(emptyList<NoteTagCrossRef>()))
         }
-        viewModel = NotesPageVM(repository, noteDataStore)
+        viewModel = NotesPageVM(repository, tagRepository, noteDataStore, databaseProxy)
     }
 
     @Test
@@ -60,8 +76,6 @@ class NotesPageVMShould: BaseUnitTest() {
 
         assertEquals(viewModel.sortAndOrderData.value, Pair(sortBy, orderBy))
     }
-
-    // TODO: Add test for when sortAndOrderData is change, the list is refetching
 
     @Test
     fun haveNullNoteListInTheInitialState() {
@@ -285,6 +299,112 @@ class NotesPageVMShould: BaseUnitTest() {
         assertEquals(viewModel.markedNoteList.size, 0)
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Note Pinning Tests
+    // ─────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun toggleNotePin_callsRepository() = runTest {
+        mockSuccessfulPinCase()
+
+        viewModel.toggleNotePin(note.id, true)
+
+        verify(repository, times(1)).toggleNotePin(note.id, true)
+    }
+
+    @Test
+    fun toggleNotePin_returnsSuccessResult() = runTest {
+        mockSuccessfulPinCase()
+
+        val result = viewModel.toggleNotePin(note.id, true)
+
+        assertEquals(Result.success(true), result)
+    }
+
+    @Test
+    fun toggleNotePin_returnsErrorResultOnFailure() = runTest {
+        mockErrorPinCase()
+
+        val result = viewModel.toggleNotePin(note.id, true)
+
+        assertEquals(pinException.message, result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun toggleNotePin_throwingException_returnsErrorResult() = runTest {
+        whenever(repository.toggleNotePin(note.id, true)).thenThrow(pinException)
+
+        val result = viewModel.toggleNotePin(note.id, true)
+
+        assertEquals(pinException.message, result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun toggleNotePin_showsLoaderDuringOperation() = runTest {
+        mockSuccessfulPinCase()
+
+        viewModel.loader.captureValues {
+            viewModel.toggleNotePin(note.id, true)
+
+            assertTrue(values.contains(true))
+        }
+    }
+
+    @Test
+    fun toggleNotePin_hidesLoaderAfterSuccess() = runTest {
+        mockSuccessfulPinCase()
+
+        viewModel.loader.captureValues {
+            viewModel.toggleNotePin(note.id, true)
+
+            assertEquals(false, values.last())
+        }
+    }
+
+    @Test
+    fun toggleNotePin_hidesLoaderAfterError() = runTest {
+        mockErrorPinCase()
+
+        viewModel.loader.captureValues {
+            viewModel.toggleNotePin(note.id, true)
+
+            assertEquals(false, values.last())
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Previously-missing coverage: sort change + tag filter path
+    // ─────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun sortAndOrderChange_doesNotThrowAndUpdatesLiveData() = runTest {
+        // Verify that changing sortAndOrderData to a different value updates correctly
+        viewModel.sortAndOrder(Constants.TITLE, Constants.ASCENDING)
+        assertEquals(Pair(Constants.TITLE, Constants.ASCENDING), viewModel.sortAndOrderData.value)
+
+        viewModel.sortAndOrder(Constants.UPDATED_AT, Constants.DESCENDING)
+        assertEquals(Pair(Constants.UPDATED_AT, Constants.DESCENDING), viewModel.sortAndOrderData.value)
+    }
+
+    @Test
+    fun observeNotes_withSelectedTagId_callsGetNotesByTag() = runTest {
+        val tagId = 42
+        val tagNotes = listOf(NoteModel(3, "Tagged Note", "body"))
+        whenever(repository.getNotesByTag(tagId, sortBy, orderBy)).thenReturn(
+            flowOf(Result.success(tagNotes))
+        )
+        viewModel.sortAndOrderData.value = Pair(sortBy, orderBy)
+        viewModel.selectedTagId.value = tagId
+
+        viewModel.observeNotes()
+
+        verify(repository, times(1)).getNotesByTag(tagId, sortBy, orderBy)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
     private fun mockSuccessfulDeletionCase() {
         runBlocking {
             whenever(repository.deleteNoteList(note)).thenReturn(
@@ -317,6 +437,22 @@ class NotesPageVMShould: BaseUnitTest() {
                 flow {
                     emit(Result.failure(exception))
                 }
+            )
+        }
+    }
+
+    private fun mockSuccessfulPinCase() {
+        runBlocking {
+            whenever(repository.toggleNotePin(note.id, true)).thenReturn(
+                flowOf(Result.success(true))
+            )
+        }
+    }
+
+    private fun mockErrorPinCase() {
+        runBlocking {
+            whenever(repository.toggleNotePin(note.id, true)).thenReturn(
+                flowOf(Result.failure(pinException))
             )
         }
     }

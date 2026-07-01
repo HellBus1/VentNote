@@ -237,4 +237,35 @@ class NoteLocalServiceShould: BaseUnitTest() {
             service.insertNote(note).first().exceptionOrNull()?.message
         )
     }
+
+    /**
+     * Test suite for toggleNotePin from dao
+     */
+    @Test
+    fun toggleNotePin_callsDAOSetPinned() = runTest {
+        runBlocking { whenever(dao.setPinned(1, true)).then { Unit } }
+
+        service.toggleNotePin(1, true).first()
+
+        verify(dao, times(1)).setPinned(1, true)
+    }
+
+    @Test
+    fun toggleNotePin_emitsSuccessResult() = runTest {
+        runBlocking { whenever(dao.setPinned(1, true)).then { Unit } }
+
+        val result = service.toggleNotePin(1, true).first()
+
+        assertEquals(Result.success(true), result)
+    }
+
+    @Test
+    fun toggleNotePin_emitsErrorOnDAOFailure() = runTest {
+        val pinException = RuntimeException("Failed to update list of notes")
+        runBlocking { whenever(dao.setPinned(1, true)).thenThrow(pinException) }
+
+        val result = service.toggleNotePin(1, true).first()
+
+        assertEquals(pinException.message, result.exceptionOrNull()?.message)
+    }
 }

@@ -69,4 +69,13 @@ class NoteRepository @Inject constructor(
                 Result.failure(it.exceptionOrNull()!!)
             }
         }
+
+    fun toggleNotePin(noteId: Int, isPinned: Boolean): Flow<Result<Boolean>> =
+        service.toggleNotePin(noteId, isPinned).map {
+            if (it.isSuccess) {
+                Result.success(true)
+            } else {
+                Result.failure(it.exceptionOrNull()!!)
+            }
+        }
 }

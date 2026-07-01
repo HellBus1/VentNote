@@ -90,4 +90,11 @@ interface NotesPageBaseVM {
     fun closeMarkingEvent()
 
     fun observeNotes()
+
+    /**
+     * Toggle the pinned state of a note.
+     * @param noteId the ID of the note to pin or unpin
+     * @param isPinned true to pin, false to unpin
+     */
+    suspend fun toggleNotePin(noteId: Int, isPinned: Boolean): Result<Boolean>
 }
