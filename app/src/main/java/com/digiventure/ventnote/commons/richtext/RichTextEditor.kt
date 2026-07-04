@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -86,33 +87,55 @@ fun RichTextEditor(
                 )
             }
 
-            BasicTextField(
-                value = richTextState.textFieldValue,
-                onValueChange = { newValue ->
-                    if (!readOnly) {
-                        richTextState.onTextFieldValueChange(newValue)
-                    }
-                },
-                readOnly = readOnly,
-                textStyle = MaterialTheme.typography.titleMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .onFocusChanged { focusState ->
-                        onFocusChanged?.invoke(focusState.isFocused)
-                    }
-                    .semantics {
-                        if (testTagText.isNotEmpty()) {
-                            testTag = testTagText
+            if (readOnly) {
+                SelectionContainer {
+                    Text(
+                        text = richTextState.textFieldValue.annotatedString,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .semantics {
+                                if (testTagText.isNotEmpty()) {
+                                    testTag = testTagText
+                                }
+                                if (contentDescriptionText.isNotEmpty()) {
+                                    contentDescription = contentDescriptionText
+                                }
+                            }
+                    )
+                }
+            } else {
+                BasicTextField(
+                    value = richTextState.textFieldValue,
+                    onValueChange = { newValue ->
+                        if (!readOnly) {
+                            richTextState.onTextFieldValueChange(newValue)
                         }
-                        if (contentDescriptionText.isNotEmpty()) {
-                            contentDescription = contentDescriptionText
+                    },
+                    readOnly = readOnly,
+                    textStyle = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .onFocusChanged { focusState ->
+                            onFocusChanged?.invoke(focusState.isFocused)
                         }
-                    }
-            )
+                        .semantics {
+                            if (testTagText.isNotEmpty()) {
+                                testTag = testTagText
+                            }
+                            if (contentDescriptionText.isNotEmpty()) {
+                                contentDescription = contentDescriptionText
+                            }
+                        }
+                )
+            }
         }
     }
 }

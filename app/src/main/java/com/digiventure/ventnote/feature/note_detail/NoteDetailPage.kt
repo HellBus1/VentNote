@@ -7,7 +7,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -181,7 +183,7 @@ fun NoteDetailPage(
             val titlePlain = viewModel.titleRichTextState.toPlainText()
             val bodyPlain = viewModel.richTextState.toPlainText()
 
-            if (titlePlain.isEmpty() || bodyPlain.isEmpty()) {
+            if (bodyPlain.isEmpty()) {
                 requiredDialogState.value = true
             } else {
                 data?.let { noteData ->
@@ -258,10 +260,17 @@ fun NoteDetailPage(
         },
         snackbarHost = { SnackbarHost(snackBarHostState) },
         content = { contentPadding ->
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .fillMaxSize(),
+                contentAlignment = androidx.compose.ui.Alignment.TopCenter
+            ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
+                    .fillMaxHeight()
+                    .widthIn(max = 800.dp)
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .clickable(
                         indication = null,
@@ -364,6 +373,7 @@ fun NoteDetailPage(
                     )
                 }
             }
+            }
         },
         bottomBar = {
             EnhancedBottomAppBar(
@@ -385,20 +395,13 @@ fun NoteDetailPage(
     )
 
     // Dialogs
-    val titlePlaceholderText = stringResource(R.string.title_textField_input)
     val notePlaceholderText = stringResource(R.string.body_textField_input)
 
-    val titlePlainText = viewModel.titleRichTextState.toPlainText()
     val noteBodyText = viewModel.richTextState.toPlainText()
     val missingFieldName = remember(
-        titlePlainText,
         noteBodyText
     ) {
-        when {
-            titlePlainText.isEmpty() -> titlePlaceholderText
-            noteBodyText.isEmpty() -> notePlaceholderText
-            else -> EMPTY_STRING
-        }
+        if (noteBodyText.isEmpty()) notePlaceholderText else EMPTY_STRING
     }
 
     if (requiredDialogState.value) {

@@ -134,22 +134,27 @@ class NoteDetailFeature : BaseAcceptanceTest() {
     }
 
     /**
-     * Verifies that a validation dialog is shown when trying to save an empty title.
+     * Verifies that updating a note with an empty title succeeds.
      */
     @Test
-    fun saveFlow_validation_emptyTitle_showsRequiredDialog() {
+    fun saveFlow_withEmptyTitle_successfullyUpdatesNote() {
         composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).performClick()
         composeTestRule.waitForIdle()
 
         // Clear title
         composeTestRule.onNodeWithTag(TestTags.TITLE_TEXT_FIELD).performTextReplacement("")
         
+        // Ensure no validation dialog is present
+        composeTestRule.onNodeWithTag(TestTags.CONFIRMATION_DIALOG).assertDoesNotExist()
+        
         composeTestRule.onNodeWithTag(TestTags.SAVE_ICON_BUTTON).performClick()
         composeTestRule.waitForIdle()
 
-        // Validation dialog should appear
-        composeTestRule.onNodeWithTag(TestTags.CONFIRMATION_DIALOG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.CONFIRM_BUTTON).performClick() // Dismiss it
+        // Should return to view mode (Edit button reappears)
+        composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).assertIsDisplayed()
+        
+        // In NoteDetailPage, the title field displays the empty text if it is empty, but we might just verify it's empty
+        composeTestRule.onNodeWithTag(TestTags.TITLE_TEXT_FIELD).assertTextContains("")
     }
 
     /**

@@ -304,7 +304,7 @@ fun NotesPage(
                 when (viewModel.noteViewMode.value) {
                     Constants.VIEW_MODE_STAGGERED -> {
                         LazyVerticalStaggeredGrid(
-                            columns = StaggeredGridCells.Fixed(2),
+                            columns = StaggeredGridCells.Adaptive(minSize = 160.dp),
                             modifier = listModifier,
                             verticalItemSpacing = 16.dp,
                             horizontalArrangement = Arrangement.spacedBy(16.dp),

@@ -5,8 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -110,7 +113,7 @@ fun NoteCreationPage(
         val titlePlain = viewModel.titleRichTextState.toPlainText()
         val bodyPlain = viewModel.richTextState.toPlainText()
 
-        if (titlePlain.isEmpty() || bodyPlain.isEmpty()) {
+        if (bodyPlain.isEmpty()) {
             requiredDialogState.value = true
         } else {
             scope.launch {
@@ -161,17 +164,24 @@ fun NoteCreationPage(
             )
         },
         content = { contentPadding ->
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .fillMaxSize(),
+                contentAlignment = androidx.compose.ui.Alignment.TopCenter
+            ) {
             // Better scrolling performance with LazyColumn
             LazyColumn(
                 modifier = Modifier
-                    .padding(contentPadding)
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
                         focusManager.clearFocus()
                     }
-                    .fillMaxSize(),
+                    .fillMaxHeight()
+                    .widthIn(max = 800.dp)
+                    .fillMaxWidth(),
                 contentPadding = PaddingValues(
                     horizontal = 16.dp,
                     vertical = 8.dp
@@ -257,6 +267,7 @@ fun NoteCreationPage(
                     )
                 }
             }
+            }
         },
         bottomBar = {
             EnhancedBottomAppBar(
@@ -271,16 +282,10 @@ fun NoteCreationPage(
     )
 
     // Optimized missing field calculation
-    val emptyTitleText = stringResource(R.string.empty_note_title_placeholder)
     val emptyNoteText = stringResource(R.string.empty_note_placeholder)
-    val titlePlainText = viewModel.titleRichTextState.toPlainText()
     val noteBodyText = viewModel.richTextState.toPlainText()
-    val missingFieldName = remember(titlePlainText, noteBodyText) {
-        when {
-            titlePlainText.isEmpty() -> emptyTitleText
-            noteBodyText.isEmpty() -> emptyNoteText
-            else -> EMPTY_STRING
-        }
+    val missingFieldName = remember(noteBodyText) {
+        if (noteBodyText.isEmpty()) emptyNoteText else EMPTY_STRING
     }
 
     if (requiredDialogState.value) {
