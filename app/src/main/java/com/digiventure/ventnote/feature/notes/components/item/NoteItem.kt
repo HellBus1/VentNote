@@ -133,8 +133,9 @@ fun NotesItem(
                             .semantics { }) {
                     }
                 }
+                val titleText = if (data.title.isEmpty()) androidx.compose.ui.res.stringResource(com.digiventure.ventnote.R.string.untitled) else data.title
                 Text(
-                    text = MarkdownParser.parseToAnnotatedString(data.title),
+                    text = MarkdownParser.parseToAnnotatedString(titleText),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium.copy(

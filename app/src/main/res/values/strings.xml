@@ -2,8 +2,8 @@
     <string name="app_name">VentNote</string>
 
     <string name="fab">fab</string>
-
     <string name="title">VentNote</string>
+    <string name="untitled">Untitled</string>
 
     <!--  Top Appbar Components  -->
     <string name="close_nav_icon">close nav icon</string>
