@@ -211,16 +211,7 @@ fun NoteCreationPage(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            val selectedTags = allTags.filter { it.id in selectedTagIds }
-                            selectedTags.forEach { tag ->
-                                TagChip(
-                                    tag = tag,
-                                    onRemove = {
-                                        selectedTagIds = selectedTagIds - tag.id
-                                    }
-                                )
-                            }
-                            // Custom Add/Edit Tag Chip
+                            // Custom Add/Edit Tag Chip anchored at the start (leftmost)
                             val tintColor = MaterialTheme.colorScheme.primary
                             val chipShape = androidx.compose.foundation.shape.RoundedCornerShape(50)
                             Row(
@@ -251,6 +242,16 @@ fun NoteCreationPage(
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 12.sp
                                     )
+                                )
+                            }
+
+                            val selectedTags = allTags.filter { it.id in selectedTagIds }
+                            selectedTags.forEach { tag ->
+                                TagChip(
+                                    tag = tag,
+                                    onRemove = {
+                                        selectedTagIds = selectedTagIds - tag.id
+                                    }
                                 )
                             }
                         }

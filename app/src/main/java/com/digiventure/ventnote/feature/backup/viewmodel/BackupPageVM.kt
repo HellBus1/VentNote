@@ -29,7 +29,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class BackupPageVM @Inject constructor(
+open class BackupPageVM @Inject constructor(
     private val app: Application,
     private val repository: GoogleDriveRepository,
     private val databaseRepository: NoteRepository,
@@ -63,13 +63,18 @@ class BackupPageVM @Inject constructor(
                     payload,
                     getDatabaseNameWithTimestamps(),
                     drive
-                ).onEach {
-                    // Clean up old backups first (seamlessly)
-                    cleanupOldBackups(drive)
+                ).onEach { result ->
+                    if (result.isSuccess) {
+                        // Clean up old backups first (seamlessly)
+                        cleanupOldBackups(drive)
 
-                    // Then update UI state and fetch final list
-                    _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
-                    getBackupFileList()
+                        // Then update UI state and fetch final list
+                        _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
+                        getBackupFileList()
+                    } else {
+                        val errorMessage = result.exceptionOrNull()?.message ?: Constants.EMPTY_STRING
+                        _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFailed(errorMessage))
+                    }
                 }.first()
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
@@ -86,8 +91,16 @@ class BackupPageVM @Inject constructor(
             try {
                 val drive = getDriveInstance()
                 repository.restoreDatabaseFile(fileId, drive)
-                    .onEach {
-                        _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFinished)
+                    .onEach { result ->
+                        result.fold(
+                            onSuccess = {
+                                _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFinished)
+                            },
+                            onFailure = { e ->
+                                val errorMessage = e.message ?: Constants.EMPTY_STRING
+                                _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFailed(errorMessage))
+                            }
+                        )
                     }.last()
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
@@ -154,7 +167,7 @@ class BackupPageVM @Inject constructor(
         )
     }
 
-    private fun getDriveInstance(): Drive? {
+    open fun getDriveInstance(): Drive? {
         return GoogleSignIn.getLastSignedInAccount(app.applicationContext)?.run {
             DriveAPI.getInstance(app.applicationContext, this)
         }

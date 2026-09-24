@@ -312,16 +312,6 @@ fun NoteDetailPage(
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                currentTags.forEach { tag ->
-                                    TagChip(
-                                        tag = tag,
-                                        onRemove = if (isEditingState) {
-                                            { selectedTagIds = selectedTagIds - tag.id }
-                                        } else {
-                                            null
-                                        }
-                                    )
-                                }
                                 if (isEditingState) {
                                     val tintColor = MaterialTheme.colorScheme.primary
                                     val chipShape = androidx.compose.foundation.shape.RoundedCornerShape(50)
@@ -355,6 +345,16 @@ fun NoteDetailPage(
                                             )
                                         )
                                     }
+                                }
+                                currentTags.forEach { tag ->
+                                    TagChip(
+                                        tag = tag,
+                                        onRemove = if (isEditingState) {
+                                            { selectedTagIds = selectedTagIds - tag.id }
+                                        } else {
+                                            null
+                                        }
+                                    )
                                 }
                             }
                         }

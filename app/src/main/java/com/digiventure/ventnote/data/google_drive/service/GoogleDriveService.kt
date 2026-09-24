@@ -75,12 +75,21 @@ class GoogleDriveService @Inject constructor(
 
             if (payload != null) {
                 // New format — restore notes, tags, and note-tag cross refs
-                proxy.dao().upsertNotes(payload.notes)
-                if (payload.tags.isNotEmpty()) {
-                    upsertTags(payload.tags)
+                val notes = payload.notes ?: emptyList()
+                val tags = payload.tags ?: emptyList()
+                val noteTags = payload.noteTags ?: emptyList()
+
+                proxy.dao().upsertNotes(notes)
+                if (tags.isNotEmpty()) {
+                    upsertTags(tags)
                 }
-                if (payload.noteTags.isNotEmpty()) {
-                    upsertNoteTagCrossRefs(payload.noteTags)
+                if (noteTags.isNotEmpty()) {
+                    val allNoteIds = (notes.map { it.id } + proxy.dao().getSyncNotes().map { it.id }).toSet()
+                    val allTagIds = (tags.map { it.id } + proxy.tagDao().getAllTagsSync().map { it.id }).toSet()
+                    val validCrossRefs = noteTags.filter { it.noteId in allNoteIds && it.tagId in allTagIds }
+                    if (validCrossRefs.isNotEmpty()) {
+                        upsertNoteTagCrossRefs(validCrossRefs)
+                    }
                 }
             } else {
                 // Legacy format — plain array of NoteModel
@@ -127,12 +136,10 @@ class GoogleDriveService @Inject constructor(
     }
 
     private suspend fun upsertTags(tags: List<TagModel>) {
-        tags.forEach { tag ->
-            proxy.tagDao().insertTag(tag)
-        }
+        proxy.tagDao().upsertTags(tags)
     }
 
     private suspend fun upsertNoteTagCrossRefs(crossRefs: List<NoteTagCrossRef>) {
-        proxy.tagDao().insertNoteTagCrossRefs(crossRefs)
+        proxy.tagDao().upsertNoteTagCrossRefs(crossRefs)
     }
 }
