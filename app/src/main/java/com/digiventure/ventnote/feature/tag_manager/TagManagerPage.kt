@@ -167,7 +167,7 @@ fun TagManagerPage(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
                 items(items = tags, key = { it.id }) { tag ->

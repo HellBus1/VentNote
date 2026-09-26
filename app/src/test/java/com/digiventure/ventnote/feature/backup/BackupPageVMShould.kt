@@ -10,6 +10,7 @@ import com.digiventure.ventnote.data.persistence.TagDAO
 import com.digiventure.ventnote.data.persistence.TagRepository
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM.FileBackupState
+import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM.FileDeleteState
 import com.digiventure.ventnote.feature.backup.viewmodel.BackupPageVM.FileRestoreState
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import kotlinx.coroutines.Dispatchers
@@ -139,5 +140,34 @@ class BackupPageVMShould : BaseUnitTest() {
         val state = viewModel.uiState.value.fileBackupState
         assertTrue(state is FileBackupState.SyncFailed)
         assertEquals(errorMessage, (state as FileBackupState.SyncFailed).errorMessage)
+    }
+
+    @Test
+    fun deleteDatabase_setsSyncFinished_whenDeleteIsSuccessful() = runTest(testDispatcher) {
+        val fileId = "test-delete-id"
+        whenever(repository.deleteFile(any(), anyOrNull()))
+            .thenReturn(flowOf(Result.success(null)))
+        whenever(repository.getBackupFileList(anyOrNull()))
+            .thenReturn(flowOf(Result.success(emptyList())))
+
+        viewModel.deleteDatabase(fileId)
+        advanceUntilIdle()
+
+        assertEquals(FileDeleteState.SyncFinished, viewModel.uiState.value.fileDeleteState)
+    }
+
+    @Test
+    fun deleteDatabase_setsSyncFailed_whenDeleteReturnsFailure() = runTest(testDispatcher) {
+        val fileId = "test-delete-id"
+        val errorMessage = "Failed to delete file from Drive"
+        whenever(repository.deleteFile(any(), anyOrNull()))
+            .thenReturn(flowOf(Result.failure(Exception(errorMessage))))
+
+        viewModel.deleteDatabase(fileId)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value.fileDeleteState
+        assertTrue(state is FileDeleteState.SyncFailed)
+        assertEquals(errorMessage, (state as FileDeleteState.SyncFailed).errorMessage)
     }
 }

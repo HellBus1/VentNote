@@ -77,13 +77,11 @@ fun BackupFileList(backupPageVM: BackupPageBaseVM,
     val fileRestoreState = backupPageVM.uiState.value.fileRestoreState
     val fileDeleteState = backupPageVM.uiState.value.fileDeleteState
 
-    LaunchedEffect(key1 = true, key2 = backupPageVM.uiState.value.fileDeleteState) {
-        scope.launch {
-            backupPageVM.getBackupFileList()
-        }
+    LaunchedEffect(Unit) {
+        backupPageVM.getBackupFileList()
     }
 
-    LaunchedEffect(key1 = backupPageVM.uiState.value.fileRestoreState) {
+    LaunchedEffect(fileRestoreState) {
         when (fileRestoreState) {
             is BackupPageVM.FileRestoreState.SyncFailed -> {
                 restoreLoadingDialogState.value = false
@@ -104,7 +102,7 @@ fun BackupFileList(backupPageVM: BackupPageBaseVM,
         }
     }
 
-    LaunchedEffect(key1 = backupPageVM.uiState.value.fileDeleteState) {
+    LaunchedEffect(fileDeleteState) {
         when (fileDeleteState) {
             is BackupPageVM.FileDeleteState.SyncFailed -> {
                 restoreLoadingDialogState.value = false
@@ -146,7 +144,12 @@ fun BackupFileList(backupPageVM: BackupPageBaseVM,
         }
 
         is BackupPageVM.FileBackupListState.FileBackupListStarted -> {
-            FileBackupListStartedContainer()
+            val backupFiles = driveBackupFileListState.value
+            if (backupFiles.isNullOrEmpty()) {
+                FileBackupListStartedContainer()
+            } else {
+                BackupListContainer(backupFiles, onRestoreRequest, onDeleteRequest, onBackupRequest)
+            }
         }
     }
 
