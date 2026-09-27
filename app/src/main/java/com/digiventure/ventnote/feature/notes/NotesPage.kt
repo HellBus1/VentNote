@@ -241,9 +241,7 @@ fun NotesPage(
                 },
                 toggleDrawerCallback = openDrawer,
                 selectAllCallback = {
-                    noteListState?.getOrNull()?.let { notes ->
-                        viewModel.markAllNote(notes)
-                    }
+                    viewModel.markAllNote(filteredNotes)
                 },
                 unSelectAllCallback = viewModel::unMarkAllNote,
                 closeMarkingCallback = viewModel::closeMarkingEvent,

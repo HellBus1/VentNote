@@ -139,6 +139,7 @@ fun NoteDetailPage(
             viewModel.descriptionText.value = it.note
             viewModel.titleRichTextState.setFromMarkdown(it.title)
             viewModel.richTextState.setFromMarkdown(it.note)
+            viewModel.selectedTagIds.value = noteTags.map { tag -> tag.id }.toSet()
         }
     }
 
@@ -218,13 +219,15 @@ fun NoteDetailPage(
         }
     }
 
+    val parsedNoteId = remember(id) { id.toIntOrNull() ?: 0 }
+
     // Effects
-    LaunchedEffect(id) {
-        viewModel.getNoteDetail(id.toInt())
+    LaunchedEffect(parsedNoteId) {
+        viewModel.getNoteDetail(parsedNoteId)
     }
 
-    LaunchedEffect(id) {
-        viewModel.loadTagsForNote(id.toInt())
+    LaunchedEffect(parsedNoteId) {
+        viewModel.loadTagsForNote(parsedNoteId)
     }
 
     LaunchedEffect(noteDetailState) {
@@ -426,7 +429,7 @@ fun NoteDetailPage(
                 cancelDialogState.value = false
                 initData()
                 scope.launch {
-                    viewModel.loadTagsForNote(id.toInt())
+                    viewModel.loadTagsForNote(parsedNoteId)
                 }
             },
             modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG }

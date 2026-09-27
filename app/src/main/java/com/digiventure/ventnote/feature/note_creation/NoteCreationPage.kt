@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.feature.note_creation
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -148,12 +149,23 @@ fun NoteCreationPage(
     val scrollBehaviorState = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val scrollBehavior = remember { scrollBehaviorState }
 
+    val handleBackPress: () -> Unit = {
+        val hasContent = viewModel.titleRichTextState.toPlainText().isNotBlank() ||
+                viewModel.richTextState.toPlainText().isNotBlank() ||
+                selectedTagIds.isNotEmpty()
+        if (hasContent) {
+            cancelDialogState.value = true
+        } else {
+            navHostController.popBackStack()
+        }
+    }
+
+    BackHandler(onBack = handleBackPress)
+
     Scaffold(
         topBar = {
             NoteCreationAppBar(
-                onBackPressed = {
-                    cancelDialogState.value = true
-                },
+                onBackPressed = handleBackPress,
                 scrollBehavior = scrollBehavior
             )
         },
