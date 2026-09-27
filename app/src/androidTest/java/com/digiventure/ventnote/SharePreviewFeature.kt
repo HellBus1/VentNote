@@ -48,6 +48,12 @@ class SharePreviewFeature : BaseAcceptanceTest() {
         val testDate = sdf.parse("2026-02-19T10:00:00Z")!!
 
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val existingNotes = databaseProxy.dao().getSyncNotes()
+            if (existingNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*existingNotes.toTypedArray())
+            }
             databaseProxy.dao().upsertNotes(listOf(
                 NoteModel(1, "Test Title", "Test Note Content", testDate, testDate)
             ))
@@ -75,6 +81,8 @@ class SharePreviewFeature : BaseAcceptanceTest() {
     @After
     fun tearDown() {
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
             val allNotes = databaseProxy.dao().getSyncNotes()
             if (allNotes.isNotEmpty()) {
                 databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())

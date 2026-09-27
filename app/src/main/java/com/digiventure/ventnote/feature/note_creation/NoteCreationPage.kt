@@ -1,6 +1,7 @@
 package com.digiventure.ventnote.feature.note_creation
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -148,12 +149,23 @@ fun NoteCreationPage(
     val scrollBehaviorState = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val scrollBehavior = remember { scrollBehaviorState }
 
+    val handleBackPress: () -> Unit = {
+        val hasContent = viewModel.titleRichTextState.toPlainText().isNotBlank() ||
+                viewModel.richTextState.toPlainText().isNotBlank() ||
+                selectedTagIds.isNotEmpty()
+        if (hasContent) {
+            cancelDialogState.value = true
+        } else {
+            navHostController.popBackStack()
+        }
+    }
+
+    BackHandler(onBack = handleBackPress)
+
     Scaffold(
         topBar = {
             NoteCreationAppBar(
-                onBackPressed = {
-                    cancelDialogState.value = true
-                },
+                onBackPressed = handleBackPress,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -211,16 +223,7 @@ fun NoteCreationPage(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            val selectedTags = allTags.filter { it.id in selectedTagIds }
-                            selectedTags.forEach { tag ->
-                                TagChip(
-                                    tag = tag,
-                                    onRemove = {
-                                        selectedTagIds = selectedTagIds - tag.id
-                                    }
-                                )
-                            }
-                            // Custom Add/Edit Tag Chip
+                            // Custom Add/Edit Tag Chip anchored at the start (leftmost)
                             val tintColor = MaterialTheme.colorScheme.primary
                             val chipShape = androidx.compose.foundation.shape.RoundedCornerShape(50)
                             Row(
@@ -251,6 +254,16 @@ fun NoteCreationPage(
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 12.sp
                                     )
+                                )
+                            }
+
+                            val selectedTags = allTags.filter { it.id in selectedTagIds }
+                            selectedTags.forEach { tag ->
+                                TagChip(
+                                    tag = tag,
+                                    onRemove = {
+                                        selectedTagIds = selectedTagIds - tag.id
+                                    }
                                 )
                             }
                         }

@@ -17,7 +17,7 @@ import com.digiventure.ventnote.data.persistence.TagModel
  */
 data class BackupPayload(
     val version: Int = 1,
-    val notes: List<NoteModel> = emptyList(),
-    val tags: List<TagModel> = emptyList(),
-    val noteTags: List<NoteTagCrossRef> = emptyList()
+    val notes: List<NoteModel>? = emptyList(),
+    val tags: List<TagModel>? = emptyList(),
+    val noteTags: List<NoteTagCrossRef>? = emptyList()
 )

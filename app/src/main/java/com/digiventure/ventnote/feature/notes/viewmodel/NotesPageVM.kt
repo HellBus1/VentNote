@@ -81,6 +81,12 @@ class NotesPageVM @Inject constructor(
         viewModelScope.launch {
             tagRepository.getAllTags().collect { result ->
                 _allTags.postValue(result)
+                val activeTagIds = result.getOrNull()?.map { it.id }?.toSet() ?: emptySet()
+                selectedTagId.value?.let { currentId ->
+                    if (currentId !in activeTagIds) {
+                        selectedTagId.value = null
+                    }
+                }
             }
         }
         // Observe note-tag associations reactively

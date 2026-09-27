@@ -103,6 +103,7 @@ fun BackupPage(
             BackupPageVM.FileBackupState.SyncFinished -> {
                 loadingDialogState.value = false
                 scope.launch {
+                    snackBarHostState.currentSnackbarData?.dismiss()
                     snackBarHostState.showSnackbar(
                         message = backedUpMessage,
                         withDismissAction = true
@@ -167,6 +168,7 @@ fun BackupPage(
                             },
                             successfullyRestoredRequest = {
                                 scope.launch {
+                                    snackBarHostState.currentSnackbarData?.dismiss()
                                     snackBarHostState.showSnackbar(
                                         message = restoredMessage,
                                         withDismissAction = true
@@ -175,6 +177,7 @@ fun BackupPage(
                             },
                             successfullyDeletedRequest = {
                                 scope.launch {
+                                    snackBarHostState.currentSnackbarData?.dismiss()
                                     snackBarHostState.showSnackbar(
                                         message = deletedMessage,
                                         withDismissAction = true

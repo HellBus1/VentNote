@@ -20,6 +20,12 @@ interface TagDAO {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTag(tag: TagModel): Long
 
+    /**
+     * Upsert multiple tags at once (used during Google Drive backup restore).
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertTags(tags: List<TagModel>)
+
     @Update
     suspend fun updateTag(tag: TagModel): Int
 
@@ -48,6 +54,12 @@ interface TagDAO {
      */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertNoteTagCrossRefs(crossRefs: List<NoteTagCrossRef>)
+
+    /**
+     * Upsert multiple note-tag cross-references at once (used during Google Drive backup restore).
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertNoteTagCrossRefs(crossRefs: List<NoteTagCrossRef>)
 
     /**
      * Remove a single tag association from a note.
