@@ -78,7 +78,7 @@ import androidx.compose.runtime.setValue
 import com.digiventure.ventnote.feature.tag_manager.components.TagChip
 import com.digiventure.ventnote.feature.tag_manager.components.TagPickerBottomSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NoteDetailPage(
     navHostController: NavHostController,

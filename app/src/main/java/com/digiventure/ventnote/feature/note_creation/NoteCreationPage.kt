@@ -73,7 +73,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import com.digiventure.ventnote.feature.tag_manager.components.TagChip
 import com.digiventure.ventnote.feature.tag_manager.components.TagPickerBottomSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NoteCreationPage(
     navHostController: NavHostController,
