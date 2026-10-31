@@ -4,6 +4,8 @@ import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteTagCrossRef
 import com.digiventure.ventnote.data.persistence.TagModel
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * Wrapper used for serializing/deserializing the entire app database to/from JSON for Google Drive backup.
  *
@@ -16,8 +18,15 @@ import com.digiventure.ventnote.data.persistence.TagModel
  * Missing [tags] or [noteTags] fields default to empty lists via Gson's null-safe handling.
  */
 data class BackupPayload(
+    @SerializedName("version")
     val version: Int = 1,
+
+    @SerializedName("notes")
     val notes: List<NoteModel>? = emptyList(),
+
+    @SerializedName("tags")
     val tags: List<TagModel>? = emptyList(),
+
+    @SerializedName("noteTags", alternate = ["note_tags"])
     val noteTags: List<NoteTagCrossRef>? = emptyList()
 )

@@ -11,7 +11,9 @@ import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
+import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -24,7 +26,15 @@ class GoogleDriveService @Inject constructor(
     companion object {
         private const val FILE_MIME_TYPE = "application/json"
         private const val APP_DATA_FOLDER_SPACE = "appDataFolder"
+
+        fun createBackupGson(): Gson {
+            return GsonBuilder()
+                .registerTypeAdapter(Date::class.java, DateTypeAdapter())
+                .create()
+        }
     }
+
+    private val gson: Gson = createBackupGson()
 
     /**
      * Uploads the full database as a [BackupPayload] JSON to Google Drive.
@@ -38,7 +48,7 @@ class GoogleDriveService @Inject constructor(
             return@withContext try {
                 val metaData = getMetaData(fileName)
                 metaData.parents = listOf(APP_DATA_FOLDER_SPACE)
-                val jsonString = Gson().toJson(payload)
+                val jsonString = gson.toJson(payload)
                 val fileContent = ByteArrayContent(FILE_MIME_TYPE, jsonString.toByteArray())
                 val result = drive?.files()?.create(metaData, fileContent)?.execute()
                 Result.success(result)
@@ -54,7 +64,8 @@ class GoogleDriveService @Inject constructor(
      * 1. **New format** (version 1+): `{"version":1,"notes":[...],"tags":[...],"noteTags":[...]}`
      * 2. **Legacy format** (version 0): a plain JSON array `[{note},{note},...]`
      *
-     * If the legacy format is detected, notes are restored and tags default to empty.
+     * Inspects the JSON structure (object vs array) rather than speculative deserialization
+     * to prevent misleading errors.
      */
     suspend fun readFile(fileId: String, drive: Drive?): Result<Unit> = withContext(Dispatchers.IO) {
         return@withContext try {
@@ -62,22 +73,18 @@ class GoogleDriveService @Inject constructor(
                 it.bufferedReader().use { reader -> reader.readText() }
             } ?: return@withContext Result.failure(Exception("Empty file"))
 
-            val gson = Gson()
-
-            // Try new BackupPayload format first
-            val payload: BackupPayload? = try {
-                val parsed = gson.fromJson(jsonString, BackupPayload::class.java)
-                // A valid payload must have a notes list; a JSON array parsed as this class will have null notes
-                if (parsed?.notes != null) parsed else null
-            } catch (_: JsonSyntaxException) {
-                null
+            val jsonElement = try {
+                JsonParser.parseString(jsonString)
+            } catch (e: Exception) {
+                return@withContext Result.failure(Exception("Invalid JSON backup: ${e.message}", e))
             }
 
-            if (payload != null) {
+            if (jsonElement.isJsonObject) {
                 // New format — restore notes, tags, and note-tag cross refs
-                val notes = payload.notes ?: emptyList()
-                val tags = payload.tags ?: emptyList()
-                val noteTags = payload.noteTags ?: emptyList()
+                val payload = gson.fromJson(jsonElement.asJsonObject, BackupPayload::class.java)
+                val notes = payload?.notes ?: emptyList()
+                val tags = payload?.tags ?: emptyList()
+                val noteTags = payload?.noteTags ?: emptyList()
 
                 proxy.dao().upsertNotes(notes)
                 if (tags.isNotEmpty()) {
@@ -91,11 +98,13 @@ class GoogleDriveService @Inject constructor(
                         upsertNoteTagCrossRefs(validCrossRefs)
                     }
                 }
-            } else {
+            } else if (jsonElement.isJsonArray) {
                 // Legacy format — plain array of NoteModel
-                val notes = gson.fromJson(jsonString, Array<NoteModel>::class.java)?.toList() ?: emptyList()
+                val notes = gson.fromJson(jsonElement.asJsonArray, Array<NoteModel>::class.java)?.toList() ?: emptyList()
                 proxy.dao().upsertNotes(notes)
                 // Tags remain empty — notes become "uncategorized"
+            } else {
+                return@withContext Result.failure(Exception("Unexpected backup file format: expected JSON object or array"))
             }
 
             // Refresh widget after restore
