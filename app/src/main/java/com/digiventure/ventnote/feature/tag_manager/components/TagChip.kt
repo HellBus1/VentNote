@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +47,7 @@ fun TagChip(
     onRemove: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val tagColor = parseColor(tag.colorHex)
+    val tagColor = remember(tag.colorHex) { parseColor(tag.colorHex) }
     val chipShape = RoundedCornerShape(50)
     val bgAlpha = if (isSelected) 0.20f else 0.12f
     val borderAlpha = if (isSelected) 1f else 0.4f

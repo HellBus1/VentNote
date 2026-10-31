@@ -347,4 +347,78 @@ class NoteDetailFeature : BaseAcceptanceTest() {
         composeTestRule.onNodeWithTag(TestTags.BODY_TEXT_FIELD).assertIsFocused()
         composeTestRule.onNodeWithTag(TestTags.TITLE_TEXT_FIELD).assertIsNotFocused()
     }
+
+    /**
+     * Verifies that tags assigned to a note in edit mode are saved, synced into
+     * selectedTagIds, and restored if the user removes a tag in edit mode and cancels.
+     */
+    @Test
+    fun editMode_tagSelectionSyncs_andRevertsOnCancel() {
+        runBlocking {
+            databaseProxy.tagDao().insertTag(
+                com.digiventure.ventnote.data.persistence.TagModel(id = 50, name = "PriorityTag", colorHex = "#EF5350")
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        // 1. Enter edit mode and assign "PriorityTag" via TagPickerBottomSheet
+        composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Add Tags").performClick()
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNode(
+                    hasTestTag("tag_chip_PriorityTag") and hasAnyAncestor(hasTestTag(TestTags.BOTTOM_SHEET))
+                ).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        composeTestRule.onNode(
+            hasTestTag("tag_chip_PriorityTag") and hasAnyAncestor(hasTestTag(TestTags.BOTTOM_SHEET))
+        ).performClick()
+
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+            .sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+        composeTestRule.waitForIdle()
+
+        // Save note with the assigned tag
+        composeTestRule.onNodeWithTag(TestTags.SAVE_ICON_BUTTON).performClick()
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        // 2. Re-enter edit mode, remove the tag, and cancel
+        composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Remove tag PriorityTag", useUnmergedTree = true).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertDoesNotExist()
+
+        // Cancel editing and confirm
+        composeTestRule.onNodeWithTag(TestTags.CANCEL_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(TestTags.CONFIRM_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        // The tag chip should be restored in view mode
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+    }
 }

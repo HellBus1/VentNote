@@ -53,8 +53,7 @@ import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.commons.TestTags
 
-val SortIcon: ImageVector
-    get() = ImageVector.Builder(
+val SortIcon: ImageVector = ImageVector.Builder(
         name = "SortIcon",
         defaultWidth = 24.dp,
         defaultHeight = 24.dp,
@@ -92,8 +91,7 @@ val SortIcon: ImageVector
     }.build()
 
 // ViewAgendaIcon: shown when in STAGGERED mode → tapping switches back to list
-val ViewAgendaIcon: ImageVector
-    get() = ImageVector.Builder(
+val ViewAgendaIcon: ImageVector = ImageVector.Builder(
         name = "ViewAgenda",
         defaultWidth = 24.dp,
         defaultHeight = 24.dp,
@@ -125,8 +123,7 @@ val ViewAgendaIcon: ImageVector
     }.build()
 
 // ViewListIcon: shown when in LIST mode → tapping switches to staggered
-val ViewListIcon: ImageVector
-    get() = ImageVector.Builder(
+val ViewListIcon: ImageVector = ImageVector.Builder(
         name = "ViewList",
         defaultWidth = 24.dp,
         defaultHeight = 24.dp,
