@@ -66,6 +66,12 @@ class NotesFeature : BaseAcceptanceTest() {
 
         // Seed the database with deterministic notes
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val existingNotes = databaseProxy.dao().getSyncNotes()
+            if (existingNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*existingNotes.toTypedArray())
+            }
             databaseProxy.dao().upsertNotes(listOf(note1, note2, note3))
         }
 
@@ -82,8 +88,10 @@ class NotesFeature : BaseAcceptanceTest() {
 
     @After
     fun tearDown() {
-        // Clean up all seeded notes to ensure test isolation
+        // Clean up all seeded notes and tags to ensure test isolation
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
             val allNotes = databaseProxy.dao().getSyncNotes()
             if (allNotes.isNotEmpty()) {
                 databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())
@@ -673,5 +681,78 @@ class NotesFeature : BaseAcceptanceTest() {
 
         // "Meeting Notes" should appear (matches search)
         composeTestRule.onNodeWithText("Meeting Notes").assertIsDisplayed()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 8. View Mode Switcher & Rich Text / Tag Rendering
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Verifies that tapping the view mode button in the top app bar toggles
+     * between List mode and Staggered Grid mode while preserving all visible notes.
+     */
+    @Test
+    fun viewModeButton_togglesBetweenListAndStaggeredGrid() {
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        val viewModeButton = composeTestRule.onNodeWithTag("view_mode_icon_button")
+        viewModeButton.assertIsDisplayed()
+
+        // Toggle to alternate view mode
+        viewModeButton.performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Meeting Notes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Ideas").assertIsDisplayed()
+
+        // Toggle back to initial view mode
+        viewModeButton.performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Meeting Notes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Ideas").assertIsDisplayed()
+    }
+
+    /**
+     * Verifies that NotesItem parses Markdown in title/body and renders associated tag chips.
+     */
+    @Test
+    fun noteItem_rendersParsedMarkdownAndTagChips() {
+        runBlocking {
+            val insertedNoteId = databaseProxy.dao().insertNote(
+                NoteModel(id = 0, title = "**Markdown Header**", note = "*Styled body text*")
+            ).toInt()
+            val tagId = databaseProxy.tagDao().insertTag(
+                com.digiventure.ventnote.data.persistence.TagModel(id = 0, name = "SprintTag", colorHex = "#42A5F5")
+            ).toInt()
+            databaseProxy.tagDao().insertNoteTagCrossRef(
+                com.digiventure.ventnote.data.persistence.NoteTagCrossRef(noteId = insertedNoteId, tagId = tagId)
+            )
+        }
+
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Markdown Header").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        composeTestRule.onNodeWithText("Markdown Header").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Styled body text").assertIsDisplayed()
+        composeTestRule.onAllNodes(
+            hasTestTag("tag_chip_SprintTag"),
+            useUnmergedTree = true
+        )[0].assertIsDisplayed()
     }
 }

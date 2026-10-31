@@ -107,27 +107,14 @@ fun NotesPage(
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    // Memoized filtered notes — applies both tag filter and search
+    // Memoized filtered notes — applies text search on the VM's tag-filtered list
     val filteredNotes by remember {
         derivedStateOf {
             val notes = noteListState?.getOrNull() ?: emptyList()
-            // 1. Apply tag folder filter
-            val tagFiltered = if (selectedTagId == null) {
+            if (debouncedSearchQuery.isBlank()) {
                 notes
             } else {
                 notes.filter { note ->
-                    // We check against the allTags state; for proper filtering we rely on
-                    // the note's associated tags loaded in the NoteItem. A simple approach
-                    // is to store noteId→tagIds in the VM (handled via allTags + cross-refs).
-                    // For now, the ViewModel-level filtering is the source of truth.
-                    true // VM will provide pre-filtered list via observeNotesByTag
-                }
-            }
-            // 2. Apply text search
-            if (debouncedSearchQuery.isBlank()) {
-                tagFiltered
-            } else {
-                tagFiltered.filter { note ->
                     note.title.contains(debouncedSearchQuery, ignoreCase = true) ||
                             note.note.contains(debouncedSearchQuery, ignoreCase = true)
                 }
@@ -195,7 +182,7 @@ fun NotesPage(
         }
     }
 
-    val onNoteClick = remember {
+    val onNoteClick = remember(isMarking) {
         { note: NoteModel ->
             if (isMarking) {
                 viewModel.addToMarkedNoteList(note)
@@ -206,7 +193,7 @@ fun NotesPage(
         }
     }
 
-    val onNoteLongClick = remember {
+    val onNoteLongClick = remember(isMarking) {
         { note: NoteModel ->
             if (!isMarking) {
                 viewModel.isMarking.value = true

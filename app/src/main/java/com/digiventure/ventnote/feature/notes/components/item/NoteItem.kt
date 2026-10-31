@@ -5,6 +5,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,8 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,8 +48,7 @@ import com.digiventure.ventnote.data.persistence.TagModel
 import com.digiventure.ventnote.feature.tag_manager.components.TagChip
 
 /** Pushpin vector icon drawn programmatically to avoid a drawable resource dependency. */
-private val PinIcon: ImageVector
-    get() = ImageVector.Builder(
+private val PinIcon: ImageVector = ImageVector.Builder(
         name = "PinIcon",
         defaultWidth = 24.dp,
         defaultHeight = 24.dp,
@@ -133,9 +134,13 @@ fun NotesItem(
                             .semantics { }) {
                     }
                 }
-                val titleText = if (data.title.isEmpty()) androidx.compose.ui.res.stringResource(com.digiventure.ventnote.R.string.untitled) else data.title
+                val untitledText = androidx.compose.ui.res.stringResource(com.digiventure.ventnote.R.string.untitled)
+                val titleText = if (data.title.isEmpty()) untitledText else data.title
+                val parsedTitle = remember(titleText) {
+                    MarkdownParser.parseToAnnotatedString(titleText)
+                }
                 Text(
-                    text = MarkdownParser.parseToAnnotatedString(titleText),
+                    text = parsedTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium.copy(
@@ -172,9 +177,15 @@ fun NotesItem(
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 val descriptionMaxLines = if (noteViewMode == Constants.VIEW_MODE_STAGGERED) 8 else 4
+                val parsedNote = remember(data.note) {
+                    MarkdownParser.parseToAnnotatedString(data.note)
+                }
+                val formattedDate = remember(data.updatedAt) {
+                    DateUtil.formatNoteDate(data.updatedAt)
+                }
                 Column {
                     Text(
-                        text = MarkdownParser.parseToAnnotatedString(data.note),
+                        text = parsedNote,
                         maxLines = descriptionMaxLines,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -187,7 +198,7 @@ fun NotesItem(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = DateUtil.formatNoteDate(data.updatedAt),
+                        text = formattedDate,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodySmall.copy(
@@ -199,10 +210,11 @@ fun NotesItem(
                     // Tag chips row — display tags directly (maximum 3 tags)
                     if (tags.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        LazyRow(
-                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.horizontalScroll(rememberScrollState())
                         ) {
-                            items(items = tags, key = { it.id }) { tag ->
+                            tags.forEach { tag ->
                                 TagChip(tag = tag)
                             }
                         }

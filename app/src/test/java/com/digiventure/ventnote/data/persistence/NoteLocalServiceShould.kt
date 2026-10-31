@@ -248,6 +248,7 @@ class NoteLocalServiceShould: BaseUnitTest() {
         service.toggleNotePin(1, true).first()
 
         verify(dao, times(1)).setPinned(1, true)
+        verify(refresher, times(1)).refresh(app)
     }
 
     @Test

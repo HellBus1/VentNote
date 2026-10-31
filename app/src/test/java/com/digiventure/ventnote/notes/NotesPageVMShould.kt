@@ -401,6 +401,18 @@ class NotesPageVMShould : BaseUnitTest() {
         verify(repository, times(1)).getNotesByTag(tagId, sortBy, orderBy)
     }
 
+    @Test
+    fun init_populatesNoteTagsMapFromCrossRefs() = runTest {
+        val tag1 = com.digiventure.ventnote.data.persistence.TagModel(10, "Work", "#FF0000")
+        val crossRef = NoteTagCrossRef(noteId = 1, tagId = 10)
+        whenever(tagRepository.getAllTags()).thenReturn(flowOf(Result.success(listOf(tag1))))
+        whenever(tagDao.getAllNoteTagCrossRefsFlow()).thenReturn(flowOf(listOf(crossRef)))
+
+        val vm = NotesPageVM(repository, tagRepository, noteDataStore, databaseProxy)
+
+        assertEquals(listOf(tag1), vm.noteTagsMap.getValueForTest()?.get(1))
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────────────────────────────────────

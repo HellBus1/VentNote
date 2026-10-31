@@ -15,6 +15,7 @@ import com.digiventure.ventnote.data.persistence.TagModel
 import com.digiventure.ventnote.data.persistence.TagRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
@@ -77,9 +78,9 @@ class NotesPageVM @Inject constructor(
                 }
             }
         }
-        // Observe tags for the chip bar
+        // Observe tags for the chip bar and note-tag associations reactively
         viewModelScope.launch {
-            tagRepository.getAllTags().collect { result ->
+            val tagsFlow = tagRepository.getAllTags().onEach { result ->
                 _allTags.postValue(result)
                 val activeTagIds = result.getOrNull()?.map { it.id }?.toSet() ?: emptySet()
                 selectedTagId.value?.let { currentId ->
@@ -88,17 +89,14 @@ class NotesPageVM @Inject constructor(
                     }
                 }
             }
-        }
-        // Observe note-tag associations reactively
-        viewModelScope.launch {
             combine(
-                tagRepository.getAllTags(),
+                tagsFlow,
                 databaseProxy.tagDao().getAllNoteTagCrossRefsFlow()
             ) { tagsResult, crossRefs ->
-                val tags = tagsResult.getOrDefault(emptyList())
+                val tagById = tagsResult.getOrDefault(emptyList()).associateBy { it.id }
                 crossRefs.groupBy { it.noteId }
                     .mapValues { entry ->
-                        entry.value.mapNotNull { ref -> tags.find { it.id == ref.tagId } }
+                        entry.value.mapNotNull { ref -> tagById[ref.tagId] }
                     }
             }.collect { map ->
                 _noteTagsMap.postValue(map)
@@ -161,10 +159,13 @@ class NotesPageVM @Inject constructor(
         markedNoteList.clear()
     }
 
+    private var observeNotesJob: Job? = null
+
     // Sets up reactive observation of the database. Automatically fetches and updates 
     // the notes list whenever the sort order or selected tag filter changes.
     override fun observeNotes() {
-        viewModelScope.launch {
+        observeNotesJob?.cancel()
+        observeNotesJob = viewModelScope.launch {
             combine(
                 sortAndOrderData.asFlow(),
                 snapshotFlow { selectedTagId.value }
