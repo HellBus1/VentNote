@@ -35,7 +35,8 @@ class NoteWidgetFactory(
         val views = RemoteViews(context.packageName, R.layout.note_widget_item)
 
         // Convert markdown to SpannableString for rich text rendering in widget
-        val styledTitle = MarkdownToSpannable.convert(note.title)
+        val titleText = note.title.ifBlank { context.getString(R.string.untitled) }
+        val styledTitle = MarkdownToSpannable.convert(titleText)
         val styledContent = MarkdownToSpannable.convert(note.note)
 
         views.setTextViewText(R.id.widget_item_title, styledTitle)

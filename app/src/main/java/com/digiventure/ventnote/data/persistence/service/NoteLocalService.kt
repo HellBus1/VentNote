@@ -87,6 +87,8 @@ class NoteLocalService @Inject constructor(
         flow {
             proxy.dao().setPinned(noteId, isPinned)
             emit(Result.success(true))
+        }.onEach {
+            if (it.isSuccess) refresher.refresh(app)
         }.catch {
             emit(Result.failure(RuntimeException(ErrorMessage.FAILED_UPDATE_NOTE_ROOM)))
         }

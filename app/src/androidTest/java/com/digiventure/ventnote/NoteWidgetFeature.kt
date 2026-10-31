@@ -90,4 +90,26 @@ class NoteWidgetFeature : BaseAcceptanceTest() {
         // This verifies that the static refresh logic executes without exceptions in the instrumentation context
         NoteWidgetProvider.refreshWidgets(context)
     }
+
+    @Test
+    fun widgetFactory_ordersPinnedNotesFirst_andHandlesUntitledNotes() = runBlocking {
+        val olderDate = Date(1700000000000)
+        val newerDate = Date(1700005000000)
+
+        val unpinnedNewer = NoteModel(id = 10, title = "Newer Unpinned", note = "**Bold**", createdAt = newerDate, updatedAt = newerDate, isPinned = false)
+        val pinnedOlder = NoteModel(id = 20, title = "", note = "*Italic*", createdAt = olderDate, updatedAt = olderDate, isPinned = true)
+        databaseProxy.dao().upsertNotes(listOf(unpinnedNewer, pinnedOlder))
+
+        val factory = NoteWidgetFactory(context, databaseProxy)
+        factory.onDataSetChanged()
+
+        assertEquals(2, factory.getCount())
+        // Pinned note (id = 20) should be first despite older createdAt
+        assertEquals(20L, factory.getItemId(0))
+        assertEquals(10L, factory.getItemId(1))
+
+        // Verify RemoteViews creation for untitled & markdown note succeeds
+        val pinnedView = factory.getViewAt(0)
+        assertNotNull(pinnedView)
+    }
 }
