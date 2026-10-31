@@ -221,11 +221,6 @@ fun NotesPage(
         }
     }
 
-    // Selected tag name for AppBar subtitle
-    val selectedTagName = remember(selectedTagId, allTags) {
-        selectedTagId?.let { id -> allTags.find { it.id == id }?.name }
-    }
-
     Scaffold(
         topBar = {
             NotesAppBar(
@@ -302,7 +297,7 @@ fun NotesPage(
                 when (viewModel.noteViewMode.value) {
                     Constants.VIEW_MODE_STAGGERED -> {
                         LazyVerticalStaggeredGrid(
-                            columns = StaggeredGridCells.Adaptive(minSize = 160.dp),
+                            columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
                             modifier = listModifier,
                             verticalItemSpacing = 16.dp,
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
