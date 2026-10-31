@@ -195,7 +195,7 @@ fun NotesPage(
         }
     }
 
-    val onNoteClick = remember {
+    val onNoteClick = remember(isMarking) {
         { note: NoteModel ->
             if (isMarking) {
                 viewModel.addToMarkedNoteList(note)
@@ -206,7 +206,7 @@ fun NotesPage(
         }
     }
 
-    val onNoteLongClick = remember {
+    val onNoteLongClick = remember(isMarking) {
         { note: NoteModel ->
             if (!isMarking) {
                 viewModel.isMarking.value = true

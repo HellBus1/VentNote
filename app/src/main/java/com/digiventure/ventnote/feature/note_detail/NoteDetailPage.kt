@@ -234,6 +234,12 @@ fun NoteDetailPage(
         initData()
     }
 
+    LaunchedEffect(noteTags, isEditingState) {
+        if (!isEditingState) {
+            viewModel.selectedTagIds.value = noteTags.map { tag -> tag.id }.toSet()
+        }
+    }
+
     LaunchedEffect(loadingState) {
         openLoadingDialog.value = loadingState == true
     }
@@ -275,12 +281,18 @@ fun NoteDetailPage(
                     .widthIn(max = 800.dp)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        focusManager.clearFocus()
-                    },
+                    .then(
+                        if (isEditingState) {
+                            Modifier.clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
+                                focusManager.clearFocus()
+                            }
+                        } else {
+                            Modifier
+                        }
+                    ),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {

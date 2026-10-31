@@ -66,6 +66,12 @@ class NotesFeature : BaseAcceptanceTest() {
 
         // Seed the database with deterministic notes
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val existingNotes = databaseProxy.dao().getSyncNotes()
+            if (existingNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*existingNotes.toTypedArray())
+            }
             databaseProxy.dao().upsertNotes(listOf(note1, note2, note3))
         }
 

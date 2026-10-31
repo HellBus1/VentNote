@@ -40,6 +40,10 @@ class NoteDetailFeature : BaseAcceptanceTest() {
         runBlocking {
             databaseProxy.tagDao().clearAllNoteTagCrossRefs()
             databaseProxy.tagDao().clearAllTags()
+            val allNotes = databaseProxy.dao().getSyncNotes()
+            if (allNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())
+            }
             databaseProxy.dao().upsertNotes(listOf(testNote))
         }
 
