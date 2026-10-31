@@ -3,15 +3,22 @@ package com.digiventure.ventnote
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.digiventure.utils.BaseAcceptanceTest
+import com.digiventure.ventnote.data.google_drive.BackupPayload
+import com.digiventure.ventnote.data.google_drive.DateTypeAdapter
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteTagCrossRef
+import com.digiventure.ventnote.data.persistence.TagModel
 import com.digiventure.ventnote.feature.widget.NoteWidgetFactory
 import com.digiventure.ventnote.feature.widget.NoteWidgetProvider
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
+import com.digiventure.ventnote.navigation.NoteModelParamType
+import com.google.gson.GsonBuilder
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -111,5 +118,33 @@ class NoteWidgetFeature : BaseAcceptanceTest() {
         // Verify RemoteViews creation for untitled & markdown note succeeds
         val pinnedView = factory.getViewAt(0)
         assertNotNull(pinnedView)
+    }
+
+    @Test
+    fun gsonAndLocaleResources_workAfterBuildOptimization() {
+        // Verify English locale string resources resolve under localeFilters += ["en"]
+        assertEquals("Untitled", context.getString(R.string.untitled))
+        assertTrue(context.getString(R.string.app_name).isNotBlank())
+
+        // Verify Gson navigation & backup serialization without kotlinx-serialization
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Date::class.java, DateTypeAdapter())
+            .create()
+        val fixedDate = Date(1700000000000)
+        val note = NoteModel(id = 42, title = "Serialized Note", note = "Body", createdAt = fixedDate, updatedAt = fixedDate, isPinned = true)
+        val parsedNavNote = NoteModelParamType().parseValue(gson.toJson(note))
+        assertEquals(42, parsedNavNote.id)
+        assertEquals("Serialized Note", parsedNavNote.title)
+
+        val payload = BackupPayload(
+            version = 1,
+            notes = listOf(note),
+            tags = listOf(TagModel(id = 1, name = "Work", colorHex = "#90CAF9")),
+            noteTags = listOf(NoteTagCrossRef(noteId = 42, tagId = 1))
+        )
+        val roundTrip = gson.fromJson(gson.toJson(payload), BackupPayload::class.java)
+        assertEquals(1, roundTrip.notes?.size)
+        assertEquals(1, roundTrip.tags?.size)
+        assertEquals(1, roundTrip.noteTags?.size)
     }
 }
