@@ -1,86 +1,197 @@
-<div style="text-align: center;">
-  <img src="assets/banner.png" width="100%"/>
+<div align="center">
+  <img src="assets/banner.png" width="100%" alt="VentNote Banner" />
+
+  <br /><br />
+
+  [![Licence](https://img.shields.io/github/license/HellBus1/VentNote?style=for-the-badge&color=6650a4)](./LICENSE)
+  [![GitHub release](https://img.shields.io/github/downloads/HellBus1/VentNote/total?color=6650a4&label=Downloads&logo=android&style=for-the-badge)](https://github.com/HellBus1/VentNote/releases)
+  [![Platform](https://img.shields.io/badge/Platform-Android%205.1%2B-green?style=for-the-badge&logo=android)](https://github.com/HellBus1/VentNote)
+  [![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20M3-4285F4?style=for-the-badge&logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
+
+  <h3>Taking notes like a breeze.</h3>
+  <p>An intuitive, modern note management Android application built with <b>Jetpack Compose</b>, <b>Clean Architecture</b>, <b>Kotlin Coroutines & Flow</b>, <b>Room SQLite</b>, and <b>Material 3 Design</b>.</p>
 </div>
 
 <br />
 
-## VentNote
-VentNote — Taking notes like a breeze.   
-Note management app built with Jetpack Compose and the newest modern Android architecture guide
+---
+
+## 📸 Feature Showcase
+
+VentNote delivers an aesthetically pleasing, friction-free note-taking experience with adaptive layouts, vibrant theming, and robust categorization:
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="33%">
+        <img src="assets/screen_one_new.jpg" width="100%" alt="Dashboard & Tag Chips" /><br />
+        <b>Dashboard & Tag Chips</b><br />
+        <sub>Adaptive Staggered Grid, Category Filter Chips, and Quick Pin Button</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="assets/screen_two_new.jpg" width="100%" alt="Note Editor" /><br />
+        <b>Note Editor & Markdown</b><br />
+        <sub>Rich text formatting toolbar, empty title flexibility ("Untitled"), and tag selection</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="assets/screen_three_new.jpg" width="100%" alt="Note Detail" /><br />
+        <b>Note Detail & Reading</b><br />
+        <sub>Rendered Markdown formatting, category badges, and inline editing</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="33%">
+        <img src="assets/screen_four_new.jpg" width="100%" alt="Navigation Drawer" /><br />
+        <b>Navigation & Theming</b><br />
+        <sub>Dark/Light mode switch, 4 curated Material 3 color palettes, and tool shortcuts</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="assets/screen_five_new.jpg" width="100%" alt="Tag Manager" /><br />
+        <b>Tag & Category Manager</b><br />
+        <sub>12-color curated palette, duplicate prevention, and cascading deletion</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="assets/screen_six_new.jpg" width="100%" alt="Google Drive Backup" /><br />
+        <b>Google Drive Sync</b><br />
+        <sub>Hidden <code>appDataFolder</code> storage, dual-format restore, and timestamp retention</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" colspan="3">
+        <img src="assets/screen_seven_new.jpg" width="33%" alt="Share & Export" /><br />
+        <b>Export, Sharing & Batch Actions</b><br />
+        <sub>Export notes as text/image preview, multi-select marking mode, and batch deletion</sub>
+      </td>
+    </tr>
+  </table>
+</div>
 
 <br />
 
-<p>
-  <img src="assets/screen_one_new.jpg" width="200" alt=""/>
-  <img src="assets/screen_two_new.jpg" width="200" alt=""/>
-  <img src="assets/screen_three_new.jpg" width="200" alt=""/>
-  <img src="assets/screen_four_new.jpg" width="200" alt=""/>
-  <img src="assets/screen_five_new.jpg" width="200" alt=""/>
-  <img src="assets/screen_six_new.jpg" width="200" alt=""/>
-  <img src="assets/screen_seven_new.jpg" width="200" alt=""/>
-</p>
-
-<br />
+---
 
 ## 📱 Features
-- [v] Minimal and Aesthetic UI
-- [v] Create and Edit Notes
-- [v] Search and Find Notes
-- [v] Delete Notes
-- [v] Share Notes
-- [v] Dark Mode & App Colour Switch
-- [v] In App Update
-- [-] Widget (Waiting for stable version)
-- [v] Google Drive Backup
+
+- [x] **Minimal & Aesthetic UI:** Built entirely with Jetpack Compose Material 3; adapts seamlessly across compact phones, foldables, and tablets.
+- [x] **Note Pinning:** Pin important notes to permanently affix them at the top of your list with priority SQL sorting (`is_pinned DESC`).
+- [x] **Tags & Category System:** Organize notes using custom colored tags, a 12-color curated palette, and a dashboard horizontal filter chip bar. Notes support up to 3 tags max.
+- [x] **Rich Text & Markdown Editor:** Format notes on the fly with bold, italic, strikethrough, underline, and bulleted/ordered lists.
+- [x] **Flexible Note Creation:** Write notes without requiring a title; automatically displays a graceful, localized `"Untitled"` fallback.
+- [x] **Dual View Modes:** Seamlessly switch between a clean **Linear List** and a dynamic **Staggered Grid**, persisted via AndroidX DataStore.
+- [x] **Live Search & Dynamic Multi-Sorting:** Instant search across titles and body text; sort notes by Updated Date, Created Date, or Title in Ascending/Descending order.
+- [x] **Multi-Select & Batch Deletion (Marking Mode):** Long-press to enter selection mode, select/unselect all, and safely delete multiple notes with modal confirmation.
+- [x] **Google Drive Cloud Backup & Restore:** Securely backup your entire workspace (notes, tags, and cross-references) to your hidden Google Drive `appDataFolder`. Restores preserve **original historical timestamps** and support backward compatibility with legacy Version 0 backups.
+- [x] **Personalization & Dark Mode:** Choose between Dark Mode and Light Mode, and personalize your experience with 4 bespoke Material 3 color palettes (Purple, Crimson, Cadmium Green, Cobalt Blue).
+- [x] **Launcher App Widget:** Stay productive with an interactive Android home screen widget showing your latest notes with instant deep-linking.
+- [x] **Share Preview:** Export and share notes with friends and colleagues as formatted text or styled images.
+- [x] **In-App Updates:** Integrated Google Play Core update checks.
 
 <br />
 
-## Supports Me
-Want to see more free, high-quality code and articles? Buy me a coffee and make it happen! 
+---
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/syubban)
+## 📚 Technical Documentation & QA Matrix
 
-<br />
+Comprehensive architecture guides, feature specifications, and manual test matrices are available in the **[`/docs`](docs/README.md)** directory:
 
-## 🖨 Downloads
-[![Licence](https://img.shields.io/github/license/HellBus1/VentNote?style=for-the-badge&color=6650a4)](./LICENSE)
-[![GitHub release](https://img.shields.io/github/downloads/HellBus1/VentNote/total?color=6650a4&label=Downloads&logo=android&style=for-the-badge)](https://github.com/HellBus1/VentNote/releases) 
-<br />
-**Runs on Android 5.1 and up**
-
-<br />
-
-## 📑 Installation Steps
-The binary file consists of 3 files (source codes and debug APK)
-1. [Download the app](https://github.com/HellBus1/VentNote/releases) by clicking the green button or this link.
-
-For App :
-
-1. Locate the file and install. You might get a warning (allow install from untrusted source), that's because the app isn't from the playstore, but it's safe to install.
-2. After installing, you should be able to use the app.
-
-For Source Code :
-
-1. Clone the repository or download source code.zip / source code.tar.gz
-2. Extract the source code
-3. Open with Android Studio and wait for the build until done
+* **[Architecture: System Overview](docs/architecture/system_overview.md):** Clean Architecture, MVVM + MVI Unidirectional Data Flow, reactive pipelines, and Hilt dependency injection.
+* **[Architecture: Database & Persistence](docs/architecture/database_and_persistence.md):** Room SQLite schemas (`NoteModel`, `TagModel`, `NoteTagCrossRef`), Many-to-Many relations, foreign key cascades, and indexing strategies.
+* **[Manual QA Testing Matrix](docs/manual_testing/qa_flow_matrix.md):** Production-grade test matrix featuring 47 test cases spanning 10 modules with step-by-step procedures, expected outcomes, and edge-case verifications.
+* **Feature Deep-Dives:**
+  * [Note Management](docs/features/note_management.md)
+  * [Note Editor & Markdown](docs/features/note_editor.md)
+  * [Note Pinning](docs/features/note_pinning.md)
+  * [Tag & Category System](docs/features/tag_category_system.md)
+  * [Google Drive Backup & Restore](docs/features/google_drive_backup_restore.md)
+  * [App Customization & Theming](docs/features/app_customization_and_theming.md)
+  * [Launcher App Widget](docs/features/app_widget.md)
+* **[Technical Reference & Schemas](docs/reference/data_contracts_and_schemas.md):** JSON backup contracts, Room DAO interfaces, and UI test tags.
 
 <br />
 
-## 📑 Contribution Guide
-GitHub provides a comprehensive contribution guide for public repositories, which can be found here: https://docs.github.com/en/get-started/quickstart/contributing-to-projects. You can also apply this method in this repository by using the "fork & pull request" feature. In addition, please follow these rules:
+---
 
-1. After forking from the main repository, clone your fork to your local machine.
-2. Create a branch from "staging." After making your improvements, create the pull request there.
-3. To keep your fork updated and prevent conflicts, you must sync your fork (for a complete guide, read it here: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork). Make sure to do this before submitting your pull request.
-4. You can also open issues, and I will be happy to work on them immediately.
+## 🛠 Technology Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Language & Concurrency** | [Kotlin](https://kotlinlang.org/) (1.8+), [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html), [StateFlow / Flow](https://kotlinlang.org/docs/flow.html) |
+| **UI Framework** | [Jetpack Compose](https://developer.android.com/jetpack/compose) with [Material 3](https://m3.material.io/) |
+| **Architecture** | Modern Android Architecture (Clean Architecture + MVVM + UDF) |
+| **Dependency Injection** | [Dagger Hilt](https://dagger.dev/hilt/) |
+| **Local Database** | [AndroidX Room](https://developer.android.com/training/data-storage/room) (SQLite ORM) |
+| **Key-Value Storage** | [AndroidX DataStore Preferences](https://developer.android.com/topic/libraries/architecture/datastore) |
+| **Cloud Storage** | [Google Drive REST API v3](https://developers.google.com/drive) (via Google Play Services Auth) |
+| **Markdown Engine** | Custom Rich Text & Markdown Parser |
+| **Testing** | AndroidX Compose Test, Espresso, JUnit 4, Hilt Android Testing |
 
 <br />
 
-## 📑 Documentation
-You can access the technical documentation here [documentation page](https://futuristic-gateway-d0a.notion.site/Technical-Documentation-84352179b256469b8970acf91b6cb9a0). If you're interested in learning more about the journey and how to build this app, I invite you to regularly visit [my medium](https://medium.com/@syubbanfakhriya).
+---
+
+## 📥 Installation & Getting Started
+
+### Prerequisites
+- Android Studio Hedgehog or newer
+- Android SDK 34
+- JDK 17 (recommended: Android Studio bundled JBR)
+- Physical device or Emulator running Android 5.1 (API 22) or higher
+
+### Building from Source
+```bash
+# 1. Clone the repository
+git clone https://github.com/HellBus1/VentNote.git
+cd VentNote
+
+# 2. Checkout the latest branch
+git checkout staging
+
+# 3. Build debug APK
+./gradlew assembleDebug
+
+# 4. Install onto connected Android device
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Running Tests
+```bash
+# Run unit tests
+./gradlew testDebugUnitTest
+
+# Run instrumented integration tests (requires connected emulator/device)
+./gradlew connectedDebugAndroidTest
+```
 
 <br />
 
-## 📑 Contact
-Please feel free to reach out to me via email, Twitter, or LinkedIn if you have anything to discuss. And if you like this project, don't forget to leave a clap on my Medium or a star to show your support.
+---
+
+## 🤝 Contribution Guide
+
+Contributions are welcome! Please follow these steps:
+1. Fork the repository and clone your fork locally.
+2. Create a feature branch from `staging` (e.g., `git checkout -b feature/awesome-feature`).
+3. Make your improvements, ensuring code conforms to project architecture and existing tests pass.
+4. Push to your fork and submit a Pull Request targeting the `staging` branch.
+
+<br />
+
+---
+
+## ☕ Support the Project
+
+If you find VentNote helpful or use it as reference for modern Android development with Jetpack Compose, please consider leaving a star ⭐️ or supporting development:
+
+<div align="center">
+  <a href="https://www.buymeacoffee.com/syubban">
+    <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" />
+  </a>
+</div>
+
+<br />
+
+---
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICENSE) file for details.

@@ -26,4 +26,7 @@ class PageNavigation(navController: NavHostController) {
         val routeName = "${Route.SharePreviewPage.routeName}/${noteJson}"
         navController.navigate(routeName)
     }
+    val navigateToTagManagerPage: () -> Unit = {
+        navController.navigate(Route.TagManagerPage.routeName)
+    }
 }

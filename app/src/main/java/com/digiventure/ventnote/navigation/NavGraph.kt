@@ -13,6 +13,7 @@ import com.digiventure.ventnote.feature.note_creation.NoteCreationPage
 import com.digiventure.ventnote.feature.note_detail.NoteDetailPage
 import com.digiventure.ventnote.feature.notes.NotesPage
 import com.digiventure.ventnote.feature.share_preview.SharePreviewPage
+import com.digiventure.ventnote.feature.tag_manager.TagManagerPage
 
 @Composable
 fun NavGraph(navHostController: NavHostController, openDrawer: () -> Unit) {
@@ -35,8 +36,10 @@ fun NavGraph(navHostController: NavHostController, openDrawer: () -> Unit) {
                 defaultValue = emptyString
             })
         ) {
-            NoteDetailPage(navHostController = navHostController,
-                id = it.arguments?.getString(noteIdNavArgument) ?: stringZero)
+            NoteDetailPage(
+                navHostController = navHostController,
+                id = it.arguments?.getString(noteIdNavArgument) ?: stringZero
+            )
         }
         composable(Route.NoteCreationPage.routeName) {
             NoteCreationPage(navHostController = navHostController)
@@ -57,6 +60,9 @@ fun NavGraph(navHostController: NavHostController, openDrawer: () -> Unit) {
         }
         composable(Route.BackupPage.routeName) {
             BackupPage(navHostController = navHostController)
+        }
+        composable(Route.TagManagerPage.routeName) {
+            TagManagerPage(navHostController = navHostController)
         }
     }
 }

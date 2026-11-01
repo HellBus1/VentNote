@@ -11,6 +11,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
+import kotlinx.coroutines.runBlocking
 
 @HiltAndroidTest
 class NoteCreationFeature : BaseAcceptanceTest() {
@@ -21,10 +24,23 @@ class NoteCreationFeature : BaseAcceptanceTest() {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Inject
+    lateinit var databaseProxy: DatabaseProxy
+
     @Before
     fun setUp() {
         hiltRule.inject()
         Intents.init()
+
+        // Clean tables
+        runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val notes = databaseProxy.dao().getSyncNotes()
+            if (notes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*notes.toTypedArray())
+            }
+        }
 
         // Wait for list and navigate to creation
         composeTestRule.waitUntil(10000) {
@@ -52,6 +68,14 @@ class NoteCreationFeature : BaseAcceptanceTest() {
 
     @After
     fun tearDown() {
+        runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val notes = databaseProxy.dao().getSyncNotes()
+            if (notes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*notes.toTypedArray())
+            }
+        }
         Intents.release()
     }
 
@@ -67,19 +91,39 @@ class NoteCreationFeature : BaseAcceptanceTest() {
     }
 
     /**
-     * Verifies that a validation dialog is shown when trying to save with an empty title.
+     * Verifies that saving with an empty title adds the note successfully.
      */
     @Test
-    fun saveFlow_validation_emptyTitle_showsRequiredDialog() {
-        // Leave title empty, add body
-        composeTestRule.onNodeWithTag(TestTags.BODY_TEXT_FIELD).performTextInput("Some content")
+    fun saveFlow_withEmptyTitle_successfullyAddsNote() {
+        val body = "New Note Body Content"
+
+        composeTestRule.onNodeWithTag(TestTags.BODY_TEXT_FIELD).performTextInput(body)
         
-        composeTestRule.onNodeWithTag(TestTags.SAVE_ICON_BUTTON).performClick()
+        // Ensure no validation dialog is present
+        composeTestRule.onNodeWithTag(TestTags.CONFIRMATION_DIALOG).assertDoesNotExist()
+        
+        composeTestRule.onNodeWithTag(TestTags.SAVE_ICON_BUTTON).performTouchInput { click() }
         composeTestRule.waitForIdle()
 
-        // Validation dialog should appear
-        composeTestRule.onNodeWithTag(TestTags.CONFIRMATION_DIALOG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.CONFIRM_BUTTON).performClick()
+        // Should navigate back to list
+        composeTestRule.waitUntil(15000) {
+            try {
+                composeTestRule.onNodeWithTag(TestTags.NOTES_PAGE).assertIsDisplayed()
+                true
+            } catch (e: Throwable) {
+                false
+            }
+        }
+        
+        composeTestRule.waitUntil(10000) {
+            try {
+                // Should display Untitled fallback
+                composeTestRule.onNodeWithText("Untitled").assertIsDisplayed()
+                true
+            } catch (e: Throwable) {
+                false
+            }
+        }
     }
 
     /**

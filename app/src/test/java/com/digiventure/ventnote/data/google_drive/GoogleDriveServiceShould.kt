@@ -2,9 +2,14 @@ package com.digiventure.ventnote.data.google_drive
 
 import android.app.Application
 import com.digiventure.utils.BaseUnitTest
+import com.digiventure.ventnote.data.google_drive.BackupPayload
 import com.digiventure.ventnote.data.persistence.NoteDAO
 import com.digiventure.ventnote.data.persistence.NoteModel
+import com.digiventure.ventnote.data.persistence.NoteTagCrossRef
+import com.digiventure.ventnote.data.persistence.TagDAO
+import com.digiventure.ventnote.data.persistence.TagModel
 import com.digiventure.ventnote.feature.widget.WidgetRefresher
+import com.google.gson.Gson
 import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
@@ -25,8 +30,9 @@ class GoogleDriveServiceShould: BaseUnitTest() {
     private val app: Application = mock()
     private val proxy: DatabaseProxy = mock()
     private val dao: NoteDAO = mock()
+    private val tagDao: TagDAO = mock()
     private val refresher: WidgetRefresher = mock()
-    private val noteList: List<NoteModel> = listOf()
+    private val payload: BackupPayload = BackupPayload(notes = listOf(NoteModel(1, "title", "note")))
     private val fileName: String = "backup.json"
     private val fileId: String = "1"
     private val drive: Drive = mock()
@@ -47,7 +53,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         whenever(filesMock.create(any(), any())).thenReturn(createMock)
         whenever(createMock.execute()).thenReturn(driveFile)
 
-        val result = service.uploadDatabaseFile(noteList, fileName, drive)
+        val result = service.uploadDatabaseFile(payload, fileName, drive)
 
         assertTrue(result.isSuccess)
         assertEquals(driveFile, result.getOrNull())
@@ -62,7 +68,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.create(any(), any())).thenThrow(exception)
 
-        val result = service.uploadDatabaseFile(noteList, fileName, drive)
+        val result = service.uploadDatabaseFile(payload, fileName, drive)
 
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
@@ -72,7 +78,61 @@ class GoogleDriveServiceShould: BaseUnitTest() {
     fun returnResultSuccess_whenReadFileProcessIsSuccess() = runTest {
         val filesMock = mock<Drive.Files>()
         val getMock = mock<Drive.Files.Get>()
-        val inputStream = this::class.java.classLoader?.getResourceAsStream("/src/test/res/backup.json")
+        val inputStream = "[]".byteInputStream()
+        whenever(drive.files()).thenReturn(filesMock)
+        whenever(filesMock.get(fileId)).thenReturn(getMock)
+        whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
+        whenever(dao.upsertNotes(any())).thenAnswer { }
+        whenever(proxy.dao()).thenReturn(dao)
+        val result = service.readFile(fileId, drive)
+
+        if (result.isFailure) {
+            println("Exception was: ${result.exceptionOrNull()}")
+            result.exceptionOrNull()?.printStackTrace()
+        }
+        assertTrue(result.isSuccess)
+        verify(proxy.dao(), times(1)).upsertNotes(any())
+        verify(refresher, times(1)).refresh(app)
+    }
+
+    @Test
+    fun returnResultSuccess_whenReadFileWithPayloadFormatRestoresNotesAndTagsAndCrossRefs() = runTest {
+        val filesMock = mock<Drive.Files>()
+        val getMock = mock<Drive.Files.Get>()
+        val testPayload = BackupPayload(
+            version = 1,
+            notes = listOf(NoteModel(1, "title", "note")),
+            tags = listOf(TagModel(1, "Personal", "#FF0000")),
+            noteTags = listOf(NoteTagCrossRef(1, 1))
+        )
+        val jsonString = Gson().toJson(testPayload)
+        val inputStream = jsonString.byteInputStream()
+        whenever(drive.files()).thenReturn(filesMock)
+        whenever(filesMock.get(fileId)).thenReturn(getMock)
+        whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
+        whenever(dao.upsertNotes(any())).thenAnswer { }
+        whenever(dao.getSyncNotes()).thenReturn(emptyList())
+        whenever(tagDao.getAllTagsSync()).thenReturn(emptyList())
+        whenever(tagDao.upsertTags(any())).thenAnswer { }
+        whenever(tagDao.upsertNoteTagCrossRefs(any())).thenAnswer { }
+        whenever(proxy.dao()).thenReturn(dao)
+        whenever(proxy.tagDao()).thenReturn(tagDao)
+
+        val result = service.readFile(fileId, drive)
+
+        assertTrue(result.isSuccess)
+        verify(proxy.dao(), times(1)).upsertNotes(any())
+        verify(proxy.tagDao(), times(1)).upsertTags(any())
+        verify(proxy.tagDao(), times(1)).upsertNoteTagCrossRefs(any())
+        verify(refresher, times(1)).refresh(app)
+    }
+
+    @Test
+    fun returnResultSuccess_whenReadFileWithPartialPayloadFormatMissingTags() = runTest {
+        val filesMock = mock<Drive.Files>()
+        val getMock = mock<Drive.Files.Get>()
+        val jsonString = "{\"version\":1,\"notes\":[{\"id\":1,\"title\":\"title\",\"note\":\"note\"}]}"
+        val inputStream = jsonString.byteInputStream()
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.get(fileId)).thenReturn(getMock)
         whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
@@ -104,7 +164,7 @@ class GoogleDriveServiceShould: BaseUnitTest() {
         val filesMock = mock<Drive.Files>()
         val getMock = mock<Drive.Files.Get>()
         val exception = Exception()
-        val inputStream = this::class.java.classLoader?.getResourceAsStream("/src/test/res/backup.json")
+        val inputStream = "[]".byteInputStream()
         whenever(drive.files()).thenReturn(filesMock)
         whenever(filesMock.get(fileId)).thenReturn(getMock)
         whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
@@ -181,5 +241,64 @@ class GoogleDriveServiceShould: BaseUnitTest() {
 
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
+    }
+
+    @Test
+    fun returnResultSuccess_whenReadFileWithNumericTimestampDatesRestoresNotes() = runTest {
+        val filesMock = mock<Drive.Files>()
+        val getMock = mock<Drive.Files.Get>()
+        val jsonString = """{"version":1,"notes":[{"id":1,"title":"Architecture RFC","note":"Sample note","createdAt":1774674000000,"updatedAt":1774678000000,"isPinned":true}],"tags":[],"noteTags":[]}"""
+        val inputStream = jsonString.byteInputStream()
+        whenever(drive.files()).thenReturn(filesMock)
+        whenever(filesMock.get(fileId)).thenReturn(getMock)
+        whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
+        whenever(dao.upsertNotes(any())).thenAnswer { }
+        whenever(proxy.dao()).thenReturn(dao)
+
+        val result = service.readFile(fileId, drive)
+
+        assertTrue(result.isSuccess)
+        verify(proxy.dao(), times(1)).upsertNotes(any())
+        verify(refresher, times(1)).refresh(app)
+    }
+
+    @Test
+    fun returnResultSuccess_whenReadFileWithSnakeCaseFieldNamesRestoresNotes() = runTest {
+        val filesMock = mock<Drive.Files>()
+        val getMock = mock<Drive.Files.Get>()
+        val jsonString = """{"version":1,"notes":[{"id":1,"title":"Architecture RFC","note":"Sample note","created_at":1774674000000,"updated_at":1774678000000,"is_pinned":true}],"tags":[{"id":1,"name":"Work","color_hex":"#90CAF9"}],"note_tags":[{"note_id":1,"tag_id":1}]}"""
+        val inputStream = jsonString.byteInputStream()
+        whenever(drive.files()).thenReturn(filesMock)
+        whenever(filesMock.get(fileId)).thenReturn(getMock)
+        whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
+        whenever(dao.upsertNotes(any())).thenAnswer { }
+        whenever(dao.getSyncNotes()).thenReturn(emptyList())
+        whenever(tagDao.getAllTagsSync()).thenReturn(emptyList())
+        whenever(tagDao.upsertTags(any())).thenAnswer { }
+        whenever(tagDao.upsertNoteTagCrossRefs(any())).thenAnswer { }
+        whenever(proxy.dao()).thenReturn(dao)
+        whenever(proxy.tagDao()).thenReturn(tagDao)
+
+        val result = service.readFile(fileId, drive)
+
+        assertTrue(result.isSuccess)
+        verify(proxy.dao(), times(1)).upsertNotes(any())
+        verify(proxy.tagDao(), times(1)).upsertTags(any())
+        verify(proxy.tagDao(), times(1)).upsertNoteTagCrossRefs(any())
+    }
+
+    @Test
+    fun returnResultFailure_whenReadFileContainsInvalidJson() = runTest {
+        val filesMock = mock<Drive.Files>()
+        val getMock = mock<Drive.Files.Get>()
+        val inputStream = "{ not valid json".byteInputStream()
+        whenever(drive.files()).thenReturn(filesMock)
+        whenever(filesMock.get(fileId)).thenReturn(getMock)
+        whenever(getMock.executeMediaAsInputStream()).thenReturn(inputStream)
+
+        val result = service.readFile(fileId, drive)
+
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull()?.message?.contains("Invalid JSON backup") == true)
     }
 }

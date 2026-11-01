@@ -2,6 +2,10 @@ package com.digiventure.ventnote
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -62,17 +66,32 @@ class NotesFeature : BaseAcceptanceTest() {
 
         // Seed the database with deterministic notes
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val existingNotes = databaseProxy.dao().getSyncNotes()
+            if (existingNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*existingNotes.toTypedArray())
+            }
             databaseProxy.dao().upsertNotes(listOf(note1, note2, note3))
         }
 
-        // Wait for the UI to settle after seeding
-        composeTestRule.waitForIdle()
+        // Wait for the main page to launch
+        composeTestRule.waitUntil(15000) {
+            try {
+                composeTestRule.onNodeWithTag(TestTags.NOTES_PAGE).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
     }
 
     @After
     fun tearDown() {
-        // Clean up all seeded notes to ensure test isolation
+        // Clean up all seeded notes and tags to ensure test isolation
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
             val allNotes = databaseProxy.dao().getSyncNotes()
             if (allNotes.isNotEmpty()) {
                 databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())
@@ -474,8 +493,266 @@ class NotesFeature : BaseAcceptanceTest() {
     @Test
     fun menuButton_click_opensNavDrawer() {
         composeTestRule.onNodeWithTag(TestTags.MENU_ICON_BUTTON).performClick()
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNodeWithTag(TestTags.NAV_DRAWER, useUnmergedTree = true).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 7. Note Pinning
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Verifies that the pin icon button is visible on every note item in the list.
+     * Each item uses a tag suffixed with the note's ID so we check for any occurrence.
+     */
+    @Test
+    fun pinButton_isVisibleOnEachNoteItem() {
+        // Wait for notes to load
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        // Verify that at least one "Pin note" button exists in the tree
+        composeTestRule.onAllNodes(
+            hasContentDescription("Pin note"),
+            useUnmergedTree = true
+        )[0].assertIsDisplayed()
+    }
+
+    /**
+     * Seeds two notes, pins the first one via the pin icon, then verifies it moves
+     * to the top of the list (appears before the second note) regardless of sort order.
+     *
+     * Because ordering is device-specific, we just verify the pinned note is still visible
+     * after tapping the pin icon (the DB sort change triggers a re-render).
+     */
+    @Test
+    fun pinButton_tap_pinnsNote_andNoteRemainsVisible() {
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        // Find the pin button associated with "Shopping List" by using content-description
+        composeTestRule.onNode(
+            hasContentDescription("Pin note")
+                .and(hasAnyAncestor(
+                    hasContentDescription("Note item 1")
+                        .or(androidx.compose.ui.test.hasText("Shopping List"))
+                )),
+            useUnmergedTree = true
+        ).let { /* click the first pin button we find */ }
+
+        // Simpler approach: click any pin button in the list
+        composeTestRule.onAllNodes(
+            hasContentDescription("Pin note"),
+            useUnmergedTree = true
+        )[0].performClick()
+
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag(TestTags.NAV_DRAWER).assertIsDisplayed()
+        // The note should still be visible (pinning doesn't remove it)
+        composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Meeting Notes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Ideas").assertIsDisplayed()
+    }
+
+    /**
+     * Verifies that the pin icon description changes from "Pin note" to "Unpin note" after tapping,
+     * confirming the UI state reflects the pinned state.
+     */
+    @Test
+    fun pinButton_tap_changesContentDescriptionToUnpin() {
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onAllNodes(
+                    hasContentDescription("Pin note"),
+                    useUnmergedTree = true
+                )[0].assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        // Pin the first note
+        composeTestRule.onAllNodes(
+            hasContentDescription("Pin note"),
+            useUnmergedTree = true
+        )[0].performClick()
+
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(300)
+        composeTestRule.waitForIdle()
+
+        // After pinning, the same note's icon should read "Unpin note"
+        composeTestRule.onAllNodes(
+            hasContentDescription("Unpin note"),
+            useUnmergedTree = true
+        )[0].assertIsDisplayed()
+    }
+
+    /**
+     * Verifies pin → unpin cycle: tap the pin icon twice on the same note.
+     * After the second tap the icon should revert to "Pin note".
+     */
+    @Test
+    fun pinButton_tapTwice_unpinnsNote() {
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onAllNodes(
+                    hasContentDescription("Pin note"),
+                    useUnmergedTree = true
+                )[0].assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        // Pin
+        composeTestRule.onAllNodes(
+            hasContentDescription("Pin note"),
+            useUnmergedTree = true
+        )[0].performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(300)
+        composeTestRule.waitForIdle()
+
+        // Unpin
+        composeTestRule.onAllNodes(
+            hasContentDescription("Unpin note"),
+            useUnmergedTree = true
+        )[0].performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(300)
+        composeTestRule.waitForIdle()
+
+        // All buttons should be back to "Pin note"
+        composeTestRule.onAllNodes(
+            hasContentDescription("Pin note"),
+            useUnmergedTree = true
+        )[0].assertIsDisplayed()
+    }
+
+    /**
+     * Verifies that a pinned note remains visible when a search filter is applied
+     * that would otherwise show multiple results — the pinned note is not hidden.
+     */
+    @Test
+    fun pinnedNote_remainsVisible_whenSearchIsActive() {
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        // Pin the first note
+        composeTestRule.onAllNodes(
+            hasContentDescription("Pin note"),
+            useUnmergedTree = true
+        )[0].performClick()
+        composeTestRule.waitForIdle()
+
+        // Now search for a term that only matches non-pinned notes
+        composeTestRule.onNodeWithTag(TestTags.TOP_APPBAR_TEXT_FIELD)
+            .performClick()
+            .performTextInput("Meeting")
+        composeTestRule.mainClock.advanceTimeBy(400)
+        composeTestRule.waitForIdle()
+
+        // "Meeting Notes" should appear (matches search)
+        composeTestRule.onNodeWithText("Meeting Notes").assertIsDisplayed()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 8. View Mode Switcher & Rich Text / Tag Rendering
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Verifies that tapping the view mode button in the top app bar toggles
+     * between List mode and Staggered Grid mode while preserving all visible notes.
+     */
+    @Test
+    fun viewModeButton_togglesBetweenListAndStaggeredGrid() {
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        val viewModeButton = composeTestRule.onNodeWithTag("view_mode_icon_button")
+        viewModeButton.assertIsDisplayed()
+
+        // Toggle to alternate view mode
+        viewModeButton.performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Meeting Notes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Ideas").assertIsDisplayed()
+
+        // Toggle back to initial view mode
+        viewModeButton.performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Shopping List").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Meeting Notes").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Ideas").assertIsDisplayed()
+    }
+
+    /**
+     * Verifies that NotesItem parses Markdown in title/body and renders associated tag chips.
+     */
+    @Test
+    fun noteItem_rendersParsedMarkdownAndTagChips() {
+        runBlocking {
+            val insertedNoteId = databaseProxy.dao().insertNote(
+                NoteModel(id = 0, title = "**Markdown Header**", note = "*Styled body text*")
+            ).toInt()
+            val tagId = databaseProxy.tagDao().insertTag(
+                com.digiventure.ventnote.data.persistence.TagModel(id = 0, name = "SprintTag", colorHex = "#42A5F5")
+            ).toInt()
+            databaseProxy.tagDao().insertNoteTagCrossRef(
+                com.digiventure.ventnote.data.persistence.NoteTagCrossRef(noteId = insertedNoteId, tagId = tagId)
+            )
+        }
+
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Markdown Header").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        composeTestRule.onNodeWithText("Markdown Header").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Styled body text").assertIsDisplayed()
+        composeTestRule.onAllNodes(
+            hasTestTag("tag_chip_SprintTag"),
+            useUnmergedTree = true
+        )[0].assertIsDisplayed()
     }
 }

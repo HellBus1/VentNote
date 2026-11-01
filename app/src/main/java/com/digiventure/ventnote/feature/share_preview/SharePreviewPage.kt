@@ -53,6 +53,7 @@ import androidx.navigation.compose.rememberNavController
 import com.digiventure.ventnote.R
 import com.digiventure.ventnote.commons.DateUtil
 import com.digiventure.ventnote.commons.TestTags
+import com.digiventure.ventnote.commons.richtext.MarkdownParser
 import com.digiventure.ventnote.components.dialog.TextDialog
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.feature.share_preview.components.navbar.EnhancedBottomAppBar
@@ -74,28 +75,30 @@ fun SharePreviewPage(
     val shareNoteDialogState = remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val date = remember(note?.createdAt) {
-        try {
-            DateUtil.convertDateString(
-                "EEE, MMM dd HH:mm yyyy",
-                note?.createdAt?.toString() ?: Date().toString()
-            )
-        } catch (_: Exception) {
-            DateUtil.convertDateString("EEE, MMM dd HH:mm yyyy", Date().toString())
-        }
+    val date = remember(note?.updatedAt, note?.createdAt) {
+        DateUtil.formatNoteDate(note?.updatedAt ?: note?.createdAt ?: Date())
     }
 
-    val title = note?.title?.takeIf { it.isNotBlank() } ?: stringResource(R.string.empty_note_title_placeholder)
-    val text = note?.note?.takeIf { it.isNotBlank() }
-        ?: stringResource(R.string.empty_note_placeholder)
+    val untitledPlaceholder = stringResource(R.string.untitled)
+    val emptyNotePlaceholder = stringResource(R.string.empty_note_placeholder)
 
-    val joinedText = remember(date, title, text) {
+    val rawTitle = note?.title?.takeIf { it.isNotBlank() } ?: untitledPlaceholder
+    val rawText = note?.note?.takeIf { it.isNotBlank() } ?: emptyNotePlaceholder
+
+    val parsedTitle = remember(rawTitle) {
+        MarkdownParser.parseToAnnotatedString(rawTitle)
+    }
+    val parsedText = remember(rawText) {
+        MarkdownParser.parseToAnnotatedString(rawText)
+    }
+
+    val joinedText = remember(date, parsedTitle, parsedText) {
         buildString {
             append(date)
             append("\n\n")
-            append(title)
+            append(parsedTitle.text)
             append("\n\n")
-            append(text)
+            append(parsedText.text)
         }
     }
 
@@ -189,7 +192,7 @@ fun SharePreviewPage(
                     item {
                         SelectionContainer {
                             Text(
-                                text = title,
+                                text = parsedTitle,
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface,
@@ -212,7 +215,7 @@ fun SharePreviewPage(
                         ) {
                             SelectionContainer {
                                 Text(
-                                    text = text,
+                                    text = parsedText,
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Normal,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),

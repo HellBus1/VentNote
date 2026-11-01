@@ -1,12 +1,16 @@
 package com.digiventure.ventnote.feature.note_creation
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -45,8 +49,31 @@ import com.digiventure.ventnote.feature.note_creation.viewmodel.NoteCreationPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.sp
+import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
+import com.digiventure.ventnote.feature.tag_manager.components.TagChip
+import com.digiventure.ventnote.feature.tag_manager.components.TagPickerBottomSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NoteCreationPage(
     navHostController: NavHostController,
@@ -72,6 +99,11 @@ fun NoteCreationPage(
     val cancelDialogState = remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val allTagsState by viewModel.allTags.observeAsState()
+    val allTags = allTagsState?.getOrNull() ?: emptyList()
+    var selectedTagIds by viewModel.selectedTagIds
+    var showTagPicker by remember { mutableStateOf(false) }
+
     // Extracted and optimized addNote function
     val noteIsSuccessfullyAddedText = stringResource(R.string.successfully_added)
     fun addNote() {
@@ -82,7 +114,7 @@ fun NoteCreationPage(
         val titlePlain = viewModel.titleRichTextState.toPlainText()
         val bodyPlain = viewModel.richTextState.toPlainText()
 
-        if (titlePlain.isEmpty() || bodyPlain.isEmpty()) {
+        if (bodyPlain.isEmpty()) {
             requiredDialogState.value = true
         } else {
             scope.launch {
@@ -117,12 +149,23 @@ fun NoteCreationPage(
     val scrollBehaviorState = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarState)
     val scrollBehavior = remember { scrollBehaviorState }
 
+    val handleBackPress: () -> Unit = {
+        val hasContent = viewModel.titleRichTextState.toPlainText().isNotBlank() ||
+                viewModel.richTextState.toPlainText().isNotBlank() ||
+                selectedTagIds.isNotEmpty()
+        if (hasContent) {
+            cancelDialogState.value = true
+        } else {
+            navHostController.popBackStack()
+        }
+    }
+
+    BackHandler(onBack = handleBackPress)
+
     Scaffold(
         topBar = {
             NoteCreationAppBar(
-                onBackPressed = {
-                    cancelDialogState.value = true
-                },
+                onBackPressed = handleBackPress,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -133,17 +176,24 @@ fun NoteCreationPage(
             )
         },
         content = { contentPadding ->
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .fillMaxSize(),
+                contentAlignment = androidx.compose.ui.Alignment.TopCenter
+            ) {
             // Better scrolling performance with LazyColumn
             LazyColumn(
                 modifier = Modifier
-                    .padding(contentPadding)
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
                         focusManager.clearFocus()
                     }
-                    .fillMaxSize(),
+                    .fillMaxHeight()
+                    .widthIn(max = 800.dp)
+                    .fillMaxWidth(),
                 contentPadding = PaddingValues(
                     horizontal = 16.dp,
                     vertical = 8.dp
@@ -161,6 +211,65 @@ fun NoteCreationPage(
                     )
                 }
                 item {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Tags",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            // Custom Add/Edit Tag Chip anchored at the start (leftmost)
+                            val tintColor = MaterialTheme.colorScheme.primary
+                            val chipShape = androidx.compose.foundation.shape.RoundedCornerShape(50)
+                            Row(
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .clip(chipShape)
+                                    .background(tintColor.copy(alpha = 0.08f))
+                                    .border(
+                                        width = 1.dp,
+                                        color = tintColor.copy(alpha = 0.4f),
+                                        shape = chipShape
+                                    )
+                                    .clickable { showTagPicker = true }
+                                    .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Add,
+                                    contentDescription = "Add tags",
+                                    modifier = Modifier.size(12.dp),
+                                    tint = tintColor
+                                )
+                                androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (selectedTagIds.isEmpty()) "Add Tags" else "Edit",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        color = tintColor,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 12.sp
+                                    )
+                                )
+                            }
+
+                            val selectedTags = allTags.filter { it.id in selectedTagIds }
+                            selectedTags.forEach { tag ->
+                                TagChip(
+                                    tag = tag,
+                                    onRemove = {
+                                        selectedTagIds = selectedTagIds - tag.id
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                item {
                     NoteSection(
                         richTextState = viewModel.richTextState,
                         bodyTextField = bodyTextField,
@@ -170,6 +279,7 @@ fun NoteCreationPage(
                         }
                     )
                 }
+            }
             }
         },
         bottomBar = {
@@ -185,16 +295,10 @@ fun NoteCreationPage(
     )
 
     // Optimized missing field calculation
-    val emptyTitleText = stringResource(R.string.empty_note_title_placeholder)
     val emptyNoteText = stringResource(R.string.empty_note_placeholder)
-    val titlePlainText = viewModel.titleRichTextState.toPlainText()
     val noteBodyText = viewModel.richTextState.toPlainText()
-    val missingFieldName = remember(titlePlainText, noteBodyText) {
-        when {
-            titlePlainText.isEmpty() -> emptyTitleText
-            noteBodyText.isEmpty() -> emptyNoteText
-            else -> EMPTY_STRING
-        }
+    val missingFieldName = remember(noteBodyText) {
+        if (noteBodyText.isEmpty()) emptyNoteText else EMPTY_STRING
     }
 
     if (requiredDialogState.value) {
@@ -218,6 +322,21 @@ fun NoteCreationPage(
                 cancelDialogState.value = false
             },
             modifier = Modifier.semantics { testTag = TestTags.CONFIRMATION_DIALOG })
+    }
+
+    if (showTagPicker) {
+        TagPickerBottomSheet(
+            allTags = allTags,
+            selectedTagIds = selectedTagIds,
+            onTagToggle = { tag ->
+                selectedTagIds = if (tag.id in selectedTagIds) {
+                    selectedTagIds - tag.id
+                } else {
+                    selectedTagIds + tag.id
+                }
+            },
+            onDismiss = { showTagPicker = false }
+        )
     }
 }
 

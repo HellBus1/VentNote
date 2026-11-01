@@ -6,6 +6,7 @@ object TestTags {
     const val NOTE_DETAIL_PAGE = "note_detail_page"
     const val NOTE_CREATION_PAGE = "note_creation_page"
     const val SHARE_PAGE = "share_page"
+    const val TAG_MANAGER_PAGE = "tag_manager_page"
 
     // Appbar test tags
     const val TOP_APPBAR = "top_appbar"
@@ -33,6 +34,7 @@ object TestTags {
     const val THEME_TILE = "theme_tile"
     const val COLOR_MODE_TILE = "color_mode_tile"
     const val BACKUP_TILE = "backup_tile"
+    const val TAGS_TILE = "tags_tile"
     
     // Theme color tags
     const val THEME_COLOR_PURPLE = "theme_color_purple"
@@ -45,6 +47,7 @@ object TestTags {
     const val NOTE_RV = "note_rv"
     const val LOADING_DIALOG = "loading_dialog"
     const val CONFIRMATION_DIALOG = "confirmation_dialog"
+    const val PIN_ICON_BUTTON = "pin_icon_button"
 
     // Dialog Button
     const val CONFIRM_BUTTON = "confirm_button"
@@ -61,4 +64,5 @@ object TestTags {
     const val DATE_TEXT = "date_text"
     const val TITLE_TEXT = "title_text"
     const val BODY_TEXT = "body_text"
+    const val TAG_NAME_FIELD = "tag_name_field"
 }

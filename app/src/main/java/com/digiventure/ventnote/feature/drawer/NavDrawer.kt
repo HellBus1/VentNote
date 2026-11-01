@@ -17,6 +17,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.ThumbUp
 
 import androidx.compose.material3.DrawerDefaults
@@ -74,6 +75,7 @@ fun NavDrawer(
     content: @Composable () -> Unit,
     onError: (String) -> Unit,
     onBackupPressed: () -> Unit,
+    onTagsPressed: () -> Unit,
     onUpdateCheckPressed: () -> Unit,
     themeViewModel: ThemeBaseVM = hiltViewModel<ThemeVM>()
 ) {
@@ -140,6 +142,13 @@ fun NavDrawer(
                 SectionTitle(title = stringResource(id = R.string.settings))
 
                 NavDrawerItem(
+                    leftIcon = Icons.Rounded.Star,
+                    title = stringResource(id = R.string.manage_tags),
+                    subtitle = stringResource(id = R.string.manage_tags_description),
+                    testTagName = TestTags.TAGS_TILE,
+                    onClick = { onTagsPressed() })
+
+                NavDrawerItem(
                     leftIcon = Icons.Rounded.Share,
                     title = stringResource(id = R.string.backup),
                     subtitle = stringResource(id = R.string.backup_description),
@@ -160,6 +169,7 @@ fun DrawerPreview() {
         content = { },
         onError = {},
         onBackupPressed = {},
+        onTagsPressed = {},
         onUpdateCheckPressed = {},
         themeViewModel = ThemeMockVM()
     )

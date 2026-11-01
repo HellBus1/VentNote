@@ -36,8 +36,14 @@ class NoteDetailFeature : BaseAcceptanceTest() {
         hiltRule.inject()
         Intents.init()
 
-        // Seed the database
+        // Seed the database & clean tag tables
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val allNotes = databaseProxy.dao().getSyncNotes()
+            if (allNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())
+            }
             databaseProxy.dao().upsertNotes(listOf(testNote))
         }
 
@@ -68,6 +74,8 @@ class NoteDetailFeature : BaseAcceptanceTest() {
     @After
     fun tearDown() {
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
             val allNotes = databaseProxy.dao().getSyncNotes()
             if (allNotes.isNotEmpty()) {
                 databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())
@@ -130,22 +138,27 @@ class NoteDetailFeature : BaseAcceptanceTest() {
     }
 
     /**
-     * Verifies that a validation dialog is shown when trying to save an empty title.
+     * Verifies that updating a note with an empty title succeeds.
      */
     @Test
-    fun saveFlow_validation_emptyTitle_showsRequiredDialog() {
+    fun saveFlow_withEmptyTitle_successfullyUpdatesNote() {
         composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).performClick()
         composeTestRule.waitForIdle()
 
         // Clear title
         composeTestRule.onNodeWithTag(TestTags.TITLE_TEXT_FIELD).performTextReplacement("")
         
+        // Ensure no validation dialog is present
+        composeTestRule.onNodeWithTag(TestTags.CONFIRMATION_DIALOG).assertDoesNotExist()
+        
         composeTestRule.onNodeWithTag(TestTags.SAVE_ICON_BUTTON).performClick()
         composeTestRule.waitForIdle()
 
-        // Validation dialog should appear
-        composeTestRule.onNodeWithTag(TestTags.CONFIRMATION_DIALOG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTags.CONFIRM_BUTTON).performClick() // Dismiss it
+        // Should return to view mode (Edit button reappears)
+        composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).assertIsDisplayed()
+        
+        // In NoteDetailPage, the title field displays the empty text if it is empty, but we might just verify it's empty
+        composeTestRule.onNodeWithTag(TestTags.TITLE_TEXT_FIELD).assertTextContains("")
     }
 
     /**
@@ -333,5 +346,79 @@ class NoteDetailFeature : BaseAcceptanceTest() {
         composeTestRule.onNodeWithTag(TestTags.BODY_TEXT_FIELD).performClick()
         composeTestRule.onNodeWithTag(TestTags.BODY_TEXT_FIELD).assertIsFocused()
         composeTestRule.onNodeWithTag(TestTags.TITLE_TEXT_FIELD).assertIsNotFocused()
+    }
+
+    /**
+     * Verifies that tags assigned to a note in edit mode are saved, synced into
+     * selectedTagIds, and restored if the user removes a tag in edit mode and cancels.
+     */
+    @Test
+    fun editMode_tagSelectionSyncs_andRevertsOnCancel() {
+        runBlocking {
+            databaseProxy.tagDao().insertTag(
+                com.digiventure.ventnote.data.persistence.TagModel(id = 50, name = "PriorityTag", colorHex = "#EF5350")
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        // 1. Enter edit mode and assign "PriorityTag" via TagPickerBottomSheet
+        composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Add Tags").performClick()
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNode(
+                    hasTestTag("tag_chip_PriorityTag") and hasAnyAncestor(hasTestTag(TestTags.BOTTOM_SHEET))
+                ).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        composeTestRule.onNode(
+            hasTestTag("tag_chip_PriorityTag") and hasAnyAncestor(hasTestTag(TestTags.BOTTOM_SHEET))
+        ).performClick()
+
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+            .sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+        composeTestRule.waitForIdle()
+
+        // Save note with the assigned tag
+        composeTestRule.onNodeWithTag(TestTags.SAVE_ICON_BUTTON).performClick()
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        // 2. Re-enter edit mode, remove the tag, and cancel
+        composeTestRule.onNodeWithTag(TestTags.EDIT_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Remove tag PriorityTag", useUnmergedTree = true).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertDoesNotExist()
+
+        // Cancel editing and confirm
+        composeTestRule.onNodeWithTag(TestTags.CANCEL_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(TestTags.CONFIRM_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        // The tag chip should be restored in view mode
+        composeTestRule.waitUntil(5000) {
+            try {
+                composeTestRule.onNodeWithTag("tag_chip_PriorityTag", useUnmergedTree = true).assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
     }
 }

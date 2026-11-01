@@ -5,6 +5,7 @@ import com.digiventure.utils.captureValues
 import com.digiventure.utils.getValueForTest
 import com.digiventure.ventnote.data.persistence.NoteModel
 import com.digiventure.ventnote.data.persistence.NoteRepository
+import com.digiventure.ventnote.data.persistence.TagRepository
 import com.digiventure.ventnote.feature.note_detail.viewmodel.NoteDetailPageVM
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -21,6 +22,7 @@ import org.mockito.kotlin.whenever
 
 class NoteDetailPageVMShould: BaseUnitTest() {
     private val repository: NoteRepository = mock()
+    private val tagRepository: TagRepository = mock()
     private val note = Mockito.mock<NoteModel>()
     private val id = 1
 
@@ -37,7 +39,10 @@ class NoteDetailPageVMShould: BaseUnitTest() {
 
     @Before
     fun setup() {
-        viewModel = NoteDetailPageVM(repository)
+        runBlocking {
+            whenever(tagRepository.getAllTags()).thenReturn(flowOf(Result.success(emptyList())))
+        }
+        viewModel = NoteDetailPageVM(repository, tagRepository)
     }
 
     /**

@@ -3,6 +3,7 @@ package com.digiventure.ventnote.module.proxy
 import android.app.Application
 import com.digiventure.ventnote.config.NoteDatabase
 import com.digiventure.ventnote.data.persistence.NoteDAO
+import com.digiventure.ventnote.data.persistence.TagDAO
 
 
 interface Provider<T> {
@@ -26,5 +27,9 @@ class DatabaseProxy(
 
     fun dao(): NoteDAO {
         return getObject().dao()
+    }
+
+    fun tagDao(): TagDAO {
+        return getObject().tagDao()
     }
 }

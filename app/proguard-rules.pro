@@ -26,34 +26,6 @@
    void traceEventEnd();
 }
 
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
--assumenosideeffects public class androidx.compose.runtime.ComposerKt {
-   boolean isTraceInProgress();
-   void traceEventStart(int,int,int,java.lang.String);
-   void traceEventEnd();
-}
-
 # Google API Client & Auth (Targeted)
 -keep class * extends com.google.api.client.json.GenericJson { *; }
 -keep class com.google.api.client.util.** { *; }
@@ -103,10 +75,17 @@
 -keepattributes Signature
 -keepattributes *Annotation*
 
-# Keep your NoteModel class and all its fields
+# Keep your NoteModel, TagModel, NoteTagCrossRef, BackupPayload, and DateTypeAdapter classes
 -keep class com.digiventure.ventnote.data.persistence.NoteModel { *; }
 # If NoteModel has inner classes, keep them too
 -keep class com.digiventure.ventnote.data.persistence.NoteModel$* { *; }
+-keep class com.digiventure.ventnote.data.persistence.TagModel { *; }
+-keep class com.digiventure.ventnote.data.persistence.TagModel$* { *; }
+-keep class com.digiventure.ventnote.data.persistence.NoteTagCrossRef { *; }
+-keep class com.digiventure.ventnote.data.persistence.NoteTagCrossRef$* { *; }
+-keep class com.digiventure.ventnote.data.google_drive.BackupPayload { *; }
+-keep class com.digiventure.ventnote.data.google_drive.BackupPayload$* { *; }
+-keep class com.digiventure.ventnote.data.google_drive.DateTypeAdapter { *; }
 
 
 

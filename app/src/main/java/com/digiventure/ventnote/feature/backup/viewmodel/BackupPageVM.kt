@@ -10,13 +10,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.digiventure.ventnote.commons.Constants
 import com.digiventure.ventnote.config.DriveAPI
+import com.digiventure.ventnote.data.google_drive.BackupPayload
 import com.digiventure.ventnote.data.google_drive.GoogleDriveRepository
 import com.digiventure.ventnote.data.persistence.NoteRepository
+import com.digiventure.ventnote.data.persistence.TagRepository
+import com.digiventure.ventnote.module.proxy.DatabaseProxy
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -25,10 +29,12 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class BackupPageVM @Inject constructor(
+open class BackupPageVM @Inject constructor(
     private val app: Application,
     private val repository: GoogleDriveRepository,
-    private val databaseRepository: NoteRepository
+    private val databaseRepository: NoteRepository,
+    private val tagRepository: TagRepository,
+    private val databaseProxy: DatabaseProxy
 ): ViewModel(), BackupPageBaseVM {
     private val _uiState = mutableStateOf(BackupPageState())
     override val uiState: State<BackupPageState> = _uiState
@@ -38,95 +44,121 @@ class BackupPageVM @Inject constructor(
 
     override fun backupDatabase() {
         viewModelScope.launch {
-            val currentState = _uiState.value.copy(fileBackupState = FileBackupState.SyncStarted)
-            _uiState.value = currentState
+            _uiState.value = _uiState.value.copy(fileBackupState = FileBackupState.SyncStarted)
 
             try {
                 val drive = getDriveInstance()
-                databaseRepository.getNoteList(Constants.UPDATED_AT, Constants.DESCENDING)
-                    .collect {
-                        repository.uploadDatabaseFile(
-                            it.getOrDefault(listOf()),
-                            getDatabaseNameWithTimestamps(),
-                            drive
-                        ).onEach {
-                            // Clean up old backups first (seamlessly)
-                            cleanupOldBackups(drive)
-                            
-                            // Then update UI state and fetch final list
-                            _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFinished)
-                            getBackupFileList()
-                        }.last()
+                val notesResult = databaseRepository.getNoteList(Constants.UPDATED_AT, Constants.DESCENDING).first()
+                val notes = notesResult.getOrDefault(listOf())
+                val tags = tagRepository.getAllTags().first().getOrDefault(emptyList())
+                val noteTags = databaseProxy.tagDao().getAllNoteTagCrossRefs()
+                val payload = BackupPayload(
+                    version = 1,
+                    notes = notes,
+                    tags = tags,
+                    noteTags = noteTags
+                )
+                repository.uploadDatabaseFile(
+                    payload,
+                    getDatabaseNameWithTimestamps(),
+                    drive
+                ).onEach { result ->
+                    if (result.isSuccess) {
+                        // Clean up old backups first (seamlessly)
+                        cleanupOldBackups(drive)
+
+                        // Then update UI state and fetch final list
+                        _uiState.value = _uiState.value.copy(fileBackupState = FileBackupState.SyncFinished)
+                        getBackupFileList()
+                    } else {
+                        val errorMessage = result.exceptionOrNull()?.message ?: Constants.EMPTY_STRING
+                        _uiState.value = _uiState.value.copy(fileBackupState = FileBackupState.SyncFailed(errorMessage))
                     }
+                }.first()
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
-                _uiState.value = currentState.copy(fileBackupState = FileBackupState.SyncFailed(errorMessage))
+                _uiState.value = _uiState.value.copy(fileBackupState = FileBackupState.SyncFailed(errorMessage))
             }
         }
     }
 
     override fun restoreDatabase(fileId: String) {
         viewModelScope.launch {
-            val currentState = _uiState.value.copy(fileRestoreState = FileRestoreState.SyncStarted)
-            _uiState.value = currentState
+            _uiState.value = _uiState.value.copy(fileRestoreState = FileRestoreState.SyncStarted)
 
             try {
                 val drive = getDriveInstance()
                 repository.restoreDatabaseFile(fileId, drive)
-                    .onEach {
-                        _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFinished)
+                    .onEach { result ->
+                        result.fold(
+                            onSuccess = {
+                                _uiState.value = _uiState.value.copy(fileRestoreState = FileRestoreState.SyncFinished)
+                            },
+                            onFailure = { e ->
+                                val errorMessage = e.message ?: Constants.EMPTY_STRING
+                                _uiState.value = _uiState.value.copy(fileRestoreState = FileRestoreState.SyncFailed(errorMessage))
+                            }
+                        )
                     }.last()
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
-                _uiState.value = currentState.copy(fileRestoreState = FileRestoreState.SyncFailed(errorMessage))
+                _uiState.value = _uiState.value.copy(fileRestoreState = FileRestoreState.SyncFailed(errorMessage))
             }
         }
     }
 
     override fun getBackupFileList() {
         viewModelScope.launch {
-            val currentState = _uiState.value.copy(listOfBackupFileState = FileBackupListState.FileBackupListStarted)
-            _uiState.value = currentState
+            _uiState.value = _uiState.value.copy(listOfBackupFileState = FileBackupListState.FileBackupListStarted)
 
             try {
                 val drive = getDriveInstance()
                 repository.getBackupFileList(drive).collect { result ->
-                    _uiState.value = currentState.copy(listOfBackupFileState = FileBackupListState.FileBackupListFinished)
                     if (result.isSuccess) {
                         val files = result.getOrNull()
                         _driveBackupFileList.value = files ?: emptyList()
+                        _uiState.value = _uiState.value.copy(listOfBackupFileState = FileBackupListState.FileBackupListFinished)
                     } else {
                         val errorMessage = result.exceptionOrNull()?.message ?: Constants.EMPTY_STRING
-                        _uiState.value = currentState.copy(
+                        _uiState.value = _uiState.value.copy(
                             listOfBackupFileState = FileBackupListState.FileBackupListFailed(
                                 errorMessage
-                            ))
+                            )
+                        )
                     }
                 }
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
-                _uiState.value = currentState.copy(
+                _uiState.value = _uiState.value.copy(
                     listOfBackupFileState = FileBackupListState.FileBackupListFailed(
                         errorMessage
-                    ))
+                    )
+                )
             }
         }
     }
 
     override fun deleteDatabase(fileId: String) {
         viewModelScope.launch {
-            val currentState = _uiState.value.copy(fileDeleteState = FileDeleteState.SyncStarted)
-            _uiState.value = currentState
+            _uiState.value = _uiState.value.copy(fileDeleteState = FileDeleteState.SyncStarted)
 
             try {
                 val drive = getDriveInstance()
                 repository.deleteFile(fileId, drive)
-                    .onEach {
-                        _uiState.value = currentState.copy(fileDeleteState = FileDeleteState.SyncFinished)
+                    .onEach { result ->
+                        if (result.isSuccess) {
+                            // Optimistically remove from local list for instant seamless UI update
+                            _driveBackupFileList.value = _driveBackupFileList.value?.filter { it.id != fileId } ?: emptyList()
+                            _uiState.value = _uiState.value.copy(fileDeleteState = FileDeleteState.SyncFinished)
+                            getBackupFileList()
+                        } else {
+                            val errorMessage = result.exceptionOrNull()?.message ?: Constants.EMPTY_STRING
+                            _uiState.value = _uiState.value.copy(fileDeleteState = FileDeleteState.SyncFailed(errorMessage))
+                        }
                     }.last()
             } catch (e: Exception) {
                 val errorMessage = e.message ?: Constants.EMPTY_STRING
-                _uiState.value = currentState.copy(fileDeleteState = FileDeleteState.SyncFailed(errorMessage))
+                _uiState.value = _uiState.value.copy(fileDeleteState = FileDeleteState.SyncFailed(errorMessage))
             }
         }
     }
@@ -141,7 +173,7 @@ class BackupPageVM @Inject constructor(
         )
     }
 
-    private fun getDriveInstance(): Drive? {
+    open fun getDriveInstance(): Drive? {
         return GoogleSignIn.getLastSignedInAccount(app.applicationContext)?.run {
             DriveAPI.getInstance(app.applicationContext, this)
         }

@@ -108,7 +108,9 @@ class MainActivity : ComponentActivity() {
 
                 // Check for updates automatically on startup without blocking initial frame
                 LaunchedEffect(Unit) {
-                    checkUpdate(isManual = false)
+                    if (!isTesting()) {
+                        checkUpdate(isManual = false)
+                    }
                 }
 
                 Surface(
@@ -121,6 +123,10 @@ class MainActivity : ComponentActivity() {
                         onError = {},
                         onBackupPressed = {
                             navigationActions.navigateToBackupPage()
+                        },
+                        onTagsPressed = {
+                            navigationActions.navigateToTagManagerPage()
+                            coroutineScope.launch { drawerState.close() }
                         },
                         onUpdateCheckPressed = {
                             checkUpdate(isManual = true)
@@ -202,6 +208,7 @@ class MainActivity : ComponentActivity() {
      */
     override fun onResume() {
         super.onResume()
+        if (isTesting()) return
 
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo != null) {
@@ -239,5 +246,14 @@ class MainActivity : ComponentActivity() {
     private fun clearIntent() {
         intent?.removeExtra("noteId")
         intent?.removeExtra("action_create")
+    }
+
+    private fun isTesting(): Boolean {
+        return try {
+            Class.forName("androidx.test.espresso.Espresso")
+            true
+        } catch (_: ClassNotFoundException) {
+            false
+        }
     }
 }

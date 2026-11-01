@@ -22,6 +22,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.TimeZone
 import javax.inject.Inject
 
@@ -48,6 +49,12 @@ class SharePreviewFeature : BaseAcceptanceTest() {
         val testDate = sdf.parse("2026-02-19T10:00:00Z")!!
 
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
+            val existingNotes = databaseProxy.dao().getSyncNotes()
+            if (existingNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*existingNotes.toTypedArray())
+            }
             databaseProxy.dao().upsertNotes(listOf(
                 NoteModel(1, "Test Title", "Test Note Content", testDate, testDate)
             ))
@@ -75,6 +82,8 @@ class SharePreviewFeature : BaseAcceptanceTest() {
     @After
     fun tearDown() {
         runBlocking {
+            databaseProxy.tagDao().clearAllNoteTagCrossRefs()
+            databaseProxy.tagDao().clearAllTags()
             val allNotes = databaseProxy.dao().getSyncNotes()
             if (allNotes.isNotEmpty()) {
                 databaseProxy.dao().deleteNotes(*allNotes.toTypedArray())
@@ -129,5 +138,41 @@ class SharePreviewFeature : BaseAcceptanceTest() {
         // Using System Back via NavController or Hardware back
         composeTestRule.onNodeWithTag(TestTags.BACK_ICON_BUTTON).performClick()
         composeTestRule.onNodeWithTag(TestTags.NOTE_DETAIL_PAGE).assertIsDisplayed()
+    }
+
+    @Test
+    fun untitledMarkdownNote_rendersUntitledAndParsedRichText() {
+        // Navigate back to NotesPage and seed an untitled markdown note
+        composeTestRule.onNodeWithTag(TestTags.BACK_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(TestTags.BACK_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        runBlocking {
+            val existingNotes = databaseProxy.dao().getSyncNotes()
+            if (existingNotes.isNotEmpty()) {
+                databaseProxy.dao().deleteNotes(*existingNotes.toTypedArray())
+            }
+            databaseProxy.dao().upsertNotes(listOf(
+                NoteModel(2, "", "**Formatted Share Content**", Date(), Date())
+            ))
+        }
+
+        composeTestRule.waitUntil(10000) {
+            try {
+                composeTestRule.onNodeWithText("Untitled").assertIsDisplayed()
+                true
+            } catch (_: Throwable) {
+                false
+            }
+        }
+
+        composeTestRule.onNodeWithText("Untitled").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(TestTags.SHARE_ICON_BUTTON).performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(TestTags.TITLE_TEXT).assertTextContains("Untitled")
+        composeTestRule.onNodeWithTag(TestTags.BODY_TEXT).assertTextContains("Formatted Share Content")
     }
 }
